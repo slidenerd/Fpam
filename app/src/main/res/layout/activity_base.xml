@@ -27,13 +27,11 @@
         </android.support.design.widget.AppBarLayout>
     </android.support.design.widget.CoordinatorLayout>
 
-    <fragment
-        android:id="@+id/main_drawer"
-        class="slidenerd.vivz.fpam.FragmentDrawer_"
+    <FrameLayout
+        android:id="@+id/drawer_frame_layout"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:tag="@string/fragment_drawer_tag"
-        tools:layout="@layout/fragment_drawer" />
+        android:tag="@string/fragment_drawer_tag" />
 
 </android.support.v4.widget.DrawerLayout>

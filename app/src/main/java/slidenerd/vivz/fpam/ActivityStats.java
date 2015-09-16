@@ -8,7 +8,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 
-import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsMenu;
 
@@ -26,10 +25,6 @@ public class ActivityStats extends ActivityBase implements SwipeRefreshLayout.On
         super.onCreate(savedInstanceState);
         mRefreshFeed = (SwipeRefreshLayout) findViewById(R.id.refresh_feed);
         mRecyclerFeed = (RecyclerView) findViewById(R.id.recycler_feed);
-        initUI();
-    }
-
-    void initUI() {
         mRecyclerFeed.setLayoutManager(new LinearLayoutManager(this));
         mRefreshFeed.setOnRefreshListener(this);
     }

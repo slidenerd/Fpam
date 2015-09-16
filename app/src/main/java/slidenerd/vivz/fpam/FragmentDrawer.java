@@ -4,9 +4,15 @@ package slidenerd.vivz.fpam;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +26,7 @@ import com.facebook.login.LoginManager;
 
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import java.util.ArrayList;
 
@@ -28,6 +35,7 @@ import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.admin.FBAdmin;
 import slidenerd.vivz.fpam.model.json.group.FBGroup;
+import slidenerd.vivz.fpam.prefs.MyPrefs_;
 import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
@@ -41,6 +49,8 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     The item from the Drawer previously selected by the user. If the user has not selected anything previously, this defaults to the first item in the drawer
      */
     private static final int MENU_START_ID = 101;
+    @Pref
+    MyPrefs_ mSharedPreferences;
     @InstanceState
     int mSelectedId = 0;
     @InstanceState
@@ -50,6 +60,11 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
      */
     @InstanceState
     ArrayList<FBGroup> mListGroups = new ArrayList<>();
+    private DrawerLayout mDrawerLayout;
+    /*
+    The Drawer Listener responsible for providing a handy way to tie together the functionality of DrawerLayout and the framework ActionBar to implement the recommended design for navigation drawers.
+     */
+    private ActionBarDrawerToggle mDrawerToggle;
     private NavigationView mDrawer;
     private Context context;
     private ActivityBase activityBase;
@@ -73,6 +88,16 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
         this.activityBase = (ActivityBase) activity;
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        realm = Realm.getInstance(context);
+        if (savedInstanceState == null) {
+            mAdmin = DataStore.loadAdmin(context);
+            mListGroups = DataStore.loadGroups(realm, context);
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -82,22 +107,34 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        realm = Realm.getInstance(context);
-        mDrawer = (NavigationView) view.findViewById(R.id.main_drawer);
+        mDrawer = (NavigationView) view.findViewById(R.id.drawer_frame_layout);
         mDrawer.setNavigationItemSelectedListener(this);
-        if (savedInstanceState == null) {
-            mAdmin = DataStore.loadAdmin(context);
-            mListGroups = DataStore.loadGroups(realm, context);
-        }
         if (mAdmin != null) {
             addHeaderToDrawer(mAdmin);
         }
         addGroupsToDrawer(mListGroups);
     }
 
+    void initDrawer(Toolbar toolbar, DrawerLayout drawerLayout) {
+        mDrawerLayout = drawerLayout;
+        mDrawerToggle = new ActionBarDrawerToggle(activityBase,
+                mDrawerLayout,
+                toolbar,
+                R.string.drawer_open,
+                R.string.drawer_close);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerToggle.syncState();
+    }
+
     @Override
     public void onResume() {
         super.onResume();
+        if (!didUserSeeDrawer()) {
+            showDrawer();
+            markDrawerSeen();
+        } else {
+            hideDrawer();
+        }
         navigate();
     }
 
@@ -107,7 +144,7 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
      * @param admin
      */
 
-    public void addHeaderToDrawer(FBAdmin admin) {
+    public void addHeaderToDrawer(@NonNull FBAdmin admin) {
         View headerView = mDrawer.inflateHeaderView(R.layout.drawer_header);
         TextView textUser = (TextView) headerView.findViewById(R.id.text_user);
         textUser.setText(admin.getFirstName() + " " + admin.getLastName());
@@ -137,6 +174,14 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
         mi.setTitle(mi.getTitle());
     }
 
+    private boolean didUserSeeDrawer() {
+        return mSharedPreferences.firstTime().get() == true;
+    }
+
+    private void markDrawerSeen() {
+        mSharedPreferences.edit().firstTime().put(true).apply();
+    }
+
     /**
      * @return true if a non zero number of groups were retrieved for the currently logged in user , else false
      */
@@ -144,13 +189,37 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
         return !mListGroups.isEmpty() ? true : false;
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    void showDrawer() {
+        mDrawerLayout.openDrawer(GravityCompat.START);
+    }
+
+    void hideDrawer() {
+        mDrawerLayout.closeDrawer(GravityCompat.START);
+    }
+
+    public boolean onBackPressed() {
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            hideDrawer();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
     /**
      * The dynamic ID assigned to each group while adding it to the Navigation Drawer. If we have a non zero number of groups, we need to find the position of a group within the List. The dynamic ID starts from a number like 101 and hence if there are 4 groups currently present, their IDS would be 101, 102, 103, 104. If the third group is selected by the user currently from the Navigation Drawer, we get the selected ID as 103.The position of the group with ID 103 is simply calculated as the difference between the selected ID 103 and start ID 101 which turns out to be 2. We check whether the position obtained in the above step is truly within the range of the List before extracting it as an additional measure of precaution.
      *
      * @return the group object corresponding to the id selected by the user.
      */
     @Nullable
-    FBGroup getSelectedGroup() {
+    public FBGroup getSelectedGroup() {
         FBGroup group = null;
         if (hasGroups()) {
             int position = mSelectedId - MENU_START_ID;
@@ -167,24 +236,30 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     }
 
     boolean navigate() {
-        if (mSelectedId == R.id.menu_settings) {
-
-        } else if (mSelectedId == R.id.menu_logout) {
-            logout();
-            NavUtils.startActivityLogin(context);
-            getActivity().finish();
-            activityBase.hideDrawer();
-        } else {
-            FBGroup group = getSelectedGroup();
-            if (group != null) {
-                activityBase.setTitle(group.getName());
-            }
-            AccessToken accessToken = FpamApplication.getFacebookAccessToken();
-            if (FBUtils.isValidToken(accessToken)) {
-                activityBase.loadFeedAsync(FpamApplication.getFacebookAccessToken(), group);
-            } else {
-                L.m("Did not find a good access token from fragment drawer");
-            }
+        switch (mSelectedId) {
+            case R.id.menu_settings:
+                break;
+            case R.id.menu_logout:
+                logout();
+                NavUtils.startActivityLogin(context);
+                activityBase.finish();
+                hideDrawer();
+                break;
+            default:
+                FBGroup group = getSelectedGroup();
+                if (group != null) {
+                    activityBase.setTitle(group.getName());
+                }
+                AccessToken accessToken = FpamApplication.getFacebookAccessToken();
+                if (FBUtils.isValidToken(accessToken)) {
+                    activityBase.loadFeedAsync(FpamApplication.getFacebookAccessToken(), group);
+                } else {
+                    L.m("Did not find a good access token from fragment drawer");
+                }
+                if (mSelectedId != 0) {
+                    hideDrawer();
+                }
+                break;
         }
         return true;
     }
