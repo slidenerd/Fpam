@@ -53,6 +53,10 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     MyPrefs_ mSharedPreferences;
     @InstanceState
     int mSelectedId = 0;
+
+    @InstanceState
+    long mLastSelectedGroupId = 0;
+
     @InstanceState
     FBAdmin mAdmin;
     /*
@@ -130,10 +134,8 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     public void onResume() {
         super.onResume();
         if (!didUserSeeDrawer()) {
-            showDrawer();
+            show();
             markDrawerSeen();
-        } else {
-            hideDrawer();
         }
         navigate();
     }
@@ -195,23 +197,68 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
-    void showDrawer() {
+    void show() {
         mDrawerLayout.openDrawer(GravityCompat.START);
     }
 
-    void hideDrawer() {
+    void hide() {
         mDrawerLayout.closeDrawer(GravityCompat.START);
     }
 
     public boolean onBackPressed() {
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-            hideDrawer();
+            hide();
+            //return true to indicate that back press was handled here by the drawer itself
             return true;
         } else {
+            //return false to indicate the activity must handle the back press event
             return false;
         }
     }
 
+    @Override
+    public boolean onNavigationItemSelected(MenuItem menuItem) {
+        menuItem.setChecked(true);
+        mSelectedId = menuItem.getItemId();
+        return navigate();
+    }
+
+    boolean navigate() {
+        switch (mSelectedId) {
+            case R.id.menu_settings:
+                hide();
+                break;
+            case R.id.menu_logout:
+                logout();
+                hide();
+                NavUtils.startActivityLogin(context);
+                activityBase.finish();
+                break;
+            default:
+                FBGroup group = getSelectedGroup();
+                if (group != null && mLastSelectedGroupId != group.getId()) {
+                    activityBase.setTitle(group.getName());
+                    AccessToken accessToken = FpamApplication.getFacebookAccessToken();
+                    if (FBUtils.isValidToken(accessToken)) {
+                        activityBase.loadFeedAsync(FpamApplication.getFacebookAccessToken(), group);
+                    } else {
+                        L.m("Did not find a good access token from fragment drawer");
+                    }
+                    mLastSelectedGroupId = group.getId();
+                }
+                //If the selected id is not the default one, then hide the drawer. It is default if the user has not selected anything previously and sees the drawer for the first time.
+                if (mSelectedId != 0) {
+                    hide();
+                }
+                break;
+        }
+        return true;
+    }
+
+    private void logout() {
+        LoginManager loginManager = LoginManager.getInstance();
+        loginManager.logOut();
+    }
 
     /**
      * The dynamic ID assigned to each group while adding it to the Navigation Drawer. If we have a non zero number of groups, we need to find the position of a group within the List. The dynamic ID starts from a number like 101 and hence if there are 4 groups currently present, their IDS would be 101, 102, 103, 104. If the third group is selected by the user currently from the Navigation Drawer, we get the selected ID as 103.The position of the group with ID 103 is simply calculated as the difference between the selected ID 103 and start ID 101 which turns out to be 2. We check whether the position obtained in the above step is truly within the range of the List before extracting it as an additional measure of precaution.
@@ -223,52 +270,12 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
         FBGroup group = null;
         if (hasGroups()) {
             int position = mSelectedId - MENU_START_ID;
+            //if we have a valid position between 0 to number of items in the list, then retrieve the item at that position
             if (position < mListGroups.size() && position >= 0) {
                 group = mListGroups.get(position);
             }
         }
         return group;
-    }
-
-    private void logout() {
-        LoginManager loginManager = LoginManager.getInstance();
-        loginManager.logOut();
-    }
-
-    boolean navigate() {
-        switch (mSelectedId) {
-            case R.id.menu_settings:
-                break;
-            case R.id.menu_logout:
-                logout();
-                hideDrawer();
-                NavUtils.startActivityLogin(context);
-                activityBase.finish();
-                break;
-            default:
-                FBGroup group = getSelectedGroup();
-                if (group != null) {
-                    activityBase.setTitle(group.getName());
-                }
-                AccessToken accessToken = FpamApplication.getFacebookAccessToken();
-                if (FBUtils.isValidToken(accessToken)) {
-                    activityBase.loadFeedAsync(FpamApplication.getFacebookAccessToken(), group);
-                } else {
-                    L.m("Did not find a good access token from fragment drawer");
-                }
-                if (mSelectedId != 0) {
-                    hideDrawer();
-                }
-                break;
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(MenuItem menuItem) {
-        menuItem.setChecked(true);
-        mSelectedId = menuItem.getItemId();
-        return navigate();
     }
 
     @Override

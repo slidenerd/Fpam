@@ -3,6 +3,7 @@ package slidenerd.vivz.fpam;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -48,7 +49,7 @@ public abstract class ActivityBase extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
-        //call this method first to prevent crashes in the sub activities that implement this activity
+
         initChildActivityLayout();
         //if we dont have a valid access token or its null, redirect the person back to login screen
         AccessToken accessToken = FpamApplication.getFacebookAccessToken();
@@ -60,6 +61,7 @@ public abstract class ActivityBase extends AppCompatActivity {
         //The statements below wont be run if access token is null or invalid
         mToolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(mToolbar);
+        //If the drawer is created in XML, it runs code inside its onCreate, onCreateView, onViewCreated even before redirectToLogin is triggered executing unnecessary code. Rather create the drawer in code, and replace it everytime the Activity is started after a rotation.
         if (savedInstanceState == null) {
             mDrawer = new FragmentDrawer_();
         } else {
@@ -67,31 +69,31 @@ public abstract class ActivityBase extends AppCompatActivity {
         }
         getFragmentManager().beginTransaction().replace(R.id.drawer_frame_layout, mDrawer, "fragment_drawer").commit();
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        //Calling initDrawer inside the onCreate, results in a situation where the onCreate, onCreateView and onViewCreated of FragmentDrawer are not yet executed and the drawer does not associate properly with the DrawerLayout. Call this method here so that onCreate, onCreateView, onViewCreated are first executed and then this method runs inside the FragmentDrawer.
         mDrawer.initDrawer(mToolbar, mDrawerLayout);
     }
 
+    /**
+     * call this method before calling redirectToLogin to prevent crashes in the sub activities that implement this activity
+     */
     private void initChildActivityLayout() {
+        /**
+         * The ViewStub into which the actual layout of the subclasses implementing this Activity is loaded. Each subclass Activity is expected to have a simple container or Layout and specify its id and layout resource file name when they implement this Activity. This needs to be done regardless of whether the Activity starts for the first time or starts after a subsequent rotation.
+         */
         mMainContent = (ViewStub) findViewById(R.id.main_content);
         mMainContent.setInflatedId(getRootViewId());
         mMainContent.setLayoutResource(getLayoutForActivity());
         mMainContent.inflate();
     }
 
-    /**
-     * The ViewStub into which the actual layout of the subclasses implementing this Activity is loaded. Each subclass Activity is expected to have a simple container or Layout and specify its id and layout resource file name when they implement this Activity. This needs to be done regardless of whether the Activity starts for the first time or starts after a subsequent rotation. First initialize the Toolbar that represents our Action Bar. Initialize our Navigation Drawer and configure it. Decide whether we need to show the drawer or not. Check if the user selected an item previously from the drawer, if yes set that item to be the currently selected item inside the drawer, otherwise let the currently selected item be 'Settings'
-     */
-
 
     @Background
-    void loadFeedAsync(AccessToken accessToken, FBGroup group) {
-        if (group == null)
-            return;
+    void loadFeedAsync(AccessToken accessToken, @NonNull FBGroup group) {
         ArrayList<FBGroup> listGroups = new ArrayList<>();
         ArrayList<FBPost> listPosts = new ArrayList<>();
         listGroups.add(group);
@@ -100,12 +102,11 @@ public abstract class ActivityBase extends AppCompatActivity {
         } catch (JSONException e) {
             L.m("" + e);
         }
-        onFeedLoaded(listPosts);
+        onFeedLoaded(group, listPosts);
     }
 
     @UiThread
-    void onFeedLoaded(ArrayList<FBPost> listPosts) {
-        FBGroup group = mDrawer.getSelectedGroup();
+    void onFeedLoaded(FBGroup group, ArrayList<FBPost> listPosts) {
         String data = group.getName() + "\n" + listPosts.toString();
         DiskUtils.writeToCache(ActivityBase.this, data);
     }
