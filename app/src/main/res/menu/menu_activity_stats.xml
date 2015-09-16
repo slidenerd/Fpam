@@ -1,0 +1,26 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="slidenerd.vivz.fpam.ActivityStats">
+    <item
+        android:id="@+id/action_cache"
+        android:orderInCategory="200"
+        android:title="@string/action_cache"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="300"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_test"
+        android:orderInCategory="300"
+        android:title="@string/title_activity_test1"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_test2"
+        android:orderInCategory="300"
+        android:title="@string/title_activity_test2"
+        app:showAsAction="never" />
+
+</menu>

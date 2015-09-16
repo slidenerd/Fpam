@@ -1,0 +1,51 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- A 'parent' preference, which enables/disables child preferences (below)
+         when checked/unchecked. -->
+    <PreferenceCategory android:title="@string/pref_category_allow_posts">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/key_no_text"
+            android:summaryOff="@string/pref_summary_off_empty_posts"
+            android:summaryOn="@string/pref_summary_on_empty_posts"
+            android:title="@string/text_no_text" />
+
+        <!-- Allows the user to choose a ringtone in the 'notification' category. -->
+        <!-- NOTE: This preference will be enabled only when the checkbox above is checked. -->
+        <!-- NOTE: RingtonePreference's summary should be set to its value by the activity code. -->
+        <slidenerd.vivz.fpam.widget.ListPreferenceWithSummary
+            android:defaultValue="1"
+            android:dialogTitle="@string/dialog_title_links"
+            android:entries="@array/three_choices"
+            android:entryValues="@array/three_choices_values"
+            android:key="@string/key_choice_links"
+            android:title="@string/text_links" />
+
+        <!-- NOTE: This preference will be enabled only when the checkbox above is checked. -->
+        <slidenerd.vivz.fpam.widget.ListPreferenceWithSummary
+            android:defaultValue="1"
+            android:dialogTitle="@string/dialog_title_images"
+            android:entries="@array/three_choices"
+            android:entryValues="@array/three_choices_values"
+            android:key="@string/key_choice_images"
+            android:title="@string/text_images" />
+        <slidenerd.vivz.fpam.widget.ListPreferenceWithSummary
+            android:defaultValue="1"
+            android:dialogTitle="@string/dialog_title_attachments"
+            android:entries="@array/three_choices"
+            android:entryValues="@array/three_choices_values"
+            android:key="@string/key_choice_attachments"
+            android:title="@string/text_attachments" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/category_duplicates">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/key_delete_duplicates"
+            android:title="@string/text_delete_duplicates" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:dependency="@string/key_delete_duplicates"
+            android:key="@string/key_block_user"
+            android:title="@string/text_block_user" />
+    </PreferenceCategory>
+</PreferenceScreen>

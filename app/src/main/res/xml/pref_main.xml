@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <slidenerd.vivz.fpam.widget.ListPreferenceWithSummary
+        android:defaultValue="120"
+        android:dialogTitle="@string/pref_dialog_title_frequency"
+        android:entries="@array/pref_scan_frequency_titles"
+        android:entryValues="@array/pref_scan_frequency_values"
+        android:key="@string/key_scan_frequency"
+        android:title="@string/pref_header_scan" />
+    <slidenerd.vivz.fpam.widget.MultiGroupsSelectPreference
+        android:key="@string/key_groups"
+        android:summary="@string/pref_summary_groups"
+        android:title="@string/pref_title_groups" />
+    <Preference
+        android:key="@string/key_posts"
+        android:summary="@string/pref_summary_posts"
+        android:title="@string/pref_header_posts" />
+    <Preference
+        android:key="@string/key_spam"
+        android:summary="@string/pref_summary_spam"
+        android:title="@string/pref_header_spam" />
+</PreferenceScreen>
