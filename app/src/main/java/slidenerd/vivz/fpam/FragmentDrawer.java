@@ -241,9 +241,9 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
                 break;
             case R.id.menu_logout:
                 logout();
+                hideDrawer();
                 NavUtils.startActivityLogin(context);
                 activityBase.finish();
-                hideDrawer();
                 break;
             default:
                 FBGroup group = getSelectedGroup();
