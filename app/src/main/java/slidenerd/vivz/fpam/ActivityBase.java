@@ -36,7 +36,6 @@ import slidenerd.vivz.fpam.util.NavUtils;
 @EActivity
 public abstract class ActivityBase extends AppCompatActivity {
 
-
     @Pref
     MyPrefs_ mSharedPreferences;
     private FragmentDrawer mDrawer;
@@ -47,10 +46,6 @@ public abstract class ActivityBase extends AppCompatActivity {
     The Drawer Listener responsible for providing a handy way to tie together the functionality of DrawerLayout and the framework ActionBar to implement the recommended design for navigation drawers.
      */
     private ActionBarDrawerToggle mDrawerToggle;
-    /*
-    A variable indicating whether the user has seen the drawer before. If the user has launched this app for the very first time, we want to open the drawer and show them its existence but if the user has started the app more than once, we keep the drawer closed.
-     */
-    private boolean mUserSawDrawer = false;
 
     /**
      * Get a reference to our access token. If its not valid, then let the user login once again through the Login screen.
@@ -90,6 +85,11 @@ public abstract class ActivityBase extends AppCompatActivity {
                 R.string.drawer_close);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         if (!didUserSeeDrawer()) {
             showDrawer();
             markDrawerSeen();
@@ -127,12 +127,10 @@ public abstract class ActivityBase extends AppCompatActivity {
     }
 
     private boolean didUserSeeDrawer() {
-        mUserSawDrawer = mSharedPreferences.firstTime().get();
-        return mUserSawDrawer;
+        return mSharedPreferences.firstTime().get() == true;
     }
 
     private void markDrawerSeen() {
-        mUserSawDrawer = true;
         mSharedPreferences.edit().firstTime().put(true).apply();
     }
 

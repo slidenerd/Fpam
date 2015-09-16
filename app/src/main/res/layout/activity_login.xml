@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_margin="32dp"
-        android:background="@drawable/com_facebook_button_background"
+        android:background="@color/colorPrimary"
         android:drawableLeft="@drawable/com_facebook_button_icon"
         android:fontFamily="sans-serif-light"
         android:text="Login With Facebook"
