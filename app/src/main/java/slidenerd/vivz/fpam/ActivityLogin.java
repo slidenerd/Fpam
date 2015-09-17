@@ -12,6 +12,7 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.google.gson.Gson;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
@@ -29,39 +30,17 @@ import java.util.Set;
 import io.realm.Realm;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.admin.FBAdmin;
-import slidenerd.vivz.fpam.model.json.group.FBGroup;
+import slidenerd.vivz.fpam.model.json.admin.Admin;
+import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
 @EActivity(R.layout.activity_login)
 @OptionsMenu(R.menu.menu_activity_login)
-public class ActivityLogin extends AppCompatActivity {
+public class ActivityLogin extends AppCompatActivity implements FacebookCallback<LoginResult> {
     private CallbackManager mCallbackManager;
     private AlertDialog mDialog;
     private Realm realm;
-
-    /**
-     * This callback is invoked when the user has hit the login button and successfully logged in Facebook. The user is given an AccessToken which should not be null anymore. If the access token is valid, load the user profile and groups data in a background Async Task.
-     */
-    private FacebookCallback<LoginResult> mFacebookCallback = new FacebookCallback<LoginResult>() {
-        @Override
-        public void onSuccess(LoginResult loginResult) {
-            AccessToken accessToken = loginResult.getAccessToken();
-            showDialogJustifyingPermissions(accessToken);
-        }
-
-        @Override
-        public void onCancel() {
-            L.m("You cancelled while logging in");
-        }
-
-        @Override
-        public void onError(FacebookException e) {
-            L.t(ActivityLogin.this, "Facebook Servers couldn't connect to Fpam " + e);
-        }
-    };
-
 
     private void showDialogJustifyingPermissions(AccessToken accessToken) {
         Set<String> setDeclinedPermissions = accessToken.getDeclinedPermissions();
@@ -87,21 +66,22 @@ public class ActivityLogin extends AppCompatActivity {
             }
         } else {
             if (FBUtils.isValidToken(accessToken)) {
-                loadUserAndGroups(accessToken);
+                Gson gson = FpamApplication.getGson();
+                loadUserAndGroups(accessToken, gson);
             }
         }
     }
 
     @Background
-    void loadUserAndGroups(AccessToken accessToken) {
-        FBAdmin admin = null;
-        ArrayList<FBGroup> listGroups = new ArrayList<>();
+    void loadUserAndGroups(AccessToken accessToken, Gson gson) {
+        Admin admin = null;
+        ArrayList<Group> listGroups = new ArrayList<>();
         try {
-            admin = FBUtils.requestMeSync(accessToken);
-            listGroups = FBUtils.requestGroupsSync(accessToken);
-            Collections.sort(listGroups, new Comparator<FBGroup>() {
+            admin = FBUtils.requestMeSync(accessToken, gson);
+            listGroups = FBUtils.requestGroupsSync(accessToken, gson);
+            Collections.sort(listGroups, new Comparator<Group>() {
                 @Override
-                public int compare(FBGroup lhs, FBGroup rhs) {
+                public int compare(Group lhs, Group rhs) {
                     return lhs.getName().toLowerCase().compareTo(rhs.getName().toLowerCase());
                 }
             });
@@ -113,7 +93,7 @@ public class ActivityLogin extends AppCompatActivity {
     }
 
     @UiThread
-    void storeUserAndGroups(FBAdmin admin, ArrayList<FBGroup> listGroups) {
+    void storeUserAndGroups(Admin admin, ArrayList<Group> listGroups) {
         DataStore.storeAdmin(this, admin);
         DataStore.storeGroups(realm, this, listGroups);
         NavUtils.startActivityStats(ActivityLogin.this);
@@ -137,7 +117,7 @@ public class ActivityLogin extends AppCompatActivity {
 
     private void setupLoginManager() {
         LoginManager loginManager = LoginManager.getInstance();
-        loginManager.registerCallback(mCallbackManager, mFacebookCallback);
+        loginManager.registerCallback(mCallbackManager, this);
         loginManager.logInWithReadPermissions(this, Arrays.asList("email", "user_managed_groups", "user_friends"));
     }
 
@@ -152,5 +132,21 @@ public class ActivityLogin extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         realm.close();
+    }
+
+    @Override
+    public void onSuccess(LoginResult loginResult) {
+        AccessToken accessToken = loginResult.getAccessToken();
+        showDialogJustifyingPermissions(accessToken);
+    }
+
+    @Override
+    public void onCancel() {
+        L.m("You cancelled while logging in");
+    }
+
+    @Override
+    public void onError(FacebookException e) {
+        L.t(ActivityLogin.this, "Facebook Servers couldn't connect to Fpam " + e);
     }
 }

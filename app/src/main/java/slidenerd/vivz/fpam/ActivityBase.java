@@ -19,10 +19,11 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.feed.FBPost;
-import slidenerd.vivz.fpam.model.json.group.FBGroup;
-import slidenerd.vivz.fpam.util.DiskUtils;
+import slidenerd.vivz.fpam.model.json.feed.Post;
+import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.realm.RealmPost;
 import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
@@ -36,6 +37,7 @@ public abstract class ActivityBase extends AppCompatActivity {
     private ViewStub mMainContent;
     private Toolbar mToolbar;
     private DrawerLayout mDrawerLayout;
+    private Realm mRealm;
 
     /**
      * Get a reference to our access token. If its not valid, then let the user login once again through the Login screen.
@@ -49,7 +51,7 @@ public abstract class ActivityBase extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
-
+        mRealm = Realm.getDefaultInstance();
         initChildActivityLayout();
         //if we dont have a valid access token or its null, redirect the person back to login screen
         AccessToken accessToken = FpamApplication.getFacebookAccessToken();
@@ -93,22 +95,33 @@ public abstract class ActivityBase extends AppCompatActivity {
 
 
     @Background
-    void loadFeedAsync(AccessToken accessToken, @NonNull FBGroup group) {
-        ArrayList<FBGroup> listGroups = new ArrayList<>();
-        ArrayList<FBPost> listPosts = new ArrayList<>();
-        listGroups.add(group);
+    void loadFeedAsync(AccessToken accessToken, @NonNull Group group) {
         try {
-            listPosts = FBUtils.requestFeedSync(accessToken, listGroups);
+            ArrayList<Post> listPosts = FBUtils.requestFeedSync(accessToken, FpamApplication.getGson(), group);
+            onFeedLoaded(group, listPosts);
         } catch (JSONException e) {
             L.m("" + e);
         }
-        onFeedLoaded(group, listPosts);
     }
 
     @UiThread
-    void onFeedLoaded(FBGroup group, ArrayList<FBPost> listPosts) {
+    void onFeedLoaded(Group group, ArrayList<Post> listPosts) {
         String data = group.getName() + "\n" + listPosts.toString();
-        DiskUtils.writeToCache(ActivityBase.this, data);
+        ArrayList<RealmPost> listRealmPosts = new ArrayList<>(listPosts.size());
+        for (Post post : listPosts) {
+            RealmPost realmPost = new RealmPost();
+            realmPost.setId(post.getId());
+            realmPost.setName(post.getName());
+            realmPost.setCaption(post.getCaption());
+            realmPost.setDescription(post.getDescription());
+            realmPost.setLink(post.getLink());
+            realmPost.setType(post.getType());
+            realmPost.setUpdatedTime(post.getUpdatedTime());
+            listRealmPosts.add(realmPost);
+        }
+        mRealm.beginTransaction();
+        mRealm.copyToRealmOrUpdate(listRealmPosts);
+        mRealm.commitTransaction();
     }
 
     @Override
@@ -116,6 +129,12 @@ public abstract class ActivityBase extends AppCompatActivity {
         if (!mDrawer.onBackPressed()) {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mRealm.close();
     }
 
     /**

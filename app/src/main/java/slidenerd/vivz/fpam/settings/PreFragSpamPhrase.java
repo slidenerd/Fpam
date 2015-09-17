@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 import io.realm.Realm;
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.adapter.SpamPhraseAdapter;
+import slidenerd.vivz.fpam.adapter.PhraseAdapter;
 import slidenerd.vivz.fpam.adapter.SwipeDragHelper;
 
 /**
@@ -26,7 +26,7 @@ import slidenerd.vivz.fpam.adapter.SwipeDragHelper;
  */
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class PreFragSpamPhrase extends Fragment {
-    private SpamPhraseAdapter mAdapter;
+    private PhraseAdapter mAdapter;
     private RecyclerView mRecyclerSpamPhrases;
     private Context mContext;
     private Realm realm;
@@ -59,7 +59,7 @@ public class PreFragSpamPhrase extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         TextView emptyView = (TextView) view.findViewById(R.id.text_empty);
-        mAdapter = new SpamPhraseAdapter(getActivity(), realm);
+        mAdapter = new PhraseAdapter(getActivity(), realm);
         mRecyclerSpamPhrases = (RecyclerView) view.findViewById(R.id.recycler_spam_content);
         mRecyclerSpamPhrases.setLayoutManager(new LinearLayoutManager(mContext));
         mRecyclerSpamPhrases.setAdapter(mAdapter);

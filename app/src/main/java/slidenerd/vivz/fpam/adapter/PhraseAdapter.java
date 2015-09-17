@@ -12,17 +12,17 @@ import android.widget.TextView;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.model.SpamPhrase;
+import slidenerd.vivz.fpam.model.json.realm.RealmPhrase;
 
 /**
  * Created by vivz on 29/08/15.
  */
-public class SpamPhraseAdapter extends AbstractRealmAdapter<SpamPhrase, RecyclerView.ViewHolder> {
+public class PhraseAdapter extends AbstractRealmAdapter<RealmPhrase, RecyclerView.ViewHolder> {
 
     private LayoutInflater mLayoutInflater;
     private Context mContext;
 
-    public SpamPhraseAdapter(Context context, Realm realm) {
+    public PhraseAdapter(Context context, Realm realm) {
         super(context, realm);
         mContext = context;
         mLayoutInflater = LayoutInflater.from(context);
@@ -62,14 +62,14 @@ public class SpamPhraseAdapter extends AbstractRealmAdapter<SpamPhrase, Recycler
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ItemHolder) {
             ItemHolder itemHolder = (ItemHolder) holder;
-            SpamPhrase spamPhrase = mRealmResults.get(position - getHeaderCount());
-            itemHolder.mTextSpamPhrase.setText(spamPhrase.getSpamPhrase());
+            RealmPhrase spamPhrase = mRealmResults.get(position - getHeaderCount());
+            itemHolder.mTextPhrase.setText(spamPhrase.getPhrase());
         }
     }
 
     @Override
-    public RealmResults<SpamPhrase> getResults(Realm realm) {
-        return realm.where(SpamPhrase.class).findAllSorted("spamPhrase");
+    public RealmResults<RealmPhrase> getResults(Realm realm) {
+        return realm.where(RealmPhrase.class).findAllSorted("phrase");
     }
 
     public class HeaderHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -86,7 +86,7 @@ public class SpamPhraseAdapter extends AbstractRealmAdapter<SpamPhrase, Recycler
         @Override
         public void onClick(View v) {
             if (isValidPhrase(mInputPhrase)) {
-                SpamPhrase phrase = new SpamPhrase(mInputPhrase.getText().toString().trim().toLowerCase(), System.currentTimeMillis());
+                RealmPhrase phrase = new RealmPhrase(mInputPhrase.getText().toString().trim().toLowerCase(), System.currentTimeMillis());
                 add(phrase, true);
                 mInputPhrase.setText("");
             }
@@ -95,11 +95,11 @@ public class SpamPhraseAdapter extends AbstractRealmAdapter<SpamPhrase, Recycler
 
     public class ItemHolder extends RecyclerView.ViewHolder {
 
-        private TextView mTextSpamPhrase;
+        private TextView mTextPhrase;
 
         public ItemHolder(View itemView) {
             super(itemView);
-            mTextSpamPhrase = (TextView) itemView.findViewById(R.id.text_spam_phrase);
+            mTextPhrase = (TextView) itemView.findViewById(R.id.text_spam_phrase);
         }
     }
 }

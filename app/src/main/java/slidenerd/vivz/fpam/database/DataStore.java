@@ -17,8 +17,9 @@ import io.realm.RealmObject;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.Keys;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.admin.FBAdmin;
-import slidenerd.vivz.fpam.model.json.group.FBGroup;
+import slidenerd.vivz.fpam.model.json.admin.Admin;
+import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.realm.RealmGroup;
 
 /**
  * Created by vivz on 03/08/15.
@@ -43,15 +44,19 @@ public class DataStore {
      *
      * @param listGroups
      */
-    public static void storeGroups(Realm realm, Context context, ArrayList<FBGroup> listGroups) {
+    public static void storeGroups(Realm realm, Context context, ArrayList<Group> listGroups) {
+        ArrayList<RealmGroup> listRealmGroups = new ArrayList<>(listGroups.size());
+        for (Group group : listGroups) {
+            RealmGroup realmGroup = new RealmGroup();
+            realmGroup.setId(group.getId());
+            realmGroup.setName(group.getName());
+            realmGroup.setIcon(group.getIcon());
+            realmGroup.setUnread(group.getUnread());
+            listRealmGroups.add(realmGroup);
+        }
         realm.beginTransaction();
-        realm.copyToRealmOrUpdate(listGroups);
+        realm.copyToRealmOrUpdate(listRealmGroups);
         realm.commitTransaction();
-//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        String data = sGson.toJson(listGroups);
-//        editor.putString(Keys.PREF_GROUPS, data);
-//        editor.apply();
     }
 
     /**
@@ -59,29 +64,16 @@ public class DataStore {
      *
      * @return a list of groups that were retrieved from the backend, if the admin owns no groups or if there was a problem while retrieving data, then return an empty list.
      */
-    public static ArrayList<FBGroup> loadGroups(Realm realm, Context context) {
+    public static ArrayList<Group> loadGroups(Realm realm, Context context) {
 
-        RealmResults<FBGroup> realmResults = realm.where(FBGroup.class).findAllSorted("name");
-        ArrayList<FBGroup> listGroups = new ArrayList<>(realmResults.size());
-        for (FBGroup group : realmResults) {
-            /*
-            To avoid the below error, I simply duplicated the RealmResults so that it doesnt get passed to the background thread
-            Caused by: java.lang.IllegalStateException: Realm access from incorrect thread. Realm objects can only be accessed on the thread they were created.
-            at io.realm.Realm.checkIfValid(Realm.java:192)
-            at io.realm.FBGroupRealmProxy.getId(FBGroupRealmProxy.java:51)
-            at slidenerd.vivz.fpam.util.FBUtils.requestFeedSync(FBUtils.java:111)
-            at slidenerd.vivz.fpam.background.TaskLoadFeed.doInBackground(TaskLoadFeed.java:35)
-            at slidenerd.vivz.fpam.background.TaskLoadFeed.doInBackground(TaskLoadFeed.java:19)
-             */
-            FBGroup fbGroup = new FBGroup(group.getId(), group.getName(), group.getIsAdministrator(), group.getIconUrl(), group.getUnreadCount());
+        RealmResults<RealmGroup> realmResults = realm.where(RealmGroup.class).findAllSorted("name");
+        ArrayList<Group> listGroups = new ArrayList<>(20);
+        for (RealmGroup group : realmResults) {
+            //To avoid the below error, I simply duplicated the RealmResults so that it doesnt get passed to the background thread Caused by: java.lang.IllegalStateException: Realm access from incorrect thread. Realm objects can only be accessed on the thread they were created.
+            Group fbGroup = new Group(group.getId(), group.getName(), group.getIcon(), group.getUnread());
             listGroups.add(fbGroup);
         }
         return listGroups;
-//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-//        String jsonGroups = sharedPreferences.getString(Keys.PREF_GROUPS, "[]");
-//        ArrayList<FBGroup> listGroups = sGson.fromJson(jsonGroups, new TypeToken<ArrayList<FBGroup>>() {
-//        }.getType());
-//        return listGroups;
     }
 
     /**
@@ -89,7 +81,7 @@ public class DataStore {
      *
      * @param admin the person using this app as an admin whose details you want to store in the backend.
      */
-    public static void storeAdmin(Context context, FBAdmin admin) {
+    public static void storeAdmin(Context context, Admin admin) {
         if (admin != null) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -107,10 +99,10 @@ public class DataStore {
      * @return an admin whose account is currently logged in if the login was successful, on any error, it returns null
      */
     @Nullable
-    public static FBAdmin loadAdmin(Context context) {
+    public static Admin loadAdmin(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String adminJson = sharedPreferences.getString(Keys.PREF_ADMIN, null);
-        FBAdmin admin = gson.fromJson(adminJson, FBAdmin.class);
+        Admin admin = gson.fromJson(adminJson, Admin.class);
         return admin;
     }
 

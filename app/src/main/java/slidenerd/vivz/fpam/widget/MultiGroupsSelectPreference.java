@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.database.DataStore;
-import slidenerd.vivz.fpam.model.json.group.FBGroup;
+import slidenerd.vivz.fpam.model.json.group.Group;
 
 /**
  * Created by vivz on 03/08/15.
  */
 public class MultiGroupsSelectPreference extends MultiSelectListPreference {
-    private ArrayList<FBGroup> mListGroups = new ArrayList<>();
+    private ArrayList<Group> mListGroups = new ArrayList<>();
     private Context mContext;
     private Realm realm;
 
@@ -38,7 +38,7 @@ public class MultiGroupsSelectPreference extends MultiSelectListPreference {
         mListGroups = DataStore.loadGroups(realm, mContext);
         ArrayList<String> listGroupNames = new ArrayList<>(mListGroups.size());
         ArrayList<String> listGroupIds = new ArrayList<>(mListGroups.size());
-        for (FBGroup group : mListGroups) {
+        for (Group group : mListGroups) {
             listGroupIds.add(String.valueOf(group.getId()));
             listGroupNames.add(group.getName());
         }

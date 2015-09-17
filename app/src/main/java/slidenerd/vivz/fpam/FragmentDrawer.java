@@ -33,8 +33,8 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.admin.FBAdmin;
-import slidenerd.vivz.fpam.model.json.group.FBGroup;
+import slidenerd.vivz.fpam.model.json.admin.Admin;
+import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.prefs.MyPrefs_;
 import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
@@ -55,15 +55,15 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     int mSelectedId = 0;
 
     @InstanceState
-    long mLastSelectedGroupId = 0;
+    String mLastSelectedGroupId = "";
 
     @InstanceState
-    FBAdmin mAdmin;
+    Admin mAdmin;
     /*
         The list of groups that the logged in user is an admin of.
      */
     @InstanceState
-    ArrayList<FBGroup> mListGroups = new ArrayList<>();
+    ArrayList<Group> mListGroups = new ArrayList<>();
     private DrawerLayout mDrawerLayout;
     /*
     The Drawer Listener responsible for providing a handy way to tie together the functionality of DrawerLayout and the framework ActionBar to implement the recommended design for navigation drawers.
@@ -146,7 +146,7 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
      * @param admin
      */
 
-    public void addHeaderToDrawer(@NonNull FBAdmin admin) {
+    public void addHeaderToDrawer(@NonNull Admin admin) {
         View headerView = mDrawer.inflateHeaderView(R.layout.drawer_header);
         TextView textUser = (TextView) headerView.findViewById(R.id.text_user);
         textUser.setText(admin.getFirstName() + " " + admin.getLastName());
@@ -157,7 +157,7 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
      *
      * @param list
      */
-    public void addGroupsToDrawer(ArrayList<FBGroup> list) {
+    public void addGroupsToDrawer(ArrayList<Group> list) {
         Menu menu = mDrawer.getMenu();
         SubMenu subMenu = menu.addSubMenu(100, 100, 100, R.string.text_my_groups).setIcon(android.R.drawable.ic_menu_info_details);
         if (!hasGroups()) {
@@ -165,7 +165,7 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
             item.setIcon(android.R.drawable.stat_notify_error);
         } else {
             int i = MENU_START_ID;
-            for (FBGroup group : list) {
+            for (Group group : list) {
                 MenuItem item = subMenu.add(100, i, i, group.getName());
                 item.setIcon(android.R.drawable.ic_menu_week);
                 i++;
@@ -235,8 +235,8 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
                 activityBase.finish();
                 break;
             default:
-                FBGroup group = getSelectedGroup();
-                if (group != null && mLastSelectedGroupId != group.getId()) {
+                Group group = getSelectedGroup();
+                if (group != null && !mLastSelectedGroupId.equals(group.getId())) {
                     activityBase.setTitle(group.getName());
                     AccessToken accessToken = FpamApplication.getFacebookAccessToken();
                     if (FBUtils.isValidToken(accessToken)) {
@@ -266,8 +266,8 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
      * @return the group object corresponding to the id selected by the user.
      */
     @Nullable
-    public FBGroup getSelectedGroup() {
-        FBGroup group = null;
+    public Group getSelectedGroup() {
+        Group group = null;
         if (hasGroups()) {
             int position = mSelectedId - MENU_START_ID;
             //if we have a valid position between 0 to number of items in the list, then retrieve the item at that position

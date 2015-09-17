@@ -4,17 +4,39 @@ import android.app.Application;
 
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.androidannotations.annotations.EApplication;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.RealmObject;
 
 /**
  * Created by vivz on 28/07/15.
  */
 @EApplication
 public class FpamApplication extends Application {
+
+    public static Gson getGson() {
+        Gson gson = new GsonBuilder()
+                .setExclusionStrategies(new ExclusionStrategy() {
+                    @Override
+                    public boolean shouldSkipField(FieldAttributes f) {
+                        return f.getDeclaringClass().equals(RealmObject.class);
+                    }
+
+                    @Override
+                    public boolean shouldSkipClass(Class<?> clazz) {
+                        return false;
+                    }
+                })
+                .create();
+        return gson;
+    }
 
     public static AccessToken getFacebookAccessToken() {
         return AccessToken.getCurrentAccessToken();
