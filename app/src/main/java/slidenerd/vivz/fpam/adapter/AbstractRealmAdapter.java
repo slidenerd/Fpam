@@ -53,9 +53,6 @@ public abstract class AbstractRealmAdapter<T extends RealmObject, VH extends Rec
     }
 
     public T getItem(int i) {
-        if (mRealmResults == null) {
-            return null;
-        }
         return mRealmResults.get(i);
     }
 
@@ -76,7 +73,7 @@ public abstract class AbstractRealmAdapter<T extends RealmObject, VH extends Rec
     }
 
     public final int getCount() {
-        return mRealmResults == null ? 0 : mRealmResults.size();
+        return mRealmResults.size();
     }
 
     public void add(T item, boolean update) {
@@ -90,7 +87,7 @@ public abstract class AbstractRealmAdapter<T extends RealmObject, VH extends Rec
     public final void onSwipe(int position) {
         if (!isHeader(position) && !isFooter(position)) {
             int itemPosition = position - getHeaderCount();
-            if (mRealmResults != null && !mRealmResults.isEmpty()) {
+            if (!mRealmResults.isEmpty()) {
                 realm.beginTransaction();
                 T item = mRealmResults.get(itemPosition);
                 item.removeFromRealm();
