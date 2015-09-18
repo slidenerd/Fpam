@@ -13,6 +13,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.model.json.realm.RealmPhrase;
+import slidenerd.vivz.fpam.util.ValidationUtils;
 
 /**
  * Created by vivz on 29/08/15.
@@ -20,19 +21,10 @@ import slidenerd.vivz.fpam.model.json.realm.RealmPhrase;
 public class PhraseAdapter extends AbstractRealmAdapter<RealmPhrase, RecyclerView.ViewHolder> {
 
     private LayoutInflater mLayoutInflater;
-    private Context mContext;
 
     public PhraseAdapter(Context context, Realm realm) {
-        super(context, realm);
-        mContext = context;
+        super(realm);
         mLayoutInflater = LayoutInflater.from(context);
-    }
-
-    public static boolean isValidPhrase(EditText inputPhrase) {
-        return inputPhrase != null
-                && inputPhrase.getText() != null
-                && inputPhrase.getText().toString().trim() != null
-                && !inputPhrase.getText().toString().trim().isEmpty();
     }
 
     @Override
@@ -63,7 +55,7 @@ public class PhraseAdapter extends AbstractRealmAdapter<RealmPhrase, RecyclerVie
         if (holder instanceof ItemHolder) {
             ItemHolder itemHolder = (ItemHolder) holder;
             RealmPhrase spamPhrase = mRealmResults.get(position - getHeaderCount());
-            itemHolder.mTextPhrase.setText(spamPhrase.getPhrase());
+            itemHolder.setSpamPhrase(spamPhrase.getPhrase());
         }
     }
 
@@ -83,9 +75,10 @@ public class PhraseAdapter extends AbstractRealmAdapter<RealmPhrase, RecyclerVie
             mBtnAdd.setOnClickListener(this);
         }
 
+
         @Override
         public void onClick(View v) {
-            if (isValidPhrase(mInputPhrase)) {
+            if (ValidationUtils.hasInput(mInputPhrase)) {
                 RealmPhrase phrase = new RealmPhrase(mInputPhrase.getText().toString().trim().toLowerCase(), System.currentTimeMillis());
                 add(phrase, true);
                 mInputPhrase.setText("");
@@ -100,6 +93,10 @@ public class PhraseAdapter extends AbstractRealmAdapter<RealmPhrase, RecyclerVie
         public ItemHolder(View itemView) {
             super(itemView);
             mTextPhrase = (TextView) itemView.findViewById(R.id.text_spam_phrase);
+        }
+
+        public void setSpamPhrase(String spamPhrase) {
+            mTextPhrase.setText(spamPhrase);
         }
     }
 }

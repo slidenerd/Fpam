@@ -1,6 +1,5 @@
 package slidenerd.vivz.fpam.adapter;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 
 import io.realm.Realm;
@@ -10,14 +9,9 @@ import io.realm.RealmResults;
 public abstract class AbstractRealmAdapter<T extends RealmObject, VH extends RecyclerView.ViewHolder>
         extends RecyclerView.Adapter<VH> implements OnSwipeListener {
     protected RealmResults<T> mRealmResults;
-    protected Context context;
     private Realm realm;
 
-    public AbstractRealmAdapter(Context context, Realm realm) {
-        if (context == null) {
-            throw new IllegalArgumentException("Context cannot be null");
-        }
-        this.context = context;
+    public AbstractRealmAdapter(Realm realm) {
         this.realm = realm;
         this.mRealmResults = getResults(realm);
     }
