@@ -84,7 +84,7 @@ public class FBUtils {
         Bundle parameters = new Bundle();
         parameters.putString("fields", "from,message,caption,comments{from,message},description,name,picture,type,updated_time,attachments{media,type,url},link");
         parameters.putString("limit", "15");
-        parameters.putLong("since", 1442552400);
+//        parameters.putLong("since", 1442552400);
         GraphRequest request = new GraphRequest(token, "/" + group.getId() + "/feed");
         request.setParameters(parameters);
         GraphResponse response = request.executeAndWait();
@@ -92,7 +92,6 @@ public class FBUtils {
         JSONArray arrayData = jsonObject.getJSONArray(Keys.JSON_KEY_DATA);
         Type listType = new TypeToken<ArrayList<Post>>() {
         }.getType();
-        L.m(arrayData.toString());
         listPosts = gson.fromJson(arrayData.toString(), listType);
         return listPosts;
     }

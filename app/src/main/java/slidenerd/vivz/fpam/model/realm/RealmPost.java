@@ -9,7 +9,8 @@ import io.realm.annotations.PrimaryKey;
  */
 public class RealmPost extends RealmObject {
 
-    private RealmGroup group;
+    private String groupId;
+
     private RealmUser from;
 
     private String message;
@@ -131,11 +132,11 @@ public class RealmPost extends RealmObject {
         this.attachments = attachments;
     }
 
-    public RealmGroup getGroup() {
-        return group;
+    public String getGroupId() {
+        return groupId;
     }
 
-    public void setGroup(RealmGroup group) {
-        this.group = group;
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 }

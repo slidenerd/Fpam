@@ -235,22 +235,21 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
                 activityBase.finish();
                 break;
             default:
-                //If the selected id is not the default one, then hide the drawer. It is default if the user has not selected anything previously and sees the drawer for the first time.
-                if (mSelectedId != 0) {
-                    hide();
-                }
                 Group group = getSelectedGroup();
                 if (group != null && !mLastSelectedGroupId.equals(group.getId())) {
                     activityBase.setTitle(group.getName());
                     AccessToken accessToken = FpamApplication.getFacebookAccessToken();
                     if (FBUtils.isValidToken(accessToken)) {
-                        activityBase.loadFeed(FpamApplication.getFacebookAccessToken(), group);
+                        activityBase.loadFeed(accessToken, group);
                     } else {
                         L.m("Did not find a good access token from fragment drawer");
                     }
                     mLastSelectedGroupId = group.getId();
                 }
-
+                //If the selected id is not the default one, then hide the drawer. It is default if the user has not selected anything previously and sees the drawer for the first time.
+                if (mSelectedId != 0) {
+                    hide();
+                }
 
                 break;
         }

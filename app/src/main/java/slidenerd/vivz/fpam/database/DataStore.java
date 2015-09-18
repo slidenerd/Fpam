@@ -25,7 +25,7 @@ public class DataStore {
      * @param listGroups
      */
     public static void storeGroups(Context context, Realm realm, ArrayList<Group> listGroups) {
-        ArrayList<RealmGroup> listRealmGroups = CopyUtils.createFrom(listGroups);
+        ArrayList<RealmGroup> listRealmGroups = CopyUtils.createFromGroups(listGroups);
         realm.beginTransaction();
         realm.copyToRealmOrUpdate(listRealmGroups);
         realm.commitTransaction();
@@ -48,6 +48,7 @@ public class DataStore {
         }
         return listGroups;
     }
+
 
     /**
      * In the first step, check if we have a valid user to store. If we have a valid user, use shared preferences to store each aspect of their profile. Convert the 'Picture' object of the user into a JSON String and store that.

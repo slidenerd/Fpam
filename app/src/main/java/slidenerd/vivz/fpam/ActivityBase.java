@@ -1,6 +1,5 @@
 package slidenerd.vivz.fpam;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
@@ -21,10 +20,12 @@ import org.json.JSONException;
 import java.util.ArrayList;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.model.realm.RealmPost;
+import slidenerd.vivz.fpam.util.CopyUtils;
 import slidenerd.vivz.fpam.util.DateUtils;
 import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
@@ -39,7 +40,6 @@ public abstract class ActivityBase extends AppCompatActivity {
     private ViewStub mMainContent;
     private Toolbar mToolbar;
     private DrawerLayout mDrawerLayout;
-    private ProgressDialog mProgress;
 
     /**
      * Get a reference to our access token. If its not valid, then let the user login once again through the Login screen.
@@ -96,44 +96,30 @@ public abstract class ActivityBase extends AppCompatActivity {
     }
 
     public void loadFeed(AccessToken accessToken, @NonNull Group group) {
-        mProgress = new ProgressDialog(this);
-        mProgress.setIndeterminate(true);
-        mProgress.setTitle(group.getName());
-        mProgress.setMessage("Loading posts from " + group.getName());
-        mProgress.show();
         loadFeedAsync(accessToken, group);
     }
 
     @Background
     void loadFeedAsync(AccessToken accessToken, @NonNull Group group) {
+        Realm realm = null;
         try {
+            realm = Realm.getDefaultInstance();
             ArrayList<Post> listPosts = FBUtils.requestFeedSync(accessToken, FpamApplication.getGson(), group);
-            ArrayList<RealmPost> listRealmPosts = new ArrayList<>(listPosts.size());
-            for (Post post : listPosts) {
-                RealmPost realmPost = new RealmPost();
-                realmPost.setId(post.getId());
-                realmPost.setName(post.getName());
-                realmPost.setCaption(post.getCaption());
-                realmPost.setDescription(post.getDescription());
-                realmPost.setLink(post.getLink());
-                realmPost.setType(post.getType());
-                realmPost.setUpdatedTime(post.getUpdatedTime());
-                listRealmPosts.add(realmPost);
-            }
-            Realm realm = Realm.getDefaultInstance();
+            RealmList<RealmPost> listRealmPosts = CopyUtils.createFromPosts(group, listPosts);
             realm.beginTransaction();
             realm.copyToRealmOrUpdate(listRealmPosts);
             realm.commitTransaction();
-            realm.close();
             onFeedLoaded();
         } catch (JSONException e) {
             L.m("" + e);
+        } finally {
+            realm.close();
         }
     }
 
     @UiThread
     void onFeedLoaded() {
-        mProgress.hide();
+
     }
 
     @Override

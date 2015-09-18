@@ -98,11 +98,11 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
         DataStore.storeGroups(this, realm, listGroups);
         realm.close();
         //Store the admin and list of groups associated with the admin on the UI Thread
-        launchMainScreen();
+        onLogin();
     }
 
     @UiThread
-    void launchMainScreen() {
+    void onLogin() {
         mProgress.setVisibility(View.GONE);
         NavUtils.startActivityStats(ActivityLogin.this);
         finish();
