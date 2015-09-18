@@ -33,6 +33,9 @@ public class Admin implements Parcelable {
     @Expose
     private Picture picture;
 
+    public Admin(){
+
+    }
     protected Admin(Parcel in) {
         id = in.readString();
         email = in.readString();

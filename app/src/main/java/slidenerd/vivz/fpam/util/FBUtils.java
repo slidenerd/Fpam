@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
-import com.facebook.GraphRequestBatch;
 import com.facebook.GraphResponse;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -16,7 +15,6 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.List;
 
 import slidenerd.vivz.fpam.Keys;
 import slidenerd.vivz.fpam.log.L;
@@ -42,6 +40,7 @@ public class FBUtils {
     public static Admin requestMeSync(AccessToken accessToken, Gson gson) {
         Bundle parameters = new Bundle();
         parameters.putString("fields", "id,email,first_name,last_name,picture.type(normal).width(200).height(200)");
+
         GraphRequest request = new GraphRequest(accessToken, "me");
         request.setParameters(parameters);
         GraphResponse graphResponse = request.executeAndWait();
@@ -77,11 +76,15 @@ public class FBUtils {
         return listGroups;
     }
 
+    /*
+    TODO implement the since parameter for requesting feeds from Facebook Graph API
+     */
     public static ArrayList<Post> requestFeedSync(AccessToken token, Gson gson, Group group) throws JSONException {
         ArrayList<Post> listPosts = new ArrayList<>();
         Bundle parameters = new Bundle();
         parameters.putString("fields", "from,message,caption,comments{from,message},description,name,picture,type,updated_time,attachments{media,type,url},link");
         parameters.putString("limit", "15");
+        parameters.putLong("since", 1442552400);
         GraphRequest request = new GraphRequest(token, "/" + group.getId() + "/feed");
         request.setParameters(parameters);
         GraphResponse response = request.executeAndWait();
@@ -93,37 +96,4 @@ public class FBUtils {
         listPosts = gson.fromJson(arrayData.toString(), listType);
         return listPosts;
     }
-
-    public static ArrayList<Post> requestFeedSync(AccessToken token, Gson gson, ArrayList<Group> listGroups) throws JSONException {
-        ArrayList<Post> listPosts = new ArrayList<>();
-        GraphRequestBatch requestBatch = new GraphRequestBatch();
-        for (Group group : listGroups) {
-            Bundle parameters = new Bundle();
-            parameters.putString("fields", "from,message,caption,comments{from,message},description,name,picture,type,updated_time,attachments{media,type,url},link");
-            parameters.putString("limit", "15");
-            GraphRequest request = new GraphRequest(token, "/" + group.getId() + "/feed");
-            request.setParameters(parameters);
-            requestBatch.add(request);
-        }
-        List<GraphResponse> listResponse = requestBatch.executeAndWait();
-        for (GraphResponse response : listResponse) {
-            JSONObject jsonObject = response.getJSONObject();
-            JSONArray arrayData = jsonObject.getJSONArray(Keys.JSON_KEY_DATA);
-            Type listType = new TypeToken<ArrayList<Post>>() {
-            }.getType();
-            L.m(arrayData.toString());
-            listPosts = gson.fromJson(arrayData.toString(), listType);
-//            for (int i = 0; i < arrayData.length(); i++) {
-//                try {
-//                    JSONObject objectFeed = arrayData.getJSONObject(i);
-//                    Post post = gson.fromJson(objectFeed.toString(), Post.class);
-//                    listPosts.add(post);
-//                } catch (JSONException e) {
-//                    L.m("" + e);
-//                }
-//            }
-        }
-        return listPosts;
-    }
-    // fields=from,message,link,created_time,updated_time,name,description,caption,status_type,picture,story,type&limit=25
 }

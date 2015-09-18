@@ -29,7 +29,7 @@ public class ActivityCache extends AppCompatActivity {
 
     @AfterViews
     void initUI() {
-        RealmResults<RealmPost> realmPosts = mRealm.where(RealmPost.class).findAll();
+        RealmResults<RealmPost> realmPosts = mRealm.where(RealmPost.class).findAllSorted("id");
         StringBuilder stringBuilder = new StringBuilder();
         for (RealmPost post : realmPosts) {
             stringBuilder.append("\n" + post.getId() + "\n");

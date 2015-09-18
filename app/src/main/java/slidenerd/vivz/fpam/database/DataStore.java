@@ -1,70 +1,43 @@
 package slidenerd.vivz.fpam.database;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 
 import io.realm.Realm;
-import io.realm.RealmObject;
 import io.realm.RealmResults;
-import slidenerd.vivz.fpam.Keys;
-import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.realm.RealmAdmin;
 import slidenerd.vivz.fpam.model.json.realm.RealmGroup;
+import slidenerd.vivz.fpam.util.CopyUtils;
 
 /**
  * Created by vivz on 03/08/15.
  */
 public class DataStore {
-    private static Gson gson = new GsonBuilder()
-            .setExclusionStrategies(new ExclusionStrategy() {
-                @Override
-                public boolean shouldSkipField(FieldAttributes f) {
-                    return f.getDeclaringClass().equals(RealmObject.class);
-                }
-
-                @Override
-                public boolean shouldSkipClass(Class<?> clazz) {
-                    return false;
-                }
-            })
-            .create();
 
     /**
+     * TODO make this work in the background thread
      * In the first step, check if the list of groups to be stored is empty. If we have 1-N groups to store, use shared preferences to do the same. Convert the list of groups into a JSON string and store that.
      *
      * @param listGroups
      */
-    public static void storeGroups(Realm realm, Context context, ArrayList<Group> listGroups) {
-        ArrayList<RealmGroup> listRealmGroups = new ArrayList<>(listGroups.size());
-        for (Group group : listGroups) {
-            RealmGroup realmGroup = new RealmGroup();
-            realmGroup.setId(group.getId());
-            realmGroup.setName(group.getName());
-            realmGroup.setIcon(group.getIcon());
-            realmGroup.setUnread(group.getUnread());
-            listRealmGroups.add(realmGroup);
-        }
+    public static void storeGroups(Context context, Realm realm, ArrayList<Group> listGroups) {
+        ArrayList<RealmGroup> listRealmGroups = CopyUtils.createFrom(listGroups);
         realm.beginTransaction();
         realm.copyToRealmOrUpdate(listRealmGroups);
         realm.commitTransaction();
     }
 
     /**
+     * TODO make this work in the background thread
      * Notice the default value for the json String that contains all groups. If the JSON String is null, our ArrayList will be null, if the json String is empty, our ArrayList will be null, however if our JSON String has a default value of [], our ArrayList will be empty and not null. Our objective is to ensure the ArrayList does not get a null value if something goes wrong.
      *
      * @return a list of groups that were retrieved from the backend, if the admin owns no groups or if there was a problem while retrieving data, then return an empty list.
      */
-    public static ArrayList<Group> loadGroups(Realm realm, Context context) {
+    public static ArrayList<Group> loadGroups(Context context, Realm realm) {
 
         RealmResults<RealmGroup> realmResults = realm.where(RealmGroup.class).findAllSorted("name");
         ArrayList<Group> listGroups = new ArrayList<>(20);
@@ -81,16 +54,11 @@ public class DataStore {
      *
      * @param admin the person using this app as an admin whose details you want to store in the backend.
      */
-    public static void storeAdmin(Context context, Admin admin) {
-        if (admin != null) {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            String adminJson = gson.toJson(admin);
-            editor.putString(Keys.PREF_ADMIN, adminJson);
-            editor.apply();
-        } else {
-            L.m("We could not retrieve your profile");
-        }
+    public static void storeAdmin(Context context, Realm realm, Admin admin) {
+        RealmAdmin realmAdmin = CopyUtils.createFrom(admin);
+        realm.beginTransaction();
+        realm.copyToRealmOrUpdate(realmAdmin);
+        realm.commitTransaction();
     }
 
     /**
@@ -99,10 +67,9 @@ public class DataStore {
      * @return an admin whose account is currently logged in if the login was successful, on any error, it returns null
      */
     @Nullable
-    public static Admin loadAdmin(Context context) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String adminJson = sharedPreferences.getString(Keys.PREF_ADMIN, null);
-        Admin admin = gson.fromJson(adminJson, Admin.class);
+    public static Admin loadAdmin(Context context, Realm realm) {
+        RealmAdmin realmAdmin = realm.where(RealmAdmin.class).findFirst();
+        Admin admin = CopyUtils.createFrom(realmAdmin);
         return admin;
     }
 

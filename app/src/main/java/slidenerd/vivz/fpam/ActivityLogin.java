@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -19,6 +21,7 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.ViewById;
 import org.json.JSONException;
 
 import java.util.ArrayList;
@@ -38,9 +41,10 @@ import slidenerd.vivz.fpam.util.NavUtils;
 @EActivity(R.layout.activity_login)
 @OptionsMenu(R.menu.menu_activity_login)
 public class ActivityLogin extends AppCompatActivity implements FacebookCallback<LoginResult> {
+    @ViewById(R.id.progress)
+    ProgressBar mProgress;
     private CallbackManager mCallbackManager;
     private AlertDialog mDialog;
-    private Realm realm;
 
     private void showDialogJustifyingPermissions(AccessToken accessToken) {
         Set<String> setDeclinedPermissions = accessToken.getDeclinedPermissions();
@@ -66,6 +70,7 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
             }
         } else {
             if (FBUtils.isValidToken(accessToken)) {
+                mProgress.setVisibility(View.VISIBLE);
                 Gson gson = FpamApplication.getGson();
                 loadUserAndGroups(accessToken, gson);
             }
@@ -88,14 +93,17 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
         } catch (JSONException e) {
             L.m("" + e);
         }
+        Realm realm = Realm.getDefaultInstance();
+        DataStore.storeAdmin(this, realm, admin);
+        DataStore.storeGroups(this, realm, listGroups);
+        realm.close();
         //Store the admin and list of groups associated with the admin on the UI Thread
-        storeUserAndGroups(admin, listGroups);
+        launchMainScreen();
     }
 
     @UiThread
-    void storeUserAndGroups(Admin admin, ArrayList<Group> listGroups) {
-        DataStore.storeAdmin(this, admin);
-        DataStore.storeGroups(realm, this, listGroups);
+    void launchMainScreen() {
+        mProgress.setVisibility(View.GONE);
         NavUtils.startActivityStats(ActivityLogin.this);
         finish();
     }
@@ -103,7 +111,6 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        realm = Realm.getInstance(this);
         mCallbackManager = CallbackManager.Factory.create();
     }
 
@@ -126,12 +133,6 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
 
         super.onActivityResult(requestCode, resultCode, data);
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        realm.close();
     }
 
     @Override

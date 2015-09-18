@@ -34,6 +34,9 @@ public class PictureData implements Parcelable {
     @Expose
     private int width;
 
+    public PictureData() {
+    }
+
     protected PictureData(Parcel in) {
         height = in.readInt();
         isSilhouette = in.readByte() != 0x00;
@@ -58,7 +61,7 @@ public class PictureData implements Parcelable {
     /**
      * @return The isSilhouette
      */
-    public boolean isIsSilhouette() {
+    public boolean getIsSilhouette() {
         return isSilhouette;
     }
 

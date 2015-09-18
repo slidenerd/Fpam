@@ -22,6 +22,10 @@ public class Picture implements Parcelable {
     @Expose
     private PictureData data;
 
+    public Picture() {
+
+    }
+
     protected Picture(Parcel in) {
         data = (PictureData) in.readValue(PictureData.class.getClassLoader());
     }

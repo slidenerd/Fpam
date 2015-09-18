@@ -1,5 +1,6 @@
 package slidenerd.vivz.fpam;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
@@ -24,6 +25,7 @@ import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.model.json.realm.RealmPost;
+import slidenerd.vivz.fpam.util.DateUtils;
 import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
@@ -37,7 +39,7 @@ public abstract class ActivityBase extends AppCompatActivity {
     private ViewStub mMainContent;
     private Toolbar mToolbar;
     private DrawerLayout mDrawerLayout;
-    private Realm mRealm;
+    private ProgressDialog mProgress;
 
     /**
      * Get a reference to our access token. If its not valid, then let the user login once again through the Login screen.
@@ -51,7 +53,7 @@ public abstract class ActivityBase extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
-        mRealm = Realm.getDefaultInstance();
+        L.t(this, DateUtils.getUTCTimestamp() + "");
         initChildActivityLayout();
         //if we dont have a valid access token or its null, redirect the person back to login screen
         AccessToken accessToken = FpamApplication.getFacebookAccessToken();
@@ -93,35 +95,45 @@ public abstract class ActivityBase extends AppCompatActivity {
         mMainContent.inflate();
     }
 
+    public void loadFeed(AccessToken accessToken, @NonNull Group group) {
+        mProgress = new ProgressDialog(this);
+        mProgress.setIndeterminate(true);
+        mProgress.setTitle(group.getName());
+        mProgress.setMessage("Loading posts from " + group.getName());
+        mProgress.show();
+        loadFeedAsync(accessToken, group);
+    }
 
     @Background
     void loadFeedAsync(AccessToken accessToken, @NonNull Group group) {
         try {
             ArrayList<Post> listPosts = FBUtils.requestFeedSync(accessToken, FpamApplication.getGson(), group);
-            onFeedLoaded(group, listPosts);
+            ArrayList<RealmPost> listRealmPosts = new ArrayList<>(listPosts.size());
+            for (Post post : listPosts) {
+                RealmPost realmPost = new RealmPost();
+                realmPost.setId(post.getId());
+                realmPost.setName(post.getName());
+                realmPost.setCaption(post.getCaption());
+                realmPost.setDescription(post.getDescription());
+                realmPost.setLink(post.getLink());
+                realmPost.setType(post.getType());
+                realmPost.setUpdatedTime(post.getUpdatedTime());
+                listRealmPosts.add(realmPost);
+            }
+            Realm realm = Realm.getDefaultInstance();
+            realm.beginTransaction();
+            realm.copyToRealmOrUpdate(listRealmPosts);
+            realm.commitTransaction();
+            realm.close();
+            onFeedLoaded();
         } catch (JSONException e) {
             L.m("" + e);
         }
     }
 
     @UiThread
-    void onFeedLoaded(Group group, ArrayList<Post> listPosts) {
-        String data = group.getName() + "\n" + listPosts.toString();
-        ArrayList<RealmPost> listRealmPosts = new ArrayList<>(listPosts.size());
-        for (Post post : listPosts) {
-            RealmPost realmPost = new RealmPost();
-            realmPost.setId(post.getId());
-            realmPost.setName(post.getName());
-            realmPost.setCaption(post.getCaption());
-            realmPost.setDescription(post.getDescription());
-            realmPost.setLink(post.getLink());
-            realmPost.setType(post.getType());
-            realmPost.setUpdatedTime(post.getUpdatedTime());
-            listRealmPosts.add(realmPost);
-        }
-        mRealm.beginTransaction();
-        mRealm.copyToRealmOrUpdate(listRealmPosts);
-        mRealm.commitTransaction();
+    void onFeedLoaded() {
+        mProgress.hide();
     }
 
     @Override
@@ -129,12 +141,6 @@ public abstract class ActivityBase extends AppCompatActivity {
         if (!mDrawer.onBackPressed()) {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mRealm.close();
     }
 
     /**

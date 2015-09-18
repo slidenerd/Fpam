@@ -97,8 +97,8 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
         super.onCreate(savedInstanceState);
         realm = Realm.getInstance(context);
         if (savedInstanceState == null) {
-            mAdmin = DataStore.loadAdmin(context);
-            mListGroups = DataStore.loadGroups(realm, context);
+            mAdmin = DataStore.loadAdmin(context, realm);
+            mListGroups = DataStore.loadGroups(context, realm);
         }
     }
 
@@ -235,21 +235,23 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
                 activityBase.finish();
                 break;
             default:
+                //If the selected id is not the default one, then hide the drawer. It is default if the user has not selected anything previously and sees the drawer for the first time.
+                if (mSelectedId != 0) {
+                    hide();
+                }
                 Group group = getSelectedGroup();
                 if (group != null && !mLastSelectedGroupId.equals(group.getId())) {
                     activityBase.setTitle(group.getName());
                     AccessToken accessToken = FpamApplication.getFacebookAccessToken();
                     if (FBUtils.isValidToken(accessToken)) {
-                        activityBase.loadFeedAsync(FpamApplication.getFacebookAccessToken(), group);
+                        activityBase.loadFeed(FpamApplication.getFacebookAccessToken(), group);
                     } else {
                         L.m("Did not find a good access token from fragment drawer");
                     }
                     mLastSelectedGroupId = group.getId();
                 }
-                //If the selected id is not the default one, then hide the drawer. It is default if the user has not selected anything previously and sees the drawer for the first time.
-                if (mSelectedId != 0) {
-                    hide();
-                }
+
+
                 break;
         }
         return true;
