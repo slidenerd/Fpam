@@ -7,8 +7,8 @@ import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.admin.Picture;
 import slidenerd.vivz.fpam.model.json.admin.PictureData;
 import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.model.json.realm.RealmAdmin;
-import slidenerd.vivz.fpam.model.json.realm.RealmGroup;
+import slidenerd.vivz.fpam.model.realm.RealmAdmin;
+import slidenerd.vivz.fpam.model.realm.RealmGroup;
 
 /**
  * Created by vivz on 18/09/15.

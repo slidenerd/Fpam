@@ -1,4 +1,4 @@
-package slidenerd.vivz.fpam.model.json.realm;
+package slidenerd.vivz.fpam.model.realm;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;

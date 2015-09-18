@@ -12,7 +12,7 @@ import android.widget.TextView;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.model.json.realm.RealmPhrase;
+import slidenerd.vivz.fpam.model.realm.RealmPhrase;
 import slidenerd.vivz.fpam.util.ValidationUtils;
 
 /**

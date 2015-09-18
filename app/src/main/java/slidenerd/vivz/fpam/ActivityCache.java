@@ -11,7 +11,7 @@ import org.androidannotations.annotations.ViewById;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import slidenerd.vivz.fpam.model.json.realm.RealmPost;
+import slidenerd.vivz.fpam.model.realm.RealmPost;
 
 @EActivity(R.layout.activity_cache)
 @OptionsMenu(R.menu.menu_activity_cache_viewer)
