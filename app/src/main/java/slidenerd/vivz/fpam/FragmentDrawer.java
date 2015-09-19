@@ -41,7 +41,6 @@ import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
 /**
- * TODO when the drawer rotates it does not properly update the name of the previously selected group if any, gotta fix this!
  * A simple {@link Fragment} subclass.
  */
 @EFragment
@@ -170,7 +169,7 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     public void addGroupsToDrawer(ArrayList<Group> list) {
         Menu menu = mDrawer.getMenu();
         SubMenu subMenu = menu.addSubMenu(100, 100, 100, R.string.text_my_groups).setIcon(android.R.drawable.ic_menu_info_details);
-        if (!hasGroups()) {
+        if (mListGroups.isEmpty()) {
             MenuItem item = subMenu.add(100, 100, 100, R.string.text_no_groups);
             item.setIcon(android.R.drawable.stat_notify_error);
         } else {
@@ -192,13 +191,6 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
 
     private void markDrawerSeen() {
         mSharedPreferences.edit().firstTime().put(true).apply();
-    }
-
-    /**
-     * @return true if a non zero number of groups were retrieved for the currently logged in user , else false
-     */
-    private boolean hasGroups() {
-        return !mListGroups.isEmpty();
     }
 
     @Override
@@ -246,15 +238,17 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
                 break;
             default:
                 Group group = getSelectedGroup();
-                if (group != null && !mLastSelectedGroupId.equals(group.getId())) {
+                if (group != null) {
                     activityBase.setTitle(group.getName());
-                    AccessToken accessToken = ApplicationFpam.getFacebookAccessToken();
-                    if (FBUtils.isValidToken(accessToken)) {
-                        activityBase.loadFeed(accessToken, group);
-                    } else {
-                        L.m("Did not find a good access token from fragment drawer");
+                    if (!mLastSelectedGroupId.equals(group.getId())) {
+                        AccessToken accessToken = ApplicationFpam.getFacebookAccessToken();
+                        if (FBUtils.isValidToken(accessToken)) {
+                            activityBase.loadFeed(accessToken, group);
+                        } else {
+                            L.m("Did not find a good access token from fragment drawer");
+                        }
+                        mLastSelectedGroupId = group.getId();
                     }
-                    mLastSelectedGroupId = group.getId();
                 }
                 //If the selected id is not the default one, then hide the drawer. It is default if the user has not selected anything previously and sees the drawer for the first time.
                 if (mSelectedId != 0) {
@@ -279,7 +273,7 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     @Nullable
     public Group getSelectedGroup() {
         Group group = null;
-        if (hasGroups()) {
+        if (!mListGroups.isEmpty()) {
             int position = mSelectedId - MENU_START_ID;
             //if we have a valid position between 0 to number of items in the list, then retrieve the item at that position
             if (position < mListGroups.size() && position >= 0) {
