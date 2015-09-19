@@ -14,7 +14,6 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
-import com.google.gson.Gson;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
@@ -24,6 +23,7 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -31,7 +31,6 @@ import java.util.Set;
 import io.realm.Realm;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
@@ -68,29 +67,27 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
         } else {
             if (FBUtils.isValidToken(accessToken)) {
                 mProgress.setVisibility(View.VISIBLE);
-                Gson gson = FpamApplication.getGson();
-                loadUserAndGroups(accessToken, gson);
+                loadUserAndGroups(accessToken);
             }
         }
     }
 
     @Background
-    void loadUserAndGroups(AccessToken accessToken, Gson gson) {
-        Admin admin;
+    void loadUserAndGroups(AccessToken accessToken) {
+        JSONObject jsonObject;
         Realm realm = null;
         JSONArray jsonArray;
         try {
-            admin = FBUtils.requestMeSync(accessToken, gson);
-            jsonArray = FBUtils.requestGroupsSync(accessToken, gson);
             realm = Realm.getDefaultInstance();
-            DataStore.storeAdmin(this, realm, admin);
-            DataStore.storeGroups(this, realm, jsonArray);
+            jsonObject = FBUtils.requestMeSync(accessToken);
+            jsonArray = FBUtils.requestGroupsSync(accessToken);
+            L.m(jsonObject.toString());
+            DataStore.storeAdmin(realm, jsonObject);
+            DataStore.storeGroups(realm, jsonArray);
         } catch (JSONException e) {
             L.m("" + e);
         } finally {
-            if (realm != null) {
-                realm.close();
-            }
+            realm.close();
         }
         //Store the admin and list of groups associated with the admin on the UI Thread
         onLogin();

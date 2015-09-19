@@ -56,7 +56,7 @@ public abstract class ActivityBase extends AppCompatActivity {
         L.t(this, DateUtils.getUTCTimestamp() + "");
         initChildActivityLayout();
         //if we dont have a valid access token or its null, redirect the person back to login screen
-        AccessToken accessToken = FpamApplication.getFacebookAccessToken();
+        AccessToken accessToken = ApplicationFpam.getFacebookAccessToken();
         if (!FBUtils.isValidToken(accessToken)) {
             redirectToLogin(accessToken);
             //Prevent further processing, calling finish() does not quit your activity immediately, it still runs code after finish() in the current method
@@ -104,7 +104,7 @@ public abstract class ActivityBase extends AppCompatActivity {
         Realm realm = null;
         try {
             realm = Realm.getDefaultInstance();
-            ArrayList<Post> listPosts = FBUtils.requestFeedSync(accessToken, FpamApplication.getGson(), group);
+            ArrayList<Post> listPosts = FBUtils.requestFeedSync(accessToken, ApplicationFpam.getGson(), group);
             RealmList<RealmPost> listRealmPosts = CopyUtils.createFromPosts(group, listPosts);
             realm.beginTransaction();
             realm.copyToRealmOrUpdate(listRealmPosts);

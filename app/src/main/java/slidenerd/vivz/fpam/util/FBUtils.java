@@ -17,7 +17,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import slidenerd.vivz.fpam.Keys;
-import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 
@@ -33,15 +32,13 @@ public class FBUtils {
      * @return an admin object that contains all details such as name, email and the profile picture used by the admin.
      */
     @Nullable
-    public static Admin requestMeSync(AccessToken accessToken, Gson gson) {
+    public static JSONObject requestMeSync(AccessToken accessToken) throws JSONException {
         Bundle parameters = new Bundle();
         parameters.putString("fields", "id,email,first_name,last_name,picture.type(normal).width(200).height(200)");
-
         GraphRequest request = new GraphRequest(accessToken, "me");
         request.setParameters(parameters);
         GraphResponse graphResponse = request.executeAndWait();
-        JSONObject jsonObject = graphResponse.getJSONObject();
-        return gson.fromJson(jsonObject.toString(), Admin.class);
+        return graphResponse.getJSONObject();
     }
 
 
@@ -51,7 +48,7 @@ public class FBUtils {
      * @throws JSONException
      */
     @Nullable
-    public static JSONArray requestGroupsSync(AccessToken accessToken, Gson gson) throws JSONException {
+    public static JSONArray requestGroupsSync(AccessToken accessToken) throws JSONException {
         GraphRequest request = new GraphRequest(accessToken, "me/admined_groups");
         Bundle parameters = new Bundle();
         parameters.putString("fields", "name,id,icon,unread");

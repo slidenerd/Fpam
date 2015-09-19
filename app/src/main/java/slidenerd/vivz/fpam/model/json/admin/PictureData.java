@@ -1,47 +1,25 @@
 package slidenerd.vivz.fpam.model.json.admin;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import org.parceler.Parcel;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import io.realm.PictureDataRealmProxy;
+import io.realm.RealmObject;
 
 /**
  * This class is a container for the user's profile picture and returns profile pictures closest to a requested size maintaining its width, height, url and whether the user has set a custom profile picture on their facebook profile or facebook has provided the default image
  */
 
-public class PictureData implements Parcelable {
+@Parcel(implementations = {PictureDataRealmProxy.class},
+        value = Parcel.Serialization.BEAN,
+        analyze = {PictureData.class})
+public class PictureData extends RealmObject {
 
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<PictureData> CREATOR = new Parcelable.Creator<PictureData>() {
-        @Override
-        public PictureData createFromParcel(Parcel in) {
-            return new PictureData(in);
-        }
-
-        @Override
-        public PictureData[] newArray(int size) {
-            return new PictureData[size];
-        }
-    };
-    @Expose
     private int height;
-    @SerializedName("is_silhouette")
-    @Expose
-    private boolean isSilhouette;
-    @Expose
+    private boolean is_silhouette;
     private String url;
-    @Expose
     private int width;
 
     public PictureData() {
-    }
-
-    protected PictureData(Parcel in) {
-        height = in.readInt();
-        isSilhouette = in.readByte() != 0x00;
-        url = in.readString();
-        width = in.readInt();
     }
 
     /**
@@ -56,20 +34,6 @@ public class PictureData implements Parcelable {
      */
     public void setHeight(int height) {
         this.height = height;
-    }
-
-    /**
-     * @return The isSilhouette
-     */
-    public boolean getIsSilhouette() {
-        return isSilhouette;
-    }
-
-    /**
-     * @param isSilhouette The is_silhouette
-     */
-    public void setIsSilhouette(boolean isSilhouette) {
-        this.isSilhouette = isSilhouette;
     }
 
     /**
@@ -100,16 +64,11 @@ public class PictureData implements Parcelable {
         this.width = width;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public boolean is_silhouette() {
+        return is_silhouette;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(height);
-        dest.writeByte((byte) (isSilhouette ? 0x01 : 0x00));
-        dest.writeString(url);
-        dest.writeInt(width);
+    public void setIs_silhouette(boolean is_silhouette) {
+        this.is_silhouette = is_silhouette;
     }
 }

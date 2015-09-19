@@ -35,11 +35,11 @@ public class MultiGroupsSelectPreference extends MultiSelectListPreference {
 
     private void init() {
         realm = Realm.getInstance(mContext);
-        mListGroups = DataStore.loadGroups(mContext, realm);
+        mListGroups = DataStore.loadGroups(realm);
         ArrayList<String> listGroupNames = new ArrayList<>(mListGroups.size());
         ArrayList<String> listGroupIds = new ArrayList<>(mListGroups.size());
         for (Group group : mListGroups) {
-            listGroupIds.add(String.valueOf(group.getId()));
+            listGroupIds.add(group.getId());
             listGroupNames.add(group.getName());
         }
         setEntries(listGroupNames.toArray(new CharSequence[listGroupNames.size()]));

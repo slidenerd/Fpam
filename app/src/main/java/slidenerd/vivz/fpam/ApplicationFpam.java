@@ -19,7 +19,7 @@ import io.realm.RealmObject;
  * Created by vivz on 28/07/15.
  */
 @EApplication
-public class FpamApplication extends Application {
+public class ApplicationFpam extends Application {
 
     public static Gson getGson() {
         Gson gson = new GsonBuilder()

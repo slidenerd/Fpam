@@ -97,10 +97,10 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
         super.onCreate(savedInstanceState);
         realm = Realm.getInstance(context);
         if (savedInstanceState == null) {
-            mAdmin = DataStore.loadAdmin(context, realm);
-            mListGroups = DataStore.loadGroups(context, realm);
+            mAdmin = DataStore.loadAdmin(realm);
+            mListGroups = DataStore.loadGroups(realm);
         } else {
-            mAdmin = savedInstanceState.getParcelable("admin");
+            mAdmin = Parcels.unwrap(savedInstanceState.getParcelable("admin"));
             mListGroups = Parcels.unwrap(savedInstanceState.getParcelable("groups"));
         }
     }
@@ -146,7 +146,7 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("admin", mAdmin);
+        outState.putParcelable("admin", Parcels.wrap(mAdmin));
         outState.putParcelable("groups", Parcels.wrap(mListGroups));
     }
 
@@ -159,7 +159,7 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     public void addHeaderToDrawer(@NonNull Admin admin) {
         View headerView = mDrawer.inflateHeaderView(R.layout.drawer_header);
         TextView textUser = (TextView) headerView.findViewById(R.id.text_user);
-        textUser.setText(admin.getFirstName() + " " + admin.getLastName());
+        textUser.setText(admin.getFirst_name() + " " + admin.getLast_name());
     }
 
     /**
@@ -248,7 +248,7 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
                 Group group = getSelectedGroup();
                 if (group != null && !mLastSelectedGroupId.equals(group.getId())) {
                     activityBase.setTitle(group.getName());
-                    AccessToken accessToken = FpamApplication.getFacebookAccessToken();
+                    AccessToken accessToken = ApplicationFpam.getFacebookAccessToken();
                     if (FBUtils.isValidToken(accessToken)) {
                         activityBase.loadFeed(accessToken, group);
                     } else {

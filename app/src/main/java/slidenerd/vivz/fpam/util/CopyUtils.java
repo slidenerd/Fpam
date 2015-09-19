@@ -4,58 +4,18 @@ import java.util.List;
 
 import io.realm.RealmList;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.admin.Admin;
-import slidenerd.vivz.fpam.model.json.admin.Picture;
-import slidenerd.vivz.fpam.model.json.admin.PictureData;
 import slidenerd.vivz.fpam.model.json.feed.Attachment;
 import slidenerd.vivz.fpam.model.json.feed.AttachmentImage;
 import slidenerd.vivz.fpam.model.json.feed.Comment;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.feed.User;
 import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.model.realm.RealmAdmin;
 import slidenerd.vivz.fpam.model.realm.RealmAttachment;
 import slidenerd.vivz.fpam.model.realm.RealmComment;
 import slidenerd.vivz.fpam.model.realm.RealmPost;
 import slidenerd.vivz.fpam.model.realm.RealmUser;
 
 public class CopyUtils {
-    public static RealmAdmin createFrom(Admin admin) {
-        RealmAdmin realmAdmin = new RealmAdmin();
-        realmAdmin.setId(admin.getId());
-        realmAdmin.setEmail(admin.getEmail());
-        realmAdmin.setFirstName(admin.getFirstName());
-        realmAdmin.setLastName(admin.getLastName());
-        Picture picture = admin.getPicture();
-        if (picture != null && picture.getPictureData() != null) {
-            PictureData pictureData = picture.getPictureData();
-            realmAdmin.setHeight(pictureData.getHeight());
-            realmAdmin.setWidth(pictureData.getWidth());
-            realmAdmin.setIsSilhouette(pictureData.getIsSilhouette());
-            realmAdmin.setUrl(pictureData.getUrl());
-        } else {
-            L.m("The admin's profile image information was unavailable for saving");
-        }
-        return realmAdmin;
-    }
-
-    public static Admin createFrom(RealmAdmin realmAdmin) {
-        Admin admin = new Admin();
-        admin.setId(realmAdmin.getId());
-        admin.setFirstName(realmAdmin.getFirstName());
-        admin.setLastName(realmAdmin.getLastName());
-        admin.setEmail(realmAdmin.getEmail());
-        PictureData pictureData = new PictureData();
-        pictureData.setWidth(realmAdmin.getWidth());
-        pictureData.setHeight(realmAdmin.getHeight());
-        pictureData.setUrl(realmAdmin.getUrl());
-        pictureData.setIsSilhouette(realmAdmin.isSilhouette());
-        Picture picture = new Picture();
-        picture.setPictureData(pictureData);
-        admin.setPicture(picture);
-        return admin;
-    }
-
 
     public static RealmUser createFrom(User user) {
         RealmUser realmUser = new RealmUser();

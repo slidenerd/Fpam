@@ -1,18 +1,17 @@
 package slidenerd.vivz.fpam.database;
 
-import android.content.Context;
 import android.support.annotation.Nullable;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.model.realm.RealmAdmin;
-import slidenerd.vivz.fpam.util.CopyUtils;
 
 public class DataStore {
 
@@ -20,7 +19,7 @@ public class DataStore {
      * TODO make this work in the background thread
      * In the first step, check if the list of groups to be stored is empty. If we have 1-N groups to store, use shared preferences to do the same. Convert the list of groups into a JSON string and store that.
      */
-    public static void storeGroups(Context context, Realm realm, JSONArray jsonArray) {
+    public static void storeGroups(Realm realm, JSONArray jsonArray) {
         realm.beginTransaction();
         realm.createOrUpdateAllFromJson(Group.class, jsonArray);
         realm.commitTransaction();
@@ -32,7 +31,7 @@ public class DataStore {
      *
      * @return a list of groups that were retrieved from the backend, if the admin owns no groups or if there was a problem while retrieving data, then return an empty list.
      */
-    public static ArrayList<Group> loadGroups(Context context, Realm realm) {
+    public static ArrayList<Group> loadGroups(Realm realm) {
 
         RealmResults<Group> realmResults = realm.where(Group.class).findAllSorted("name");
         ArrayList<Group> listGroups = new ArrayList<>(20);
@@ -48,12 +47,12 @@ public class DataStore {
     /**
      * In the first step, check if we have a valid user to store. If we have a valid user, use shared preferences to store each aspect of their profile. Convert the 'Picture' object of the user into a JSON String and store that.
      *
-     * @param admin the person using this app as an admin whose details you want to store in the backend.
+     * @param jsonObject the person using this app as an admin whose details you want to store in the backend.
      */
-    public static void storeAdmin(Context context, Realm realm, Admin admin) {
-        RealmAdmin realmAdmin = CopyUtils.createFrom(admin);
+    public static void storeAdmin(Realm realm, JSONObject jsonObject) {
         realm.beginTransaction();
-        realm.copyToRealmOrUpdate(realmAdmin);
+        L.m(jsonObject.toString());
+        realm.createOrUpdateObjectFromJson(Admin.class, jsonObject);
         realm.commitTransaction();
     }
 
@@ -63,9 +62,15 @@ public class DataStore {
      * @return an admin whose account is currently logged in if the login was successful, on any error, it returns null
      */
     @Nullable
-    public static Admin loadAdmin(Context context, Realm realm) {
-        RealmAdmin realmAdmin = realm.where(RealmAdmin.class).findFirst();
-        return CopyUtils.createFrom(realmAdmin);
+    public static Admin loadAdmin(Realm realm) {
+        Admin sourceObject = realm.where(Admin.class).findFirst();
+        Admin admin = new Admin();
+        admin.setId(sourceObject.getId());
+        admin.setEmail(sourceObject.getEmail());
+        admin.setFirst_name(sourceObject.getFirst_name());
+        admin.setLast_name(sourceObject.getLast_name());
+//        admin.setPicture(sourceObject.getPicture());
+        return admin;
     }
 
 }
