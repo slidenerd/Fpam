@@ -22,5 +22,10 @@
         android:orderInCategory="300"
         android:title="@string/title_activity_test2"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_export_database"
+        android:orderInCategory="300"
+        android:title="@string/title_export_database"
+        app:showAsAction="never" />
 
 </menu>

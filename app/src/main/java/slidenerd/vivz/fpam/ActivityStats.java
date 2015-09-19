@@ -9,8 +9,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 
+import slidenerd.vivz.fpam.util.FileUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
 @EActivity
@@ -54,6 +56,11 @@ public class ActivityStats extends ActivityBase implements SwipeRefreshLayout.On
             startActivity(intent);
         }
         return false;
+    }
+
+    @OptionsItem(R.id.action_export_database)
+    void onExportDatabaseSelected() {
+        FileUtils.exportDatabase(this);
     }
 
     @Override

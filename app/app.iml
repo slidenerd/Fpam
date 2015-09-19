@@ -143,6 +143,7 @@
     <orderEntry type="library" exported="" name="androidannotations-api-3.3.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-cast-7.8.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-wearable-7.8.0" level="project" />
+    <orderEntry type="library" exported="" name="parceler-api-1.0.3" level="project" />
     <orderEntry type="library" exported="" name="play-services-wallet-7.8.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-appstate-7.8.0" level="project" />
     <orderEntry type="library" exported="" name="facebook-android-sdk-4.5.0" level="project" />

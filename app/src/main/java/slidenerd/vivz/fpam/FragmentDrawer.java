@@ -27,6 +27,7 @@ import com.facebook.login.LoginManager;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.sharedpreferences.Pref;
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 
@@ -40,6 +41,7 @@ import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
 /**
+ * TODO when the drawer rotates it does not properly update the name of the previously selected group if any, gotta fix this!
  * A simple {@link Fragment} subclass.
  */
 @EFragment
@@ -57,12 +59,10 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     @InstanceState
     String mLastSelectedGroupId = "";
 
-    @InstanceState
     Admin mAdmin;
     /*
         The list of groups that the logged in user is an admin of.
      */
-    @InstanceState
     ArrayList<Group> mListGroups = new ArrayList<>();
     private DrawerLayout mDrawerLayout;
     /*
@@ -99,6 +99,9 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
         if (savedInstanceState == null) {
             mAdmin = DataStore.loadAdmin(context, realm);
             mListGroups = DataStore.loadGroups(context, realm);
+        } else {
+            mAdmin = savedInstanceState.getParcelable("admin");
+            mListGroups = Parcels.unwrap(savedInstanceState.getParcelable("groups"));
         }
     }
 
@@ -140,10 +143,17 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
         navigate();
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("admin", mAdmin);
+        outState.putParcelable("groups", Parcels.wrap(mListGroups));
+    }
+
     /**
      * If the access token is null or expired, this Activity will finish executing but this method is still called inside the onCreate as per the debugger and hence, check whether we have a valid admin before attempting to extract any data to prevent a crash.
      *
-     * @param admin
+     * @param admin the person who has logged in using this app
      */
 
     public void addHeaderToDrawer(@NonNull Admin admin) {
@@ -155,7 +165,7 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     /**
      * If the access token is null or expired, this Activity will finish executing but this method is still called inside the onCreate as per the debugger and hence, check whether we have a valid list before adding any items to the drawer to prevent a crash.
      *
-     * @param list
+     * @param list the list of groups that the logged in user controls
      */
     public void addGroupsToDrawer(ArrayList<Group> list) {
         Menu menu = mDrawer.getMenu();
@@ -177,7 +187,7 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     }
 
     private boolean didUserSeeDrawer() {
-        return mSharedPreferences.firstTime().get() == true;
+        return mSharedPreferences.firstTime().get();
     }
 
     private void markDrawerSeen() {
@@ -188,7 +198,7 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
      * @return true if a non zero number of groups were retrieved for the currently logged in user , else false
      */
     private boolean hasGroups() {
-        return !mListGroups.isEmpty() ? true : false;
+        return !mListGroups.isEmpty();
     }
 
     @Override

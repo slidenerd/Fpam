@@ -22,19 +22,16 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
+import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Set;
 
 import io.realm.Realm;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
-import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
@@ -79,24 +76,22 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
 
     @Background
     void loadUserAndGroups(AccessToken accessToken, Gson gson) {
-        Admin admin = null;
-        ArrayList<Group> listGroups = new ArrayList<>();
+        Admin admin;
+        Realm realm = null;
+        JSONArray jsonArray;
         try {
             admin = FBUtils.requestMeSync(accessToken, gson);
-            listGroups = FBUtils.requestGroupsSync(accessToken, gson);
-            Collections.sort(listGroups, new Comparator<Group>() {
-                @Override
-                public int compare(Group lhs, Group rhs) {
-                    return lhs.getName().toLowerCase().compareTo(rhs.getName().toLowerCase());
-                }
-            });
+            jsonArray = FBUtils.requestGroupsSync(accessToken, gson);
+            realm = Realm.getDefaultInstance();
+            DataStore.storeAdmin(this, realm, admin);
+            DataStore.storeGroups(this, realm, jsonArray);
         } catch (JSONException e) {
             L.m("" + e);
+        } finally {
+            if (realm != null) {
+                realm.close();
+            }
         }
-        Realm realm = Realm.getDefaultInstance();
-        DataStore.storeAdmin(this, realm, admin);
-        DataStore.storeGroups(this, realm, listGroups);
-        realm.close();
         //Store the admin and list of groups associated with the admin on the UI Thread
         onLogin();
     }

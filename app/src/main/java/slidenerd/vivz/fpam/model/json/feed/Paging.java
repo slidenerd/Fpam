@@ -1,32 +1,24 @@
 package slidenerd.vivz.fpam.model.json.feed;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.google.gson.annotations.Expose;
 
-public class Paging implements Parcelable {
+import org.parceler.Parcel;
 
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Paging> CREATOR = new Parcelable.Creator<Paging>() {
-        @Override
-        public Paging createFromParcel(Parcel in) {
-            return new Paging(in);
-        }
+import io.realm.PagingRealmProxy;
+import io.realm.RealmObject;
 
-        @Override
-        public Paging[] newArray(int size) {
-            return new Paging[size];
-        }
-    };
+
+@Parcel(implementations = {PagingRealmProxy.class},
+        value = Parcel.Serialization.BEAN,
+        analyze = {Paging.class})
+public class Paging extends RealmObject {
+
     @Expose
     private String previous;
     @Expose
     private String next;
 
-    protected Paging(Parcel in) {
-        previous = in.readString();
-        next = in.readString();
+    public Paging() {
     }
 
     /**
@@ -55,16 +47,5 @@ public class Paging implements Parcelable {
      */
     public void setNext(String next) {
         this.next = next;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(previous);
-        dest.writeString(next);
     }
 }

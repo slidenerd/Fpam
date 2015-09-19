@@ -1,27 +1,22 @@
 package slidenerd.vivz.fpam.model.json.group;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 
+import org.parceler.Parcel;
 
-public class Group implements Parcelable {
+import io.realm.GroupRealmProxy;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Group> CREATOR = new Parcelable.Creator<Group>() {
-        @Override
-        public Group createFromParcel(Parcel in) {
-            return new Group(in);
-        }
+@Parcel(implementations = {GroupRealmProxy.class},
+        value = Parcel.Serialization.BEAN,
+        analyze = {Group.class})
+public class Group extends RealmObject {
 
-        @Override
-        public Group[] newArray(int size) {
-            return new Group[size];
-        }
-    };
     @Expose
     private String name;
+    @PrimaryKey
     @Expose
     private String id;
     @Expose
@@ -30,14 +25,7 @@ public class Group implements Parcelable {
     private int unread;
 
     public Group() {
-        this(null, null, null, 0);
-    }
 
-    protected Group(Parcel in) {
-        name = in.readString();
-        id = in.readString();
-        icon = in.readString();
-        unread = in.readInt();
     }
 
     public Group(String id, String name, String icon, int unread) {
@@ -104,16 +92,4 @@ public class Group implements Parcelable {
         this.unread = unread;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(name);
-        dest.writeString(id);
-        dest.writeString(icon);
-        dest.writeInt(unread);
-    }
 }

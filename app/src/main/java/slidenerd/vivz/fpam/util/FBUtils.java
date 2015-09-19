@@ -17,14 +17,10 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import slidenerd.vivz.fpam.Keys;
-import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 
-/**
- * Created by vivz on 29/07/15.
- */
 public class FBUtils {
     public static boolean isValidToken(AccessToken accessToken) {
         return accessToken != null && !accessToken.isExpired();
@@ -45,8 +41,7 @@ public class FBUtils {
         request.setParameters(parameters);
         GraphResponse graphResponse = request.executeAndWait();
         JSONObject jsonObject = graphResponse.getJSONObject();
-        Admin admin = gson.fromJson(jsonObject.toString(), Admin.class);
-        return admin;
+        return gson.fromJson(jsonObject.toString(), Admin.class);
     }
 
 
@@ -55,7 +50,8 @@ public class FBUtils {
      * @return a List containing all the groups owned by the logged in user and empty list if the logged in user doesn't own any groups or the groups were not retrieved for some reason. The JSON response is actually an object that contains an array with the name 'data' which contains all the groups.
      * @throws JSONException
      */
-    public static ArrayList<Group> requestGroupsSync(AccessToken accessToken, Gson gson) throws JSONException {
+    @Nullable
+    public static JSONArray requestGroupsSync(AccessToken accessToken, Gson gson) throws JSONException {
         GraphRequest request = new GraphRequest(accessToken, "me/admined_groups");
         Bundle parameters = new Bundle();
         parameters.putString("fields", "name,id,icon,unread");
@@ -63,17 +59,7 @@ public class FBUtils {
         GraphResponse response = request.executeAndWait();
         ArrayList<Group> listGroups = new ArrayList<>();
         JSONObject jsonObject = response.getJSONObject();
-        JSONArray arrayData = jsonObject.getJSONArray(Keys.JSON_KEY_DATA);
-        for (int i = 0; i < arrayData.length(); i++) {
-            try {
-                JSONObject objectGroup = arrayData.getJSONObject(i);
-                Group group = gson.fromJson(objectGroup.toString(), Group.class);
-                listGroups.add(group);
-            } catch (JSONException e) {
-                L.m("" + e);
-            }
-        }
-        return listGroups;
+        return jsonObject.getJSONArray(Keys.JSON_KEY_DATA);
     }
 
     /*
@@ -92,7 +78,6 @@ public class FBUtils {
         JSONArray arrayData = jsonObject.getJSONArray(Keys.JSON_KEY_DATA);
         Type listType = new TypeToken<ArrayList<Post>>() {
         }.getType();
-        listPosts = gson.fromJson(arrayData.toString(), listType);
-        return listPosts;
+        return gson.fromJson(arrayData.toString(), listType);
     }
 }

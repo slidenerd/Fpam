@@ -3,6 +3,8 @@ package slidenerd.vivz.fpam.database;
 import android.content.Context;
 import android.support.annotation.Nullable;
 
+import org.json.JSONArray;
+
 import java.util.ArrayList;
 
 import io.realm.Realm;
@@ -10,24 +12,17 @@ import io.realm.RealmResults;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.model.realm.RealmAdmin;
-import slidenerd.vivz.fpam.model.realm.RealmGroup;
 import slidenerd.vivz.fpam.util.CopyUtils;
 
-/**
- * Created by vivz on 03/08/15.
- */
 public class DataStore {
 
     /**
      * TODO make this work in the background thread
      * In the first step, check if the list of groups to be stored is empty. If we have 1-N groups to store, use shared preferences to do the same. Convert the list of groups into a JSON string and store that.
-     *
-     * @param listGroups
      */
-    public static void storeGroups(Context context, Realm realm, ArrayList<Group> listGroups) {
-        ArrayList<RealmGroup> listRealmGroups = CopyUtils.createFromGroups(listGroups);
+    public static void storeGroups(Context context, Realm realm, JSONArray jsonArray) {
         realm.beginTransaction();
-        realm.copyToRealmOrUpdate(listRealmGroups);
+        realm.createOrUpdateAllFromJson(Group.class, jsonArray);
         realm.commitTransaction();
     }
 
@@ -39,9 +34,9 @@ public class DataStore {
      */
     public static ArrayList<Group> loadGroups(Context context, Realm realm) {
 
-        RealmResults<RealmGroup> realmResults = realm.where(RealmGroup.class).findAllSorted("name");
+        RealmResults<Group> realmResults = realm.where(Group.class).findAllSorted("name");
         ArrayList<Group> listGroups = new ArrayList<>(20);
-        for (RealmGroup group : realmResults) {
+        for (Group group : realmResults) {
             //To avoid the below error, I simply duplicated the RealmResults so that it doesnt get passed to the background thread Caused by: java.lang.IllegalStateException: Realm access from incorrect thread. Realm objects can only be accessed on the thread they were created.
             Group fbGroup = new Group(group.getId(), group.getName(), group.getIcon(), group.getUnread());
             listGroups.add(fbGroup);
@@ -70,8 +65,7 @@ public class DataStore {
     @Nullable
     public static Admin loadAdmin(Context context, Realm realm) {
         RealmAdmin realmAdmin = realm.where(RealmAdmin.class).findFirst();
-        Admin admin = CopyUtils.createFrom(realmAdmin);
-        return admin;
+        return CopyUtils.createFrom(realmAdmin);
     }
 
 }

@@ -11,10 +11,7 @@ import slidenerd.vivz.fpam.model.json.feed.Comments;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.feed.User;
 
-/**
- * Created by vivz on 16/09/15.
- */
-public class PrintUtil {
+public class PrintUtils {
     public static String toString(User user) {
         return "\n" + user.getId()
                 + "\n" + user.getName()
@@ -31,7 +28,7 @@ public class PrintUtil {
         StringBuilder stringBuilder = new StringBuilder();
         if (comments != null) {
             for (Comment comment : comments.getData()) {
-                stringBuilder.append("\n" + toString(comment) + "\n");
+                stringBuilder.append("\n").append(toString(comment)).append("\n");
             }
         } else {
             stringBuilder.append("\nDid not find any comments\n");
@@ -59,7 +56,7 @@ public class PrintUtil {
         StringBuilder stringBuilder = new StringBuilder();
         if (attachments != null) {
             for (Attachment attachment : attachments.getData()) {
-                stringBuilder.append("\n" + toString(attachment) + "\n");
+                stringBuilder.append("\n").append(toString(attachment)).append("\n");
             }
         } else {
             stringBuilder.append("\nDid not find any attachments\n");
@@ -84,7 +81,7 @@ public class PrintUtil {
     public static String toString(List<Post> listPosts) {
         StringBuilder stringBuilder = new StringBuilder();
         for (Post post : listPosts) {
-            stringBuilder.append("\n" + toString(post) + "\n");
+            stringBuilder.append("\n").append(toString(post)).append("\n");
         }
         return stringBuilder.toString();
     }
