@@ -1,6 +1,5 @@
 package slidenerd.vivz.fpam;
 
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
@@ -25,7 +24,6 @@ import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 
 import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.parceler.Parcels;
 
@@ -52,17 +50,14 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     private static final int MENU_START_ID = 101;
     @Pref
     MyPrefs_ mSharedPreferences;
-    @InstanceState
     int mSelectedId = 0;
-
-    @InstanceState
     String mLastSelectedGroupId = "";
 
-    Admin mAdmin;
+    private Admin mAdmin;
     /*
         The list of groups that the logged in user is an admin of.
      */
-    ArrayList<Group> mListGroups = new ArrayList<>();
+    private ArrayList<Group> mListGroups = new ArrayList<>();
     private DrawerLayout mDrawerLayout;
     /*
     The Drawer Listener responsible for providing a handy way to tie together the functionality of DrawerLayout and the framework ActionBar to implement the recommended design for navigation drawers.
@@ -98,9 +93,13 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
         if (savedInstanceState == null) {
             mAdmin = DataStore.loadAdmin(realm);
             mListGroups = DataStore.loadGroups(realm);
+            L.m("Loading From Realm " + mAdmin.getId() + " " + mAdmin.getEmail() + " " + mAdmin.getFirst_name() + " " + mAdmin.getLast_name() + " " + mAdmin.getPicture());
         } else {
             mAdmin = Parcels.unwrap(savedInstanceState.getParcelable("admin"));
             mListGroups = Parcels.unwrap(savedInstanceState.getParcelable("groups"));
+            mSelectedId = savedInstanceState.getInt("selected");
+            mLastSelectedGroupId = savedInstanceState.getString("lastSelected");
+            L.m("Loading With Parceler " + " " + mAdmin.getId() + " " + mAdmin.getEmail() + " " + mAdmin.getFirst_name() + " " + mAdmin.getLast_name() + " " + mAdmin.getPicture());
         }
     }
 
@@ -145,8 +144,11 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("admin", Parcels.wrap(mAdmin));
+
+        outState.putParcelable("admin", Parcels.wrap(Admin.class, mAdmin));
         outState.putParcelable("groups", Parcels.wrap(mListGroups));
+        outState.putInt("selected", mSelectedId);
+        outState.putString("lastSelected", mLastSelectedGroupId);
     }
 
     /**

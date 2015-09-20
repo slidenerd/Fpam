@@ -18,7 +18,7 @@ import slidenerd.vivz.fpam.util.ValidationUtils;
 /**
  * Created by vivz on 29/08/15.
  */
-public class PhraseAdapter extends AbstractRealmAdapter<RealmPhrase, RecyclerView.ViewHolder> {
+public class PhraseAdapter extends AbstractMutableRealmAdapter<RealmPhrase, RecyclerView.ViewHolder> {
 
     private LayoutInflater mLayoutInflater;
 

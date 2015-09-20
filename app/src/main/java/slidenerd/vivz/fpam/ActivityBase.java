@@ -119,7 +119,7 @@ public abstract class ActivityBase extends AppCompatActivity {
 
     @UiThread
     void onFeedLoaded() {
-
+        
     }
 
     @Override

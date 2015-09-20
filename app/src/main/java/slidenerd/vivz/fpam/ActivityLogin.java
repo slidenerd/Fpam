@@ -51,13 +51,13 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
                     .setOnCancelListener(new DialogInterface.OnCancelListener() {
                         @Override
                         public void onCancel(DialogInterface dialog) {
-                            setupLoginManager();
+                            initLoginManager();
                         }
                     })
                     .setOnDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
                         public void onDismiss(DialogInterface dialog) {
-                            setupLoginManager();
+                            initLoginManager();
                         }
                     })
                     .create();
@@ -68,33 +68,35 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
             if (FBUtils.isValidToken(accessToken)) {
                 mProgress.setVisibility(View.VISIBLE);
                 loadUserAndGroups(accessToken);
+            } else {
+                L.m("access token is null or expired");
             }
         }
     }
 
     @Background
     void loadUserAndGroups(AccessToken accessToken) {
-        JSONObject jsonObject;
         Realm realm = null;
-        JSONArray jsonArray;
         try {
             realm = Realm.getDefaultInstance();
-            jsonObject = FBUtils.requestMeSync(accessToken);
-            jsonArray = FBUtils.requestGroupsSync(accessToken);
-            L.m(jsonObject.toString());
+            JSONObject jsonObject = FBUtils.requestMeSync(accessToken);
+            JSONArray jsonArray = FBUtils.requestGroupsSync(accessToken);
+            //Store the admin and list of groups associated with the admin on the UI Thread
             DataStore.storeAdmin(realm, jsonObject);
             DataStore.storeGroups(realm, jsonArray);
         } catch (JSONException e) {
             L.m("" + e);
         } finally {
-            realm.close();
+            if (realm != null) {
+                realm.close();
+            }
+            onUserAndGroupsLoaded();
         }
-        //Store the admin and list of groups associated with the admin on the UI Thread
-        onLogin();
+
     }
 
     @UiThread
-    void onLogin() {
+    void onUserAndGroupsLoaded() {
         mProgress.setVisibility(View.GONE);
         NavUtils.startActivityStats(ActivityLogin.this);
         finish();
@@ -111,21 +113,15 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
      */
     @Click(R.id.btn_login)
     public void onClickLogin() {
-        setupLoginManager();
+        initLoginManager();
     }
 
-    private void setupLoginManager() {
+    private void initLoginManager() {
         LoginManager loginManager = LoginManager.getInstance();
         loginManager.registerCallback(mCallbackManager, this);
         loginManager.logInWithReadPermissions(this, Arrays.asList("email", "user_managed_groups", "user_friends"));
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        super.onActivityResult(requestCode, resultCode, data);
-        mCallbackManager.onActivityResult(requestCode, resultCode, data);
-    }
 
     @Override
     public void onSuccess(LoginResult loginResult) {
@@ -141,5 +137,12 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
     @Override
     public void onError(FacebookException e) {
         L.t(ActivityLogin.this, "Facebook Servers couldn't connect to Fpam " + e);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+        mCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 }

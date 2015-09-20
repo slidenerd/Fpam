@@ -7,12 +7,10 @@ import io.realm.RealmObject;
 import io.realm.RealmResults;
 
 public abstract class AbstractRealmAdapter<T extends RealmObject, VH extends RecyclerView.ViewHolder>
-        extends RecyclerView.Adapter<VH> implements OnSwipeListener {
+        extends RecyclerView.Adapter<VH> {
     protected RealmResults<T> mRealmResults;
-    private Realm realm;
 
     public AbstractRealmAdapter(Realm realm) {
-        this.realm = realm;
         this.mRealmResults = getResults(realm);
     }
 
@@ -68,27 +66,6 @@ public abstract class AbstractRealmAdapter<T extends RealmObject, VH extends Rec
 
     public final int getCount() {
         return mRealmResults.size();
-    }
-
-    public void add(T item, boolean update) {
-        realm.beginTransaction();
-        T phraseToWrite = update == true ? realm.copyToRealmOrUpdate(item) : realm.copyToRealm(item);
-        realm.commitTransaction();
-        notifyItemRangeChanged(0, getItemCount());
-    }
-
-    @Override
-    public final void onSwipe(int position) {
-        if (!isHeader(position) && !isFooter(position)) {
-            int itemPosition = position - getHeaderCount();
-            if (!mRealmResults.isEmpty()) {
-                realm.beginTransaction();
-                T item = mRealmResults.get(itemPosition);
-                item.removeFromRealm();
-                realm.commitTransaction();
-                notifyItemRemoved(position);
-            }
-        }
     }
 
     public abstract boolean hasHeader();

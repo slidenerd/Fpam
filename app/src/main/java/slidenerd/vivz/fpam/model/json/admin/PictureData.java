@@ -6,6 +6,7 @@ import io.realm.PictureDataRealmProxy;
 import io.realm.RealmObject;
 
 /**
+ * TODO this will crash the app if you commit now
  * This class is a container for the user's profile picture and returns profile pictures closest to a requested size maintaining its width, height, url and whether the user has set a custom profile picture on their facebook profile or facebook has provided the default image
  */
 

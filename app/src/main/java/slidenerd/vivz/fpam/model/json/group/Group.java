@@ -1,8 +1,5 @@
 package slidenerd.vivz.fpam.model.json.group;
 
-
-import com.google.gson.annotations.Expose;
-
 import org.parceler.Parcel;
 
 import io.realm.GroupRealmProxy;
@@ -14,14 +11,13 @@ import io.realm.annotations.PrimaryKey;
         analyze = {Group.class})
 public class Group extends RealmObject {
 
-    @Expose
-    private String name;
     @PrimaryKey
-    @Expose
     private String id;
-    @Expose
+
+    private String name;
+
     private String icon;
-    @Expose
+
     private int unread;
 
     public Group() {

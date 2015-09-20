@@ -5,6 +5,9 @@ import org.parceler.Parcel;
 import io.realm.PictureRealmProxy;
 import io.realm.RealmObject;
 
+/**
+ * Todo this will crash the app if you commit now
+ */
 @Parcel(implementations = {PictureRealmProxy.class},
         value = Parcel.Serialization.BEAN,
         analyze = {Picture.class})

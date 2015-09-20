@@ -11,12 +11,13 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
+import slidenerd.vivz.fpam.model.json.admin.Picture;
+import slidenerd.vivz.fpam.model.json.admin.PictureData;
 import slidenerd.vivz.fpam.model.json.group.Group;
 
 public class DataStore {
 
     /**
-     * TODO make this work in the background thread
      * In the first step, check if the list of groups to be stored is empty. If we have 1-N groups to store, use shared preferences to do the same. Convert the list of groups into a JSON string and store that.
      */
     public static void storeGroups(Realm realm, JSONArray jsonArray) {
@@ -26,7 +27,6 @@ public class DataStore {
     }
 
     /**
-     * TODO make this work in the background thread
      * Notice the default value for the json String that contains all groups. If the JSON String is null, our ArrayList will be null, if the json String is empty, our ArrayList will be null, however if our JSON String has a default value of [], our ArrayList will be empty and not null. Our objective is to ensure the ArrayList does not get a null value if something goes wrong.
      *
      * @return a list of groups that were retrieved from the backend, if the admin owns no groups or if there was a problem while retrieving data, then return an empty list.
@@ -63,13 +63,29 @@ public class DataStore {
      */
     @Nullable
     public static Admin loadAdmin(Realm realm) {
+        //read the picture data first
+        PictureData sourcePictureData = realm.where(PictureData.class).findFirst();
+        //duplicate the picture data to prevent crashing the app after realm instance has been closed
+        PictureData pictureData = new PictureData();
+        pictureData.setUrl(sourcePictureData.getUrl());
+        pictureData.setWidth(sourcePictureData.getWidth());
+        pictureData.setHeight(sourcePictureData.getHeight());
+        pictureData.setIs_silhouette(sourcePictureData.is_silhouette());
+        //read the picture first
+        Picture sourcePicture = realm.where(Picture.class).findFirst();
+        //duplicate the picture to prevent crashing the app after the realm instance has been closed
+        Picture picture = new Picture();
+        picture.setData(pictureData);
+        //read the admin data first
         Admin sourceObject = realm.where(Admin.class).findFirst();
+        //duplicate the admin to prevent crashing the app after the realm instance has been closed
         Admin admin = new Admin();
         admin.setId(sourceObject.getId());
         admin.setEmail(sourceObject.getEmail());
         admin.setFirst_name(sourceObject.getFirst_name());
         admin.setLast_name(sourceObject.getLast_name());
-//        admin.setPicture(sourceObject.getPicture());
+        //sourceObject.getPicture() returns null for some reason and causes an app crash while trying to save to a Parcelable, better set the data read above as PictureData
+        admin.setPicture(picture);
         return admin;
     }
 
