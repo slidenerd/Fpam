@@ -67,7 +67,7 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
         } else {
             if (FBUtils.isValidToken(accessToken)) {
                 mProgress.setVisibility(View.VISIBLE);
-                loadUserAndGroups(accessToken);
+                loadUserAndGroupsAsync(accessToken);
             } else {
                 L.m("access token is null or expired");
             }
@@ -75,7 +75,7 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
     }
 
     @Background
-    void loadUserAndGroups(AccessToken accessToken) {
+    void loadUserAndGroupsAsync(AccessToken accessToken) {
         Realm realm = null;
         try {
             realm = Realm.getDefaultInstance();

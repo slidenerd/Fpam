@@ -26,7 +26,6 @@ import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.model.realm.RealmPost;
 import slidenerd.vivz.fpam.util.CopyUtils;
-import slidenerd.vivz.fpam.util.DateUtils;
 import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
@@ -36,6 +35,7 @@ import slidenerd.vivz.fpam.util.NavUtils;
 @EActivity
 public abstract class ActivityBase extends AppCompatActivity {
 
+    public static final String DRAWER_FRAGMENT_TAG = "fragment_drawer";
     private FragmentDrawer_ mDrawer;
     private ViewStub mMainContent;
     private Toolbar mToolbar;
@@ -53,8 +53,7 @@ public abstract class ActivityBase extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
-        L.t(this, DateUtils.getUTCTimestamp() + "");
-        initChildActivityLayout();
+        initSubclassLayout();
         //if we dont have a valid access token or its null, redirect the person back to login screen
         AccessToken accessToken = ApplicationFpam.getFacebookAccessToken();
         if (!FBUtils.isValidToken(accessToken)) {
@@ -69,9 +68,9 @@ public abstract class ActivityBase extends AppCompatActivity {
         if (savedInstanceState == null) {
             mDrawer = new FragmentDrawer_();
         } else {
-            mDrawer = (FragmentDrawer_) getFragmentManager().findFragmentByTag("fragment_drawer");
+            mDrawer = (FragmentDrawer_) getFragmentManager().findFragmentByTag(DRAWER_FRAGMENT_TAG);
         }
-        getFragmentManager().beginTransaction().replace(R.id.drawer_frame_layout, mDrawer, "fragment_drawer").commit();
+        getFragmentManager().beginTransaction().replace(R.id.drawer_frame_layout, mDrawer, DRAWER_FRAGMENT_TAG).commit();
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
     }
 
@@ -85,7 +84,7 @@ public abstract class ActivityBase extends AppCompatActivity {
     /**
      * call this method before calling redirectToLogin to prevent crashes in the sub activities that implement this activity
      */
-    private void initChildActivityLayout() {
+    private void initSubclassLayout() {
         /**
          * The ViewStub into which the actual layout of the subclasses implementing this Activity is loaded. Each subclass Activity is expected to have a simple container or Layout and specify its id and layout resource file name when they implement this Activity. This needs to be done regardless of whether the Activity starts for the first time or starts after a subsequent rotation.
          */
@@ -113,13 +112,15 @@ public abstract class ActivityBase extends AppCompatActivity {
         } catch (JSONException e) {
             L.m("" + e);
         } finally {
-            realm.close();
+            if (realm != null) {
+                realm.close();
+            }
         }
     }
 
     @UiThread
     void onFeedLoaded() {
-        
+
     }
 
     @Override

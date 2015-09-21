@@ -24,6 +24,7 @@ import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.parceler.Parcels;
 
@@ -49,8 +50,10 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
      */
     private static final int MENU_START_ID = 101;
     @Pref
-    MyPrefs_ mSharedPreferences;
-    int mSelectedId = 0;
+    MyPrefs_ mPref;
+    @InstanceState
+    int mSelectedMenuId = 0;
+    @InstanceState
     String mLastSelectedGroupId = "";
 
     private Admin mAdmin;
@@ -62,11 +65,11 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     /*
     The Drawer Listener responsible for providing a handy way to tie together the functionality of DrawerLayout and the framework ActionBar to implement the recommended design for navigation drawers.
      */
-    private ActionBarDrawerToggle mDrawerToggle;
+    private ActionBarDrawerToggle mDrawerListener;
     private NavigationView mDrawer;
-    private Context context;
-    private ActivityBase activityBase;
-    private Realm realm;
+    private Context mContext;
+    private ActivityBase mActivity;
+    private Realm mRealm;
 
     public FragmentDrawer() {
         // Required empty public constructor
@@ -75,30 +78,28 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        this.context = context;
-        this.activityBase = (ActivityBase) context;
+        this.mContext = context;
+        this.mActivity = (ActivityBase) context;
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        this.context = activity;
-        this.activityBase = (ActivityBase) activity;
+        this.mContext = activity;
+        this.mActivity = (ActivityBase) activity;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        realm = Realm.getInstance(context);
+        mRealm = Realm.getInstance(mContext);
         if (savedInstanceState == null) {
-            mAdmin = DataStore.loadAdmin(realm);
-            mListGroups = DataStore.loadGroups(realm);
+            mAdmin = DataStore.loadAdmin(mRealm);
+            mListGroups = DataStore.loadGroups(mRealm);
             L.m("Loading From Realm " + mAdmin.getId() + " " + mAdmin.getEmail() + " " + mAdmin.getFirst_name() + " " + mAdmin.getLast_name() + " " + mAdmin.getPicture());
         } else {
             mAdmin = Parcels.unwrap(savedInstanceState.getParcelable("admin"));
             mListGroups = Parcels.unwrap(savedInstanceState.getParcelable("groups"));
-            mSelectedId = savedInstanceState.getInt("selected");
-            mLastSelectedGroupId = savedInstanceState.getString("lastSelected");
             L.m("Loading With Parceler " + " " + mAdmin.getId() + " " + mAdmin.getEmail() + " " + mAdmin.getFirst_name() + " " + mAdmin.getLast_name() + " " + mAdmin.getPicture());
         }
     }
@@ -122,13 +123,13 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
 
     void initDrawer(Toolbar toolbar, DrawerLayout drawerLayout) {
         mDrawerLayout = drawerLayout;
-        mDrawerToggle = new ActionBarDrawerToggle(activityBase,
+        mDrawerListener = new ActionBarDrawerToggle(mActivity,
                 mDrawerLayout,
                 toolbar,
                 R.string.drawer_open,
                 R.string.drawer_close);
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-        mDrawerToggle.syncState();
+        mDrawerLayout.setDrawerListener(mDrawerListener);
+        mDrawerListener.syncState();
     }
 
     @Override
@@ -147,8 +148,6 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
 
         outState.putParcelable("admin", Parcels.wrap(Admin.class, mAdmin));
         outState.putParcelable("groups", Parcels.wrap(mListGroups));
-        outState.putInt("selected", mSelectedId);
-        outState.putString("lastSelected", mLastSelectedGroupId);
     }
 
     /**
@@ -188,17 +187,17 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     }
 
     private boolean didUserSeeDrawer() {
-        return mSharedPreferences.firstTime().get();
+        return mPref.firstTime().get();
     }
 
     private void markDrawerSeen() {
-        mSharedPreferences.edit().firstTime().put(true).apply();
+        mPref.edit().firstTime().put(true).apply();
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        mDrawerToggle.onConfigurationChanged(newConfig);
+        mDrawerListener.onConfigurationChanged(newConfig);
     }
 
     void show() {
@@ -215,7 +214,7 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
             //return true to indicate that back press was handled here by the drawer itself
             return true;
         } else {
-            //return false to indicate the activity must handle the back press event
+            //return false to indicate the mActivity must handle the back press event
             return false;
         }
     }
@@ -223,29 +222,29 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     @Override
     public boolean onNavigationItemSelected(MenuItem menuItem) {
         menuItem.setChecked(true);
-        mSelectedId = menuItem.getItemId();
+        mSelectedMenuId = menuItem.getItemId();
         return navigate();
     }
 
     boolean navigate() {
-        switch (mSelectedId) {
+        switch (mSelectedMenuId) {
             case R.id.menu_settings:
                 hide();
                 break;
             case R.id.menu_logout:
                 logout();
                 hide();
-                NavUtils.startActivityLogin(context);
-                activityBase.finish();
+                NavUtils.startActivityLogin(mContext);
+                mActivity.finish();
                 break;
             default:
                 Group group = getSelectedGroup();
                 if (group != null) {
-                    activityBase.setTitle(group.getName());
+                    mActivity.setTitle(group.getName());
                     if (!mLastSelectedGroupId.equals(group.getId())) {
                         AccessToken accessToken = ApplicationFpam.getFacebookAccessToken();
                         if (FBUtils.isValidToken(accessToken)) {
-                            activityBase.loadFeed(accessToken, group);
+                            mActivity.loadFeed(accessToken, group);
                         } else {
                             L.m("Did not find a good access token from fragment drawer");
                         }
@@ -253,7 +252,7 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
                     }
                 }
                 //If the selected id is not the default one, then hide the drawer. It is default if the user has not selected anything previously and sees the drawer for the first time.
-                if (mSelectedId != 0) {
+                if (mSelectedMenuId != 0) {
                     hide();
                 }
 
@@ -276,7 +275,7 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     public Group getSelectedGroup() {
         Group group = null;
         if (!mListGroups.isEmpty()) {
-            int position = mSelectedId - MENU_START_ID;
+            int position = mSelectedMenuId - MENU_START_ID;
             //if we have a valid position between 0 to number of items in the list, then retrieve the item at that position
             if (position < mListGroups.size() && position >= 0) {
                 group = mListGroups.get(position);
@@ -288,6 +287,6 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     @Override
     public void onDestroy() {
         super.onDestroy();
-        realm.close();
+        mRealm.close();
     }
 }

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.admin.Picture;
 import slidenerd.vivz.fpam.model.json.admin.PictureData;
@@ -50,9 +49,12 @@ public class DataStore {
      * @param jsonObject the person using this app as an admin whose details you want to store in the backend.
      */
     public static void storeAdmin(Realm realm, JSONObject jsonObject) {
+        //The Picture and PictureData classes don't have a primary key , so if we try to update Admin directly from JSON, a new entry is created for both of them each time, and hence we first remove all existing entries for each class first and then add a new entry
         realm.beginTransaction();
-        L.m(jsonObject.toString());
-        realm.createOrUpdateObjectFromJson(Admin.class, jsonObject);
+        realm.where(PictureData.class).findAll().clear();
+        realm.where(Picture.class).findAll().clear();
+        realm.where(Admin.class).findAll().clear();
+        realm.createObjectFromJson(Admin.class, jsonObject);
         realm.commitTransaction();
     }
 
