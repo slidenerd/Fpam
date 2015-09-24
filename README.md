@@ -4,21 +4,29 @@
 
 <b>Login Screen</b>
 
-![snap 2015-09-24 at 17 19 17](https://cloud.githubusercontent.com/assets/5139030/10072586/7bf45402-62e0-11e5-8de6-2a17a1a8ad07.png)
+![snap 2015-09-24 at 21 13 56](https://cloud.githubusercontent.com/assets/5139030/10078181/36276e16-6301-11e5-987c-5ed6d842206c.png)
 
 This is the first screen a person sees when they start the app, if they are already logged in, they wont see this screen
 
 <b>The Drawer</b>
 
-![snap 2015-09-24 at 17 24 23](https://cloud.githubusercontent.com/assets/5139030/10072677/203ef3dc-62e1-11e5-9476-914d267bea05.png)
+![snap 2015-09-24 at 21 14 44](https://cloud.githubusercontent.com/assets/5139030/10078208/4c99bcd0-6301-11e5-916c-325150fd3f3d.png)
 
 This is the navigation drawer that displays a list of all the groups a person owns or NONE if the person doesn't and provides options to logout and access settings.
 
 <b>The Main Screen</b>
 
-![snap 2015-09-24 at 17 24 23](https://cloud.githubusercontent.com/assets/5139030/10072677/203ef3dc-62e1-11e5-9476-914d267bea05.png)
+![snap 2015-09-24 at 21 15 24](https://cloud.githubusercontent.com/assets/5139030/10078230/6766d246-6301-11e5-9217-814abc854717.png)
 
 This is the screen showing the posts and comments from the currently selected group along with important statistics for that group. Question to answer would be what statistics, how to display posts, how to display comments
+
+![snap 2015-09-24 at 21 16 26](https://cloud.githubusercontent.com/assets/5139030/10078271/88c8ffb8-6301-11e5-9491-0d560703e5ea.png)
+
+![snap 2015-09-24 at 21 17 03](https://cloud.githubusercontent.com/assets/5139030/10078293/a005acb2-6301-11e5-8546-f8c98dd0a65d.png)
+
+![snap 2015-09-24 at 21 18 19](https://cloud.githubusercontent.com/assets/5139030/10078328/ccb9309e-6301-11e5-99d5-d36cea9e81ed.png)
+
+
 
 # Fpam
 You know what it does, don't you?
