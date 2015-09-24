@@ -1,3 +1,19 @@
+
+
+SCREEN UPDATE[September 24, 2015, 5:20 pm]
+
+<b>Login Screen</b>
+
+![snap 2015-09-24 at 17 19 17](https://cloud.githubusercontent.com/assets/5139030/10072586/7bf45402-62e0-11e5-8de6-2a17a1a8ad07.png)
+
+This is the first screen a person sees when they start the app, if they are already logged in, they wont see this screen
+
+<b>The Drawer</b>
+
+![snap 2015-09-24 at 17 24 23](https://cloud.githubusercontent.com/assets/5139030/10072677/203ef3dc-62e1-11e5-9476-914d267bea05.png)
+
+This is the navigation drawer that displays a list of all the groups a person owns or NONE if the person doesn't and provides options to logout and access settings.
+
 # Fpam
 You know what it does, don't you?
 There can be posts made by people who don't exist
@@ -16,11 +32,3 @@ Currently, only the list of groups on 1 page are being stored, gotta find a way 
 UPDATE 3 [September 20, 2015 9+ pm]
 
 The current model for Feed processing takes separate model classes, one for GSON that implements a parcelable and one for Realm that doesn't . Need to keep one single class that directly stores stuff from JSON to Realm, and eliminates the need for any intermediate GSON, the idea is also to remember the fact that only a max of 500 posts should be stored per group and when a post is deleted, all its attachments and comments also be deleted.
-
-UPDATE 4[September 24, 2015, 5:20 pm]
-
-<b>Login Screen</b>
-
-![snap 2015-09-24 at 17 19 17](https://cloud.githubusercontent.com/assets/5139030/10072586/7bf45402-62e0-11e5-8de6-2a17a1a8ad07.png)
-
-This is the first screen a person sees when they start the app, if they are already logged in, they wont see this screen
