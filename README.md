@@ -40,6 +40,7 @@ This is the screen showing the posts and comments from the currently selected gr
 <li>Last 24 hours</li>
 <li>Past 1 week</li>
 </ol>
+
 The visual representation for 
 Each?
 
