@@ -1,6 +1,6 @@
 
 
-<h1>Screens</h1> [September 24, 2015, 5:20 pm]
+Screens [September 24, 2015, 5:20 pm]
 
 <b>Login Screen</b>
 
@@ -36,7 +36,6 @@ This is the screen showing the posts and comments from the currently selected gr
 <li>Top 10 spam links</li>
 <li>Top 10 spam words found</li>
 <li>What about timelines?</li>
-
 <li>Last 24 hours</li>
 <li>Past 1 week</li>
 </ol>
@@ -65,5 +64,5 @@ UPDATE 3 [September 20, 2015 9+ pm]
 The current model for Feed processing takes separate model classes, one for GSON that implements a parcelable and one for Realm that doesn't . Need to keep one single class that directly stores stuff from JSON to Realm, and eliminates the need for any intermediate GSON, the idea is also to remember the fact that only a max of 500 posts should be stored per group and when a post is deleted, all its attachments and comments also be deleted.
 
 
-<h1>The Workflow</h1>
+The Workflow
 
