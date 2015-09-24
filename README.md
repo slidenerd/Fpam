@@ -1,12 +1,12 @@
 
 
-<h1>SCREENS</h1> [September 24, 2015, 5:20 pm]
+<h1>Screens</h1> [September 24, 2015, 5:20 pm]
 
 <b>Login Screen</b>
 
 ![snap 2015-09-24 at 21 13 56](https://cloud.githubusercontent.com/assets/5139030/10078181/36276e16-6301-11e5-987c-5ed6d842206c.png)
 
-This is the first screen a person sees when they start the app, if they are already logged in, they wont see this screen
+This is the first screen a person sees when they start the app, if they are already logged in, they wont see this screen.
 
 <b>The Drawer</b>
 
