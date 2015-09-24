@@ -26,16 +26,6 @@ This is the screen showing the posts and comments from the currently selected gr
 
 ![snap 2015-09-24 at 21 18 19](https://cloud.githubusercontent.com/assets/5139030/10078328/ccb9309e-6301-11e5-99d5-d36cea9e81ed.png)
 
-
-
-# Fpam
-You know what it does, don't you?
-There can be posts made by people who don't exist
-![people without names posting stuff](https://cloud.githubusercontent.com/assets/5139030/9966000/c7686352-5e57-11e5-89d4-47725ba6f76d.png)
-
-This example post below is made by a person who doesn't exist on Facebook anymore or was banned
-![snap 2015-09-18 at 22 32 38](https://cloud.githubusercontent.com/assets/5139030/9966022/e13ecb40-5e57-11e5-9c21-49724fcdd84a.png)
-
 <h2>What statistics?</h2>
 <ol>
 <li>% spam posts</li>
@@ -52,6 +42,15 @@ This example post below is made by a person who doesn't exist on Facebook anymor
 </ol>
 The visual representation for 
 Each?
+
+
+# Fpam
+You know what it does, don't you?
+There can be posts made by people who don't exist
+![people without names posting stuff](https://cloud.githubusercontent.com/assets/5139030/9966000/c7686352-5e57-11e5-89d4-47725ba6f76d.png)
+
+This example post below is made by a person who doesn't exist on Facebook anymore or was banned
+![snap 2015-09-18 at 22 32 38](https://cloud.githubusercontent.com/assets/5139030/9966022/e13ecb40-5e57-11e5-9c21-49724fcdd84a.png)
 
 UPDATE 1 [September 20, 2015 9+ pm writing after a nice BR ice cream and chat]
 
