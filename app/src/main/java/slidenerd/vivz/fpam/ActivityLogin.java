@@ -31,7 +31,9 @@ import java.util.Set;
 import io.realm.Realm;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
+import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.util.FBUtils;
+import slidenerd.vivz.fpam.util.JSONUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
 @EActivity(R.layout.activity_login)
@@ -82,7 +84,8 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
             JSONObject jsonObject = FBUtils.requestMeSync(accessToken);
             JSONArray jsonArray = FBUtils.requestGroupsSync(accessToken);
             //Store the admin and list of groups associated with the admin on the UI Thread
-            DataStore.storeAdmin(realm, jsonObject);
+            Admin admin = JSONUtils.loadAdminFrom(jsonObject);
+            DataStore.storeAdmin(realm, admin);
             DataStore.storeGroups(realm, jsonArray);
         } catch (JSONException e) {
             L.m("" + e);

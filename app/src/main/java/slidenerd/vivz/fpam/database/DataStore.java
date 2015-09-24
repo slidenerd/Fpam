@@ -3,15 +3,12 @@ package slidenerd.vivz.fpam.database;
 import android.support.annotation.Nullable;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
-import slidenerd.vivz.fpam.model.json.admin.Picture;
-import slidenerd.vivz.fpam.model.json.admin.PictureData;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.CopyUtils;
@@ -42,15 +39,12 @@ public class DataStore {
     /**
      * In the first step, check if we have a valid user to store. If we have a valid user, use shared preferences to store each aspect of their profile. Convert the 'Picture' object of the user into a JSON String and store that.
      *
-     * @param jsonObject the person using this app as an admin whose details you want to store in the backend.
+     * @param admin the person using this app as an admin whose details you want to store in the backend.
      */
-    public static void storeAdmin(Realm realm, JSONObject jsonObject) {
+    public static void storeAdmin(Realm realm, Admin admin) {
         //The Picture and PictureData classes don't have a primary key , so if we try to update Admin directly from JSON, a new entry is created for both of them each time, and hence we first remove all existing entries for each class first and then add a new entry
         realm.beginTransaction();
-        realm.where(PictureData.class).findAll().clear();
-        realm.where(Picture.class).findAll().clear();
-        realm.where(Admin.class).findAll().clear();
-        realm.createObjectFromJson(Admin.class, jsonObject);
+        realm.copyToRealmOrUpdate(admin);
         realm.commitTransaction();
     }
 
@@ -62,9 +56,8 @@ public class DataStore {
     @Nullable
     public static Admin loadAdmin(Realm realm) {
         //read the picture data first
-        PictureData sourcePictureData = realm.where(PictureData.class).findFirst();
-        Admin sourceAdmin = realm.where(Admin.class).findFirst();
-        return CopyUtils.duplicateAdmin(sourcePictureData, sourceAdmin);
+        Admin src = realm.where(Admin.class).findFirst();
+        return CopyUtils.duplicateAdmin(src);
     }
 
     public static void storeFeed(Realm realm, JSONArray jsonArray) {

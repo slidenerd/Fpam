@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
-import slidenerd.vivz.fpam.model.json.admin.Picture;
-import slidenerd.vivz.fpam.model.json.admin.PictureData;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 
@@ -19,10 +17,8 @@ public class CopyUtils {
         return listDestinationGroups;
     }
 
-    public static Admin duplicateAdmin(PictureData realmPictureData, Admin realmAdmin) {
-        PictureData pictureData = new PictureData(realmPictureData.getUrl(), realmPictureData.getWidth(), realmPictureData.getHeight(), realmPictureData.is_silhouette());
-        Picture picture = new Picture(pictureData);
-        Admin admin = new Admin(realmAdmin.getId(), realmAdmin.getEmail(), realmAdmin.getFirst_name(), realmAdmin.getLast_name(), picture);
+    public static Admin duplicateAdmin(Admin src) {
+        Admin admin = new Admin(src.getId(), src.getEmail(), src.getFirstName(), src.getLastName(), src.getWidth(), src.getHeight(), src.isSilhouette(), src.getUrl());
         return admin;
     }
 

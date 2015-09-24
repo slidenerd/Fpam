@@ -96,11 +96,10 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
         if (savedInstanceState == null) {
             mAdmin = DataStore.loadAdmin(mRealm);
             mListGroups = DataStore.loadGroups(mRealm);
-            L.m("Loading From Realm " + mAdmin.getId() + " " + mAdmin.getEmail() + " " + mAdmin.getFirst_name() + " " + mAdmin.getLast_name() + " " + mAdmin.getPicture());
+            L.m("Loading From Realm " + mAdmin.getId() + " " + mAdmin.getEmail() + " " + mAdmin.getFirstName() + " " + mAdmin.getLastName() + " " + mAdmin.getWidth() + " " + mAdmin.getHeight() + " " + mAdmin.getUrl() + " " + mAdmin.isSilhouette());
         } else {
             mAdmin = Parcels.unwrap(savedInstanceState.getParcelable("admin"));
             mListGroups = Parcels.unwrap(savedInstanceState.getParcelable("groups"));
-            L.m("Loading With Parceler " + " " + mAdmin.getId() + " " + mAdmin.getEmail() + " " + mAdmin.getFirst_name() + " " + mAdmin.getLast_name() + " " + mAdmin.getPicture());
         }
     }
 
@@ -159,7 +158,7 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     public void addHeaderToDrawer(@NonNull Admin admin) {
         View headerView = mDrawer.inflateHeaderView(R.layout.drawer_header);
         TextView textUser = (TextView) headerView.findViewById(R.id.text_user);
-        textUser.setText(admin.getFirst_name() + " " + admin.getLast_name());
+        textUser.setText(admin.getFirstName() + " " + admin.getLastName());
     }
 
     /**

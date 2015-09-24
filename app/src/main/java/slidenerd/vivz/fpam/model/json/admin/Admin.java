@@ -14,19 +14,25 @@ public class Admin extends RealmObject {
     @PrimaryKey
     private String id;
     private String email;
-    private String first_name;
-    private String last_name;
-    private Picture picture;
+    private String firstName;
+    private String lastName;
+    private int width;
+    private int height;
+    private boolean isSilhouette;
+    private String url;
 
     public Admin() {
     }
 
-    public Admin(String id, String email, String first_name, String last_name, Picture picture) {
+    public Admin(String id, String email, String firstName, String lastName, int width, int height, boolean isSilhouette, String url) {
         this.id = id;
         this.email = email;
-        this.first_name = first_name;
-        this.last_name = last_name;
-        this.picture = picture;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.width = width;
+        this.height = height;
+        this.isSilhouette = isSilhouette;
+        this.url = url;
     }
 
 
@@ -59,45 +65,63 @@ public class Admin extends RealmObject {
     }
 
     /**
-     * @return The first_name
+     * @return The firstName
      */
-    public String getFirst_name() {
-        return first_name;
+    public String getFirstName() {
+        return firstName;
     }
 
     /**
-     * @param first_name The first_name
+     * @param firstName The firstName
      */
-    public void setFirst_name(String first_name) {
-        this.first_name = first_name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     /**
-     * @return The last_name
+     * @return The lastName
      */
-    public String getLast_name() {
-        return last_name;
+    public String getLastName() {
+        return lastName;
     }
 
     /**
-     * @param last_name The last_name
+     * @param lastName The lastName
      */
-    public void setLast_name(String last_name) {
-        this.last_name = last_name;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
-    /**
-     * @return The picture
-     */
-    public Picture getPicture() {
-        return picture;
+
+    public int getWidth() {
+        return width;
     }
 
-    /**
-     * @param picture The picture
-     */
-    public void setPicture(Picture picture) {
-        this.picture = picture;
+    public void setWidth(int width) {
+        this.width = width;
     }
 
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public boolean isSilhouette() {
+        return isSilhouette;
+    }
+
+    public void setIsSilhouette(boolean isSilhouette) {
+        this.isSilhouette = isSilhouette;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 }
