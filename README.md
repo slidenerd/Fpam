@@ -1,6 +1,6 @@
 
 
-SCREEN UPDATE[September 24, 2015, 5:20 pm]
+<h1>SCREENS</h1> [September 24, 2015, 5:20 pm]
 
 <b>Login Screen</b>
 
@@ -13,6 +13,12 @@ This is the first screen a person sees when they start the app, if they are alre
 ![snap 2015-09-24 at 17 24 23](https://cloud.githubusercontent.com/assets/5139030/10072677/203ef3dc-62e1-11e5-9476-914d267bea05.png)
 
 This is the navigation drawer that displays a list of all the groups a person owns or NONE if the person doesn't and provides options to logout and access settings.
+
+<b>The Main Screen</b>
+
+![snap 2015-09-24 at 17 24 23](https://cloud.githubusercontent.com/assets/5139030/10072677/203ef3dc-62e1-11e5-9476-914d267bea05.png)
+
+This is the screen showing the posts and comments from the currently selected group along with important statistics for that group. Question to answer would be what statistics, how to display posts, how to display comments
 
 # Fpam
 You know what it does, don't you?
