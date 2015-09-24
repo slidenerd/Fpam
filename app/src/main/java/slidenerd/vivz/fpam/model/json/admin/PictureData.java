@@ -23,6 +23,14 @@ public class PictureData extends RealmObject {
     public PictureData() {
     }
 
+    public PictureData(String url, int width, int height, boolean is_silhouette) {
+        this.url = url;
+        this.width = width;
+        this.height = height;
+        this.is_silhouette = is_silhouette;
+    }
+
+
     /**
      * @return The height
      */

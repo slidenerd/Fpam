@@ -6,14 +6,11 @@ import android.support.annotation.Nullable;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import slidenerd.vivz.fpam.Keys;
@@ -62,7 +59,7 @@ public class FBUtils {
     /*
     TODO implement the since parameter for requesting feeds from Facebook Graph API
      */
-    public static ArrayList<Post> requestFeedSync(AccessToken token, Gson gson, Group group) throws JSONException {
+    public static JSONArray requestFeedSync(AccessToken token, Group group) throws JSONException {
         ArrayList<Post> listPosts = new ArrayList<>();
         Bundle parameters = new Bundle();
         parameters.putString("fields", "from,message,caption,comments{from,message},description,name,picture,type,updated_time,attachments{media,type,url},link");
@@ -72,9 +69,7 @@ public class FBUtils {
         request.setParameters(parameters);
         GraphResponse response = request.executeAndWait();
         JSONObject jsonObject = response.getJSONObject();
-        JSONArray arrayData = jsonObject.getJSONArray(Keys.JSON_KEY_DATA);
-        Type listType = new TypeToken<ArrayList<Post>>() {
-        }.getType();
-        return gson.fromJson(arrayData.toString(), listType);
+        return jsonObject.getJSONArray(Keys.JSON_KEY_DATA);
+
     }
 }

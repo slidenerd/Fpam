@@ -1,48 +1,42 @@
 package slidenerd.vivz.fpam.model.json.feed;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import org.parceler.Parcel;
 
-import com.google.gson.annotations.Expose;
+import io.realm.AttachmentRealmProxy;
+import io.realm.RealmObject;
 
-public class Attachment implements Parcelable {
+@Parcel(implementations = {AttachmentRealmProxy.class},
+        value = Parcel.Serialization.BEAN,
+        analyze = {Attachment.class})
+public class Attachment extends RealmObject {
 
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Attachment> CREATOR = new Parcelable.Creator<Attachment>() {
-        @Override
-        public Attachment createFromParcel(Parcel in) {
-            return new Attachment(in);
-        }
 
-        @Override
-        public Attachment[] newArray(int size) {
-            return new Attachment[size];
-        }
-    };
-    @Expose
     private AttachmentMedia media;
-    @Expose
     private String type;
-    @Expose
     private String url;
 
-    protected Attachment(Parcel in) {
-        media = (AttachmentMedia) in.readValue(AttachmentMedia.class.getClassLoader());
-        type = in.readString();
-        url = in.readString();
+    public Attachment() {
+
     }
+
+    public Attachment(String url, String type, AttachmentMedia media) {
+        this.media = media;
+        this.type = type;
+        this.url = url;
+    }
+
 
     /**
      * @return The media
      */
-    public AttachmentMedia getAttachmentMedia() {
+    public AttachmentMedia getMedia() {
         return media;
     }
 
     /**
      * @param media The media
      */
-    public void setAttachmentMedia(AttachmentMedia media) {
+    public void setMedia(AttachmentMedia media) {
         this.media = media;
     }
 
@@ -72,17 +66,5 @@ public class Attachment implements Parcelable {
      */
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(media);
-        dest.writeString(type);
-        dest.writeString(url);
     }
 }

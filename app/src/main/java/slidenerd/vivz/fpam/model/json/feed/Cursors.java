@@ -1,14 +1,27 @@
 package slidenerd.vivz.fpam.model.json.feed;
 
 
-import com.google.gson.annotations.Expose;
+import org.parceler.Parcel;
 
-public class Cursors {
+import io.realm.RealmObject;
 
-    @Expose
+@Parcel(implementations = {Cursors.class},
+        value = Parcel.Serialization.BEAN,
+        analyze = {Cursors.class})
+public class Cursors extends RealmObject {
+
+
     private String after;
-    @Expose
+
     private String before;
+
+    public Cursors() {
+
+    }
+
+    public Cursors(String before, String after) {
+
+    }
 
     /**
      * @return The after

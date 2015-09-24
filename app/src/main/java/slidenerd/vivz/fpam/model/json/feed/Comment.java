@@ -1,40 +1,32 @@
 package slidenerd.vivz.fpam.model.json.feed;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import org.parceler.Parcel;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import io.realm.CommentRealmProxy;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
-public class Comment implements Parcelable {
+@Parcel(implementations = {CommentRealmProxy.class},
+        value = Parcel.Serialization.BEAN,
+        analyze = {Comment.class})
+public class Comment extends RealmObject {
 
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Comment> CREATOR = new Parcelable.Creator<Comment>() {
-        @Override
-        public Comment createFromParcel(Parcel in) {
-            return new Comment(in);
-        }
-
-        @Override
-        public Comment[] newArray(int size) {
-            return new Comment[size];
-        }
-    };
-    @Expose
     private User from;
-    @Expose
     private String message;
-    @Expose
+    @PrimaryKey
     private String id;
-    @SerializedName("created_time")
-    @Expose
-    private String createdTime;
+    private String created_time;
 
-    protected Comment(Parcel in) {
-        from = (User) in.readValue(User.class.getClassLoader());
-        message = in.readString();
-        id = in.readString();
-        createdTime = in.readString();
+
+    public Comment() {
+
+    }
+
+    public Comment(String id, String message, User from, String created_time) {
+        this.from = from;
+        this.message = message;
+        this.id = id;
+        this.created_time = created_time;
     }
 
     /**
@@ -79,24 +71,11 @@ public class Comment implements Parcelable {
         this.id = id;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public String getCreated_time() {
+        return created_time;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(from);
-        dest.writeString(message);
-        dest.writeString(id);
-        dest.writeString(createdTime);
-    }
-
-    public String getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(String createdTime) {
-        this.createdTime = createdTime;
+    public void setCreated_time(String created_time) {
+        this.created_time = created_time;
     }
 }

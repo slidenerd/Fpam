@@ -9,11 +9,12 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.ArrayList;
+
 import io.realm.Realm;
-import io.realm.RealmResults;
-import slidenerd.vivz.fpam.model.realm.RealmAttachment;
-import slidenerd.vivz.fpam.model.realm.RealmComment;
-import slidenerd.vivz.fpam.model.realm.RealmPost;
+import slidenerd.vivz.fpam.database.DataStore;
+import slidenerd.vivz.fpam.model.json.feed.Post;
+import slidenerd.vivz.fpam.util.PrintUtils;
 
 @EActivity(R.layout.activity_cache)
 @OptionsMenu(R.menu.menu_activity_cache_viewer)
@@ -31,18 +32,9 @@ public class ActivityCache extends AppCompatActivity {
 
     @AfterViews
     void initUI() {
-        RealmResults<RealmPost> realmPosts = mRealm.where(RealmPost.class).findAllSorted("id");
-        StringBuilder stringBuilder = new StringBuilder();
-        for (RealmPost post : realmPosts) {
-            stringBuilder.append("\n" + post.getId() + "\n" + post.getGroupId() + "\n");
-            for (RealmComment comment : post.getComments()) {
-                stringBuilder.append("\n" + comment + "\n");
-            }
-            for (RealmAttachment attachment : post.getAttachments()) {
-                stringBuilder.append("\n" + attachment + "\n");
-            }
-        }
-        mTextCache.setText(stringBuilder.toString());
+        ArrayList<Post> listPosts = DataStore.loadFeed(mRealm);
+        String text = PrintUtils.toString(listPosts);
+        mTextCache.setText(text);
     }
 
     @Override

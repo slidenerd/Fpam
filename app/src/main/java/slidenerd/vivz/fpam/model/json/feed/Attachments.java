@@ -1,65 +1,45 @@
 package slidenerd.vivz.fpam.model.json.feed;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import org.parceler.Parcel;
+import org.parceler.ParcelPropertyConverter;
 
-import com.google.gson.annotations.Expose;
+import io.realm.AttachmentsRealmProxy;
+import io.realm.RealmList;
+import io.realm.RealmObject;
+import slidenerd.vivz.fpam.parcel.AttachmentsParcelConverter;
 
-import java.util.ArrayList;
-import java.util.List;
+@Parcel(implementations = {AttachmentsRealmProxy.class},
+        value = Parcel.Serialization.BEAN,
+        analyze = {Attachments.class})
+public class Attachments extends RealmObject {
 
-public class Attachments implements Parcelable {
+    private RealmList<Attachment> data = new RealmList<>();
 
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Attachments> CREATOR = new Parcelable.Creator<Attachments>() {
-        @Override
-        public Attachments createFromParcel(Parcel in) {
-            return new Attachments(in);
-        }
+    public Attachments() {
 
-        @Override
-        public Attachments[] newArray(int size) {
-            return new Attachments[size];
-        }
-    };
-    @Expose
-    private List<Attachment> data = new ArrayList<Attachment>();
+    }
 
-    protected Attachments(Parcel in) {
-        if (in.readByte() == 0x01) {
-            data = new ArrayList<Attachment>();
-            in.readList(data, Attachment.class.getClassLoader());
+    public Attachments(RealmList<Attachment> data) {
+        if (data == null) {
+            this.data = new RealmList<>();
         } else {
-            data = null;
+            this.data = data;
         }
     }
 
     /**
      * @return The data
      */
-    public List<Attachment> getData() {
+    public RealmList<Attachment> getData() {
         return data;
     }
 
     /**
      * @param data The data
      */
-    public void setData(List<Attachment> data) {
+    @ParcelPropertyConverter(AttachmentsParcelConverter.class)
+    public void setData(RealmList<Attachment> data) {
         this.data = data;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        if (data == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeList(data);
-        }
-    }
 }

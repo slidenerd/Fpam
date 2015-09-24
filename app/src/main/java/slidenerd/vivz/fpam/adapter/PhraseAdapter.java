@@ -12,13 +12,13 @@ import android.widget.TextView;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.model.realm.RealmPhrase;
+import slidenerd.vivz.fpam.model.realm.SpamPhrase;
 import slidenerd.vivz.fpam.util.ValidationUtils;
 
 /**
  * Created by vivz on 29/08/15.
  */
-public class PhraseAdapter extends AbstractMutableRealmAdapter<RealmPhrase, RecyclerView.ViewHolder> {
+public class PhraseAdapter extends AbstractMutableRealmAdapter<SpamPhrase, RecyclerView.ViewHolder> {
 
     private LayoutInflater mLayoutInflater;
 
@@ -54,14 +54,14 @@ public class PhraseAdapter extends AbstractMutableRealmAdapter<RealmPhrase, Recy
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ItemHolder) {
             ItemHolder itemHolder = (ItemHolder) holder;
-            RealmPhrase spamPhrase = mRealmResults.get(position - getHeaderCount());
+            SpamPhrase spamPhrase = getItem(position);
             itemHolder.setSpamPhrase(spamPhrase.getPhrase());
         }
     }
 
     @Override
-    public RealmResults<RealmPhrase> getResults(Realm realm) {
-        return realm.where(RealmPhrase.class).findAllSorted("phrase");
+    public RealmResults<SpamPhrase> loadData(Realm realm) {
+        return realm.where(SpamPhrase.class).findAllSorted("phrase");
     }
 
     public class HeaderHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -75,11 +75,10 @@ public class PhraseAdapter extends AbstractMutableRealmAdapter<RealmPhrase, Recy
             mBtnAdd.setOnClickListener(this);
         }
 
-
         @Override
         public void onClick(View v) {
             if (ValidationUtils.hasInput(mInputPhrase)) {
-                RealmPhrase phrase = new RealmPhrase(mInputPhrase.getText().toString().trim().toLowerCase(), System.currentTimeMillis());
+                SpamPhrase phrase = new SpamPhrase(mInputPhrase.getText().toString().trim().toLowerCase(), System.currentTimeMillis());
                 add(phrase, true);
                 mInputPhrase.setText("");
             }

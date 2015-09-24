@@ -1,35 +1,30 @@
 package slidenerd.vivz.fpam.model.json.feed;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import org.parceler.Parcel;
 
-import com.google.gson.annotations.Expose;
+import io.realm.AttachmentImageRealmProxy;
+import io.realm.RealmObject;
 
-public class AttachmentImage implements Parcelable {
+@Parcel(implementations = {AttachmentImageRealmProxy.class},
+        value = Parcel.Serialization.BEAN,
+        analyze = {AttachmentImage.class})
+public class AttachmentImage extends RealmObject {
 
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<AttachmentImage> CREATOR = new Parcelable.Creator<AttachmentImage>() {
-        @Override
-        public AttachmentImage createFromParcel(Parcel in) {
-            return new AttachmentImage(in);
-        }
-
-        @Override
-        public AttachmentImage[] newArray(int size) {
-            return new AttachmentImage[size];
-        }
-    };
-    @Expose
     private int height;
-    @Expose
+
+
     private String src;
-    @Expose
+
     private int width;
 
-    protected AttachmentImage(Parcel in) {
-        height = in.readInt();
-        src = in.readString();
-        width = in.readInt();
+    public AttachmentImage() {
+
+    }
+
+    public AttachmentImage(String src, int width, int height) {
+        this.height = height;
+        this.src = src;
+        this.width = width;
     }
 
     /**
@@ -74,15 +69,4 @@ public class AttachmentImage implements Parcelable {
         this.width = width;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(height);
-        dest.writeString(src);
-        dest.writeInt(width);
-    }
 }

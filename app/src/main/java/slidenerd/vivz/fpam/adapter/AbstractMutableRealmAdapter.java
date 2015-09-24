@@ -26,9 +26,9 @@ public abstract class AbstractMutableRealmAdapter<T extends RealmObject, VH exte
     public final void onSwipe(int position) {
         if (!isHeader(position) && !isFooter(position)) {
             int itemPosition = position - getHeaderCount();
-            if (!mRealmResults.isEmpty()) {
+            if (!mResults.isEmpty()) {
                 realm.beginTransaction();
-                T item = mRealmResults.get(itemPosition);
+                T item = mResults.get(itemPosition);
                 item.removeFromRealm();
                 realm.commitTransaction();
                 notifyItemRemoved(position);

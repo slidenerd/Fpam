@@ -1,83 +1,58 @@
 package slidenerd.vivz.fpam.model.json.feed;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import org.parceler.Parcel;
+import org.parceler.ParcelPropertyConverter;
 
-import com.google.gson.annotations.Expose;
+import io.realm.CommentsRealmProxy;
+import io.realm.RealmList;
+import io.realm.RealmObject;
+import slidenerd.vivz.fpam.parcel.CommentsParcelConverter;
 
-import java.util.ArrayList;
-import java.util.List;
+@Parcel(implementations = {CommentsRealmProxy.class},
+        value = Parcel.Serialization.BEAN,
+        analyze = {Comments.class})
+public class Comments extends RealmObject {
 
-public class Comments implements Parcelable {
 
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Comments> CREATOR = new Parcelable.Creator<Comments>() {
-        @Override
-        public Comments createFromParcel(Parcel in) {
-            return new Comments(in);
-        }
-
-        @Override
-        public Comments[] newArray(int size) {
-            return new Comments[size];
-        }
-    };
-    @Expose
-    private List<Comment> data = new ArrayList<Comment>();
-    @Expose
+    private RealmList<Comment> data = new RealmList<>();
     private CommentPaging paging;
 
-    protected Comments(Parcel in) {
-        if (in.readByte() == 0x01) {
-            data = new ArrayList<Comment>();
-            in.readList(data, Comment.class.getClassLoader());
-        } else {
-            data = null;
-        }
-        paging = (CommentPaging) in.readValue(CommentPaging.class.getClassLoader());
+    public Comments() {
+
+    }
+
+    public Comments(RealmList<Comment> data, CommentPaging paging) {
+        this.data = data;
+        this.paging = paging;
     }
 
     /**
      * @return The data
      */
-    public List<Comment> getData() {
+    public RealmList<Comment> getData() {
         return data;
     }
 
     /**
      * @param data The data
      */
-    public void setData(List<Comment> data) {
+    @ParcelPropertyConverter(CommentsParcelConverter.class)
+    public void setData(RealmList<Comment> data) {
         this.data = data;
     }
 
     /**
      * @return The paging
      */
-    public CommentPaging getCommentPaging() {
+    public CommentPaging getPaging() {
         return paging;
     }
 
     /**
      * @param paging The paging
      */
-    public void setCommentPaging(CommentPaging paging) {
+    public void setPaging(CommentPaging paging) {
         this.paging = paging;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        if (data == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeList(data);
-        }
-        dest.writeValue(paging);
-    }
 }

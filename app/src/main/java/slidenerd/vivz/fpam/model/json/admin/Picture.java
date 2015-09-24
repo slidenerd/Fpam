@@ -18,6 +18,10 @@ public class Picture extends RealmObject {
     public Picture() {
     }
 
+    public Picture(PictureData data) {
+        this.data = data;
+    }
+
     /**
      * @return The data
      */

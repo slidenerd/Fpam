@@ -17,7 +17,7 @@ import slidenerd.vivz.fpam.util.NavUtils;
 
 @EActivity
 @OptionsMenu(R.menu.menu_activity_stats)
-public class ActivityStats extends ActivityBase implements SwipeRefreshLayout.OnRefreshListener {
+public class ActivityMain extends ActivityBase implements SwipeRefreshLayout.OnRefreshListener {
 
     private SwipeRefreshLayout mRefreshFeed;
     private RecyclerView mRecyclerFeed;

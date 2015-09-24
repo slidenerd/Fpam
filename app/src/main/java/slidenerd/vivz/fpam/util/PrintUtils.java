@@ -43,13 +43,13 @@ public class PrintUtils {
     }
 
     public static String toString(AttachmentMedia attachmentMedia) {
-        return "\n" + toString(attachmentMedia.getImage());
+        return "\n" + (attachmentMedia == null ? "\nAttachment Media with no image" : toString(attachmentMedia.getImage()));
     }
 
     public static String toString(Attachment attachment) {
         return "\n" + attachment.getType()
                 + "\n" + attachment.getUrl()
-                + toString(attachment.getAttachmentMedia());
+                + attachment.getMedia() == null ? "\nAttachment with no media" : toString(attachment.getMedia());
     }
 
     public static String toString(Attachments attachments) {
@@ -72,7 +72,7 @@ public class PrintUtils {
                 + "\n" + post.getCaption()
                 + "\n" + post.getDescription()
                 + "\n" + post.getPicture()
-                + "\n" + post.getUpdatedTime()
+                + "\n" + post.getUpdated_time()
                 + "\n" + toString(post.getFrom())
                 + "\n" + toString(post.getAttachments())
                 + "\n" + toString(post.getComments()) + "\n";

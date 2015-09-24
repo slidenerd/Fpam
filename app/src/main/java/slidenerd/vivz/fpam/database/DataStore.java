@@ -12,7 +12,9 @@ import io.realm.RealmResults;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.admin.Picture;
 import slidenerd.vivz.fpam.model.json.admin.PictureData;
+import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.util.CopyUtils;
 
 public class DataStore {
 
@@ -32,14 +34,8 @@ public class DataStore {
      */
     public static ArrayList<Group> loadGroups(Realm realm) {
 
-        RealmResults<Group> realmResults = realm.where(Group.class).findAllSorted("name");
-        ArrayList<Group> listGroups = new ArrayList<>(20);
-        for (Group group : realmResults) {
-            //To avoid the below error, I simply duplicated the RealmResults so that it doesnt get passed to the background thread Caused by: java.lang.IllegalStateException: Realm access from incorrect thread. Realm objects can only be accessed on the thread they were created.
-            Group fbGroup = new Group(group.getId(), group.getName(), group.getIcon(), group.getUnread());
-            listGroups.add(fbGroup);
-        }
-        return listGroups;
+        RealmResults<Group> realmGroups = realm.where(Group.class).findAllSorted("name");
+        return CopyUtils.duplicateGroups(realmGroups);
     }
 
 
@@ -67,28 +63,19 @@ public class DataStore {
     public static Admin loadAdmin(Realm realm) {
         //read the picture data first
         PictureData sourcePictureData = realm.where(PictureData.class).findFirst();
-        //duplicate the picture data to prevent crashing the app after realm instance has been closed
-        PictureData pictureData = new PictureData();
-        pictureData.setUrl(sourcePictureData.getUrl());
-        pictureData.setWidth(sourcePictureData.getWidth());
-        pictureData.setHeight(sourcePictureData.getHeight());
-        pictureData.setIs_silhouette(sourcePictureData.is_silhouette());
-        //read the picture first
-        Picture sourcePicture = realm.where(Picture.class).findFirst();
-        //duplicate the picture to prevent crashing the app after the realm instance has been closed
-        Picture picture = new Picture();
-        picture.setData(pictureData);
-        //read the admin data first
-        Admin sourceObject = realm.where(Admin.class).findFirst();
-        //duplicate the admin to prevent crashing the app after the realm instance has been closed
-        Admin admin = new Admin();
-        admin.setId(sourceObject.getId());
-        admin.setEmail(sourceObject.getEmail());
-        admin.setFirst_name(sourceObject.getFirst_name());
-        admin.setLast_name(sourceObject.getLast_name());
-        //sourceObject.getPicture() returns null for some reason and causes an app crash while trying to save to a Parcelable, better set the data read above as PictureData
-        admin.setPicture(picture);
-        return admin;
+        Admin sourceAdmin = realm.where(Admin.class).findFirst();
+        return CopyUtils.duplicateAdmin(sourcePictureData, sourceAdmin);
+    }
+
+    public static void storeFeed(Realm realm, JSONArray jsonArray) {
+        realm.beginTransaction();
+        realm.createOrUpdateAllFromJson(Post.class, jsonArray);
+        realm.commitTransaction();
+    }
+
+    public static ArrayList<Post> loadFeed(Realm realm) {
+        RealmResults<Post> realmPosts = realm.where(Post.class).findAll();
+        return CopyUtils.duplicatePosts(realmPosts);
     }
 
 }

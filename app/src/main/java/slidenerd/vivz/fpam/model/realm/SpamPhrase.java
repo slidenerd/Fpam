@@ -7,22 +7,22 @@ import io.realm.annotations.PrimaryKey;
 /**
  * Created by vivz on 04/08/15.
  */
-public class RealmPhrase extends RealmObject {
+public class SpamPhrase extends RealmObject {
     @PrimaryKey
     private String phrase;
     private long added;
 
 
-    public RealmPhrase() {
+    public SpamPhrase() {
         this(null, 0);
     }
 
-    public RealmPhrase(String phrase, long added) {
+    public SpamPhrase(String phrase, long added) {
         this.phrase = phrase;
         this.added = added;
     }
 
-    public RealmPhrase(String phrase) {
+    public SpamPhrase(String phrase) {
         this(phrase, System.currentTimeMillis());
     }
 

@@ -6,7 +6,7 @@ import android.content.Intent;
 import slidenerd.vivz.fpam.ActivityCache;
 import slidenerd.vivz.fpam.ActivityCache_;
 import slidenerd.vivz.fpam.ActivityLogin_;
-import slidenerd.vivz.fpam.ActivityStats_;
+import slidenerd.vivz.fpam.ActivityMain_;
 import slidenerd.vivz.fpam.settings.ActivitySettings;
 
 /**
@@ -18,7 +18,7 @@ public class NavUtils {
     }
 
     public static void startActivityStats(Context context) {
-        ActivityStats_.intent(context).start();
+        ActivityMain_.intent(context).start();
     }
 
     public static void startActivityCache(Context context) {

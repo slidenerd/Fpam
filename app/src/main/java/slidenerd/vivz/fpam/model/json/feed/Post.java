@@ -1,64 +1,58 @@
 package slidenerd.vivz.fpam.model.json.feed;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import org.parceler.Parcel;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
-public class Post implements Parcelable {
+@Parcel(implementations = {Post.class},
+        value = Parcel.Serialization.BEAN,
+        analyze = {Post.class})
+public class Post extends RealmObject {
 
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Post> CREATOR = new Parcelable.Creator<Post>() {
-        @Override
-        public Post createFromParcel(Parcel in) {
-            return new Post(in);
-        }
-
-        @Override
-        public Post[] newArray(int size) {
-            return new Post[size];
-        }
-    };
-    @Expose
     private User from;
-    @Expose
+
     private String message;
-    @Expose
+
     private String caption;
-    @Expose
+
     private String description;
-    @Expose
+
     private String name;
-    @Expose
+
     private String picture;
-    @Expose
+
     private String type;
-    @SerializedName("updated_time")
-    @Expose
-    private String updatedTime;
-    @Expose
+
+    private String updated_time;
+
     private String link;
-    @Expose
+
+    @PrimaryKey
     private String id;
-    @Expose
+
     private Comments comments;
-    @Expose
+
+
     private Attachments attachments;
 
-    protected Post(Parcel in) {
-        from = (User) in.readValue(User.class.getClassLoader());
-        message = in.readString();
-        caption = in.readString();
-        description = in.readString();
-        name = in.readString();
-        picture = in.readString();
-        type = in.readString();
-        updatedTime = in.readString();
-        link = in.readString();
-        id = in.readString();
-        comments = (Comments) in.readValue(Comments.class.getClassLoader());
-        attachments = (Attachments) in.readValue(Attachments.class.getClassLoader());
+    public Post() {
+
+    }
+
+    public Post(String id, User from, String message, String name, String caption, String description, String link, String picture, String type, Attachments attachments, Comments comments, String updated_time) {
+        this.from = from;
+        this.message = message;
+        this.caption = caption;
+        this.description = description;
+        this.name = name;
+        this.picture = picture;
+        this.type = type;
+        this.updated_time = updated_time;
+        this.link = link;
+        this.id = id;
+        this.comments = comments;
+        this.attachments = attachments;
     }
 
     /**
@@ -146,17 +140,17 @@ public class Post implements Parcelable {
     }
 
     /**
-     * @return The updatedTime
+     * @return The updated_time
      */
-    public String getUpdatedTime() {
-        return updatedTime;
+    public String getUpdated_time() {
+        return updated_time;
     }
 
     /**
-     * @param updatedTime The updated_time
+     * @param updated_time The updated_time
      */
-    public void setUpdatedTime(String updatedTime) {
-        this.updatedTime = updatedTime;
+    public void setUpdated_time(String updated_time) {
+        this.updated_time = updated_time;
     }
 
     /**
@@ -213,27 +207,6 @@ public class Post implements Parcelable {
      */
     public void setAttachments(Attachments attachments) {
         this.attachments = attachments;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(from);
-        dest.writeString(message);
-        dest.writeString(caption);
-        dest.writeString(description);
-        dest.writeString(name);
-        dest.writeString(picture);
-        dest.writeString(type);
-        dest.writeString(updatedTime);
-        dest.writeString(link);
-        dest.writeString(id);
-        dest.writeValue(comments);
-        dest.writeValue(attachments);
     }
 
     public String getMessage() {

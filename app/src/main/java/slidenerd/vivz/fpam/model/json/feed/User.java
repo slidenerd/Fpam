@@ -1,32 +1,27 @@
 package slidenerd.vivz.fpam.model.json.feed;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import org.parceler.Parcel;
 
-import com.google.gson.annotations.Expose;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
-public class User implements Parcelable {
+@Parcel(implementations = {User.class},
+        value = Parcel.Serialization.BEAN,
+        analyze = {User.class})
+public class User extends RealmObject {
 
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
-        @Override
-        public User createFromParcel(Parcel in) {
-            return new User(in);
-        }
-
-        @Override
-        public User[] newArray(int size) {
-            return new User[size];
-        }
-    };
-    @Expose
     private String name;
-    @Expose
+
+    @PrimaryKey
     private String id;
 
-    protected User(Parcel in) {
-        name = in.readString();
-        id = in.readString();
+    public User() {
+
+    }
+
+    public User(String id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     /**
@@ -57,14 +52,4 @@ public class User implements Parcelable {
         this.id = id;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(name);
-        dest.writeString(id);
-    }
 }

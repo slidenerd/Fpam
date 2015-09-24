@@ -1,29 +1,23 @@
 package slidenerd.vivz.fpam.model.json.feed;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import org.parceler.Parcel;
 
-import com.google.gson.annotations.Expose;
+import io.realm.CommentPagingRealmProxy;
+import io.realm.RealmObject;
 
-public class CommentPaging implements Parcelable {
+@Parcel(implementations = {CommentPagingRealmProxy.class},
+        value = Parcel.Serialization.BEAN,
+        analyze = {CommentPaging.class})
+public class CommentPaging extends RealmObject {
 
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<CommentPaging> CREATOR = new Parcelable.Creator<CommentPaging>() {
-        @Override
-        public CommentPaging createFromParcel(Parcel in) {
-            return new CommentPaging(in);
-        }
-
-        @Override
-        public CommentPaging[] newArray(int size) {
-            return new CommentPaging[size];
-        }
-    };
-    @Expose
     private Cursors cursors;
 
-    protected CommentPaging(Parcel in) {
-        cursors = (Cursors) in.readValue(Cursors.class.getClassLoader());
+    public CommentPaging() {
+
+    }
+
+    public CommentPaging(Cursors cursors) {
+        this.cursors = cursors;
     }
 
     /**
@@ -40,13 +34,4 @@ public class CommentPaging implements Parcelable {
         this.cursors = cursors;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(cursors);
-    }
 }

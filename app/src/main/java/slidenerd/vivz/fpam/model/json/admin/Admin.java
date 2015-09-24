@@ -21,6 +21,15 @@ public class Admin extends RealmObject {
     public Admin() {
     }
 
+    public Admin(String id, String email, String first_name, String last_name, Picture picture) {
+        this.id = id;
+        this.email = email;
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.picture = picture;
+    }
+
+
     /**
      * @return The id
      */

@@ -1,108 +1,37 @@
 package slidenerd.vivz.fpam.util;
 
-import java.util.List;
+import java.util.ArrayList;
 
-import io.realm.RealmList;
-import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.feed.Attachment;
-import slidenerd.vivz.fpam.model.json.feed.AttachmentImage;
-import slidenerd.vivz.fpam.model.json.feed.Comment;
+import io.realm.RealmResults;
+import slidenerd.vivz.fpam.model.json.admin.Admin;
+import slidenerd.vivz.fpam.model.json.admin.Picture;
+import slidenerd.vivz.fpam.model.json.admin.PictureData;
 import slidenerd.vivz.fpam.model.json.feed.Post;
-import slidenerd.vivz.fpam.model.json.feed.User;
 import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.model.realm.RealmAttachment;
-import slidenerd.vivz.fpam.model.realm.RealmComment;
-import slidenerd.vivz.fpam.model.realm.RealmPost;
-import slidenerd.vivz.fpam.model.realm.RealmUser;
 
 public class CopyUtils {
-
-    public static RealmUser createFrom(User user) {
-        RealmUser realmUser = new RealmUser();
-        realmUser.setId(user.getId());
-        realmUser.setName(user.getName());
-        return realmUser;
+    public static ArrayList<Group> duplicateGroups(RealmResults<Group> listSourceGroups) {
+        ArrayList<Group> listDestinationGroups = new ArrayList<>();
+        for (Group sourceGroup : listSourceGroups) {
+            Group destinationGroup = new Group(sourceGroup.getId(), sourceGroup.getName(), sourceGroup.getIcon(), sourceGroup.getUnread());
+            listDestinationGroups.add(destinationGroup);
+        }
+        return listDestinationGroups;
     }
 
-    public static RealmComment createFrom(Comment comment) {
-        RealmComment realmComment = new RealmComment();
-        realmComment.setId(comment.getId());
-        realmComment.setMessage(comment.getMessage());
-        realmComment.setCreatedTime(comment.getCreatedTime());
-        realmComment.setFrom(createFrom(comment.getFrom()));
-        return realmComment;
+    public static Admin duplicateAdmin(PictureData realmPictureData, Admin realmAdmin) {
+        PictureData pictureData = new PictureData(realmPictureData.getUrl(), realmPictureData.getWidth(), realmPictureData.getHeight(), realmPictureData.is_silhouette());
+        Picture picture = new Picture(pictureData);
+        Admin admin = new Admin(realmAdmin.getId(), realmAdmin.getEmail(), realmAdmin.getFirst_name(), realmAdmin.getLast_name(), picture);
+        return admin;
     }
 
-    public static RealmList<RealmComment> createFromComments(List<Comment> listComments) {
-        RealmList<RealmComment> listRealmComments = new RealmList<>();
-        for (Comment comment : listComments) {
-            RealmComment realmComment = createFrom(comment);
-            listRealmComments.add(realmComment);
+    public static ArrayList<Post> duplicatePosts(RealmResults<Post> realmPosts) {
+        ArrayList<Post> listPosts = new ArrayList<>();
+        for (Post realmPost : realmPosts) {
+            Post post = new Post(realmPost.getId(), realmPost.getFrom(), realmPost.getMessage(), realmPost.getName(), realmPost.getCaption(), realmPost.getDescription(), realmPost.getLink(), realmPost.getPicture(), realmPost.getType(), realmPost.getAttachments(), realmPost.getComments(), realmPost.getUpdated_time());
+            listPosts.add(post);
         }
-        return listRealmComments;
+        return listPosts;
     }
-
-    public static RealmAttachment createFrom(Attachment attachment) {
-        RealmAttachment realmAttachment = new RealmAttachment();
-        realmAttachment.setType(attachment.getType());
-        realmAttachment.setUrl(attachment.getUrl());
-        AttachmentImage image;
-        if (attachment.getAttachmentMedia() != null && (image = attachment.getAttachmentMedia().getImage()) != null) {
-            realmAttachment.setWidth(image.getWidth());
-            realmAttachment.setHeight(image.getHeight());
-            realmAttachment.setSrc(image.getSrc());
-        }
-        return realmAttachment;
-    }
-
-    public static RealmList<RealmAttachment> createFromAttachments(List<Attachment> listAttachments) {
-        RealmList<RealmAttachment> listRealmAttachments = new RealmList<>();
-        for (Attachment attachment : listAttachments) {
-            RealmAttachment realmAttachment = createFrom(attachment);
-            listRealmAttachments.add(realmAttachment);
-        }
-        return listRealmAttachments;
-    }
-
-    public static RealmPost createFrom(Group group, Post post) {
-        RealmPost realmPost = new RealmPost();
-        realmPost.setId(post.getId());
-        realmPost.setName(post.getName());
-        realmPost.setCaption(post.getCaption());
-        realmPost.setDescription(post.getDescription());
-        realmPost.setLink(post.getLink());
-        realmPost.setType(post.getType());
-        realmPost.setUpdatedTime(post.getUpdatedTime());
-        realmPost.setMessage(post.getMessage());
-        realmPost.setPicture(post.getPicture());
-        realmPost.setGroupId(group.getId());
-        User from;
-        if ((from = post.getFrom()) != null) {
-            RealmUser realmUser = createFrom(from);
-            realmPost.setFrom(realmUser);
-        } else {
-            L.m("Did not find the person posting the post for " + post.getId());
-        }
-        List<Comment> listComments;
-        if (post.getComments() != null && (listComments = post.getComments().getData()) != null) {
-            RealmList<RealmComment> listRealmComments = createFromComments(listComments);
-            realmPost.setComments(listRealmComments);
-        }
-        List<Attachment> listAttachments;
-        if (post.getAttachments() != null && (listAttachments = post.getAttachments().getData()) != null) {
-            RealmList<RealmAttachment> listRealmAttachments = createFromAttachments(listAttachments);
-            realmPost.setAttachments(listRealmAttachments);
-        }
-        return realmPost;
-    }
-
-    public static RealmList<RealmPost> createFromPosts(Group group, List<Post> listPosts) {
-        RealmList<RealmPost> listRealmPosts = new RealmList<>();
-        for (Post post : listPosts) {
-            RealmPost realmPost = createFrom(group, post);
-            listRealmPosts.add(realmPost);
-        }
-        return listRealmPosts;
-    }
-
 }
