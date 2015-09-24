@@ -45,7 +45,7 @@ This example post below is made by a person who doesn't exist on Facebook anymor
 <li>Top 10 Spammers</li>
 <li>Top 10 spam links</li>
 <li>Top 10 spam words found</li>
-What about timelines?
+<li>What about timelines?</li>
 
 <li>Last 24 hours</li>
 <li>Past 1 week</li>
