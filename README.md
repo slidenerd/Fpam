@@ -1,3 +1,49 @@
+
+
+Screens [September 24, 2015, 5:20 pm]
+
+<b>Login Screen</b>
+
+![snap 2015-09-24 at 21 13 56](https://cloud.githubusercontent.com/assets/5139030/10078181/36276e16-6301-11e5-987c-5ed6d842206c.png)
+
+This is the first screen a person sees when they start the app, if they are already logged in, they wont see this screen.
+
+<b>The Drawer</b>
+
+![snap 2015-09-24 at 21 14 44](https://cloud.githubusercontent.com/assets/5139030/10078208/4c99bcd0-6301-11e5-916c-325150fd3f3d.png)
+
+This is the navigation drawer that displays a list of all the groups a person owns or NONE if the person doesn't and provides options to logout and access settings.
+
+<b>The Main Screen</b>
+
+![snap 2015-09-24 at 21 15 24](https://cloud.githubusercontent.com/assets/5139030/10078230/6766d246-6301-11e5-9217-814abc854717.png)
+
+This is the screen showing the posts and comments from the currently selected group along with important statistics for that group. Question to answer would be what statistics, how to display posts, how to display comments
+
+![snap 2015-09-24 at 21 16 26](https://cloud.githubusercontent.com/assets/5139030/10078271/88c8ffb8-6301-11e5-9491-0d560703e5ea.png)
+
+![snap 2015-09-24 at 21 17 03](https://cloud.githubusercontent.com/assets/5139030/10078293/a005acb2-6301-11e5-8546-f8c98dd0a65d.png)
+
+![snap 2015-09-24 at 21 18 19](https://cloud.githubusercontent.com/assets/5139030/10078328/ccb9309e-6301-11e5-99d5-d36cea9e81ed.png)
+
+<h2>What statistics?</h2>
+<ol>
+<li>% spam posts</li>
+<li>% spam comments</li>
+<li>Number of posts read so far</li>
+<li>Number of comments read so far</li>
+<li>Top 10 Spammers</li>
+<li>Top 10 spam links</li>
+<li>Top 10 spam words found</li>
+<li>What about timelines?</li>
+<li>Last 24 hours</li>
+<li>Past 1 week</li>
+</ol>
+
+The visual representation for 
+Each?
+
+
 # Fpam
 You know what it does, don't you?
 There can be posts made by people who don't exist
@@ -16,3 +62,9 @@ Currently, only the list of groups on 1 page are being stored, gotta find a way 
 UPDATE 3 [September 20, 2015 9+ pm]
 
 The current model for Feed processing takes separate model classes, one for GSON that implements a parcelable and one for Realm that doesn't . Need to keep one single class that directly stores stuff from JSON to Realm, and eliminates the need for any intermediate GSON, the idea is also to remember the fact that only a max of 500 posts should be stored per group and when a post is deleted, all its attachments and comments also be deleted.
+
+
+The Workflow
+
+When the user logs in, get the list of groups and user details and store them in Realm. 
+When the user clicks on a group, load the posts with that group id and store it in Realm. If there are more than 100 posts that are already stored for that group, delete the oldest N entries and add the new ones, update all existing posts, comments, attachments and any other detail.
