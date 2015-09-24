@@ -62,3 +62,7 @@ Currently, only the list of groups on 1 page are being stored, gotta find a way 
 UPDATE 3 [September 20, 2015 9+ pm]
 
 The current model for Feed processing takes separate model classes, one for GSON that implements a parcelable and one for Realm that doesn't . Need to keep one single class that directly stores stuff from JSON to Realm, and eliminates the need for any intermediate GSON, the idea is also to remember the fact that only a max of 500 posts should be stored per group and when a post is deleted, all its attachments and comments also be deleted.
+
+
+<h1>The Workflow</h1>
+
