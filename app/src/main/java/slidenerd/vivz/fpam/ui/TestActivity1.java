@@ -1,8 +1,12 @@
-package slidenerd.vivz.fpam;
+package slidenerd.vivz.fpam.ui;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.view.PagerAdapter;
 import android.view.View;
+
+import slidenerd.vivz.fpam.R;
 
 public class TestActivity1 extends ActivityBase {
 
@@ -21,8 +25,15 @@ public class TestActivity1 extends ActivityBase {
         return R.id.main_root;
     }
 
+    @NonNull
     @Override
-    public void addTabs(TabLayout tabLayout) {
-        tabLayout.setVisibility(View.GONE);
+    public int getViewPagerId() {
+        return 0;
+    }
+
+    @NonNull
+    @Override
+    public PagerAdapter getPagerAdapter() {
+        return null;
     }
 }

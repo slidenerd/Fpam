@@ -1,4 +1,4 @@
-package slidenerd.vivz.fpam;
+package slidenerd.vivz.fpam.ui;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -31,6 +31,8 @@ import org.parceler.Parcels;
 import java.util.ArrayList;
 
 import io.realm.Realm;
+import slidenerd.vivz.fpam.ApplicationFpam;
+import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.admin.Admin;

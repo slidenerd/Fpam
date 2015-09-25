@@ -23,17 +23,21 @@ import static slidenerd.vivz.fpam.util.JSONUtils.AdminJSONFields.WIDTH;
 public class JSONUtils {
     public static Admin loadAdminFrom(JSONObject adminObject) throws JSONException {
         Admin admin = null;
-        if (contains(adminObject, ID, EMAIL, FIRST_NAME, LAST_NAME)) {
+        //If the feed containsAll all the fields, id email first_name and last_name
+        if (containsAll(adminObject, ID, EMAIL, FIRST_NAME, LAST_NAME)) {
             admin = new Admin();
             admin.setId(adminObject.getString(ID));
             admin.setEmail(adminObject.getString(EMAIL));
             admin.setFirstName(adminObject.getString(FIRST_NAME));
             admin.setLastName(adminObject.getString(LAST_NAME));
+            //if the feed containsAll picture object
             if (contains(adminObject, PICTURE)) {
                 JSONObject pictureObject = adminObject.getJSONObject(PICTURE);
+                //if the picture object containsAll data object
                 if (contains(pictureObject, DATA)) {
                     JSONObject dataObject = pictureObject.getJSONObject(DATA);
-                    if (contains(dataObject, WIDTH, HEIGHT, IS_SILHOUETTE, URL)) {
+                    //if data object containsAll width, height, is_silhouette and url
+                    if (containsAll(dataObject, WIDTH, HEIGHT, IS_SILHOUETTE, URL)) {
                         admin.setWidth(dataObject.getInt(WIDTH));
                         admin.setHeight(dataObject.getInt(HEIGHT));
                         admin.setIsSilhouette(dataObject.getBoolean(IS_SILHOUETTE));
@@ -54,7 +58,7 @@ public class JSONUtils {
         }
     }
 
-    public static boolean contains(JSONObject jsonObject, String... keys) {
+    public static boolean containsAll(JSONObject jsonObject, String... keys) {
         boolean containsAllKeys = true;
         for (int i = 0; i < keys.length; i++) {
             containsAllKeys = containsAllKeys && contains(jsonObject, keys[i]);

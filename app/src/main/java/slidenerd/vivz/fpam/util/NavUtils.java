@@ -3,11 +3,11 @@ package slidenerd.vivz.fpam.util;
 import android.content.Context;
 import android.content.Intent;
 
-import slidenerd.vivz.fpam.ActivityCache;
-import slidenerd.vivz.fpam.ActivityCache_;
-import slidenerd.vivz.fpam.ActivityLogin_;
-import slidenerd.vivz.fpam.ActivityMain_;
+import slidenerd.vivz.fpam.ui.ActivityCache_;
+import slidenerd.vivz.fpam.ui.ActivityLogin_;
+import slidenerd.vivz.fpam.ui.ActivityMain_;
 import slidenerd.vivz.fpam.settings.ActivitySettings;
+import slidenerd.vivz.fpam.ui.ActivityLogin_;
 
 /**
  * Created by vivz on 28/07/15.

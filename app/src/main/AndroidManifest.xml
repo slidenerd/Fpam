@@ -24,10 +24,10 @@
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
-            android:name=".ActivityLogin_"
+            android:name=".ui.ActivityLogin_"
             android:label="@string/title_activity_login" />
         <activity
-            android:name=".ActivityMain_"
+            android:name=".ui.ActivityMain_"
             android:label="@string/title_activity_main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,7 +36,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ActivityCache_"
+            android:name=".ui.ActivityCache_"
             android:label="@string/title_activity_cache" />
         <activity
             android:name=".settings.ActivitySettings"
@@ -47,10 +47,10 @@
             android:exported="false" />
 
         <activity
-            android:name=".TestActivity1"
+            android:name=".ui.TestActivity1"
             android:label="@string/title_activity_test1"></activity>
         <activity
-            android:name=".TestActivity2"
+            android:name=".ui.TestActivity2"
             android:label="@string/title_activity_test2"></activity>
     </application>
 

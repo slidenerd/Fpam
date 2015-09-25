@@ -1,37 +1,33 @@
-package slidenerd.vivz.fpam;
+package slidenerd.vivz.fpam.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
 
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 
-import java.util.ArrayList;
-
+import slidenerd.vivz.fpam.R;
+import slidenerd.vivz.fpam.adapter.MainPagerAdapter;
 import slidenerd.vivz.fpam.util.FileUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
 @EActivity
 @OptionsMenu(R.menu.menu_activity_stats)
-public class ActivityMain extends ActivityBase implements SwipeRefreshLayout.OnRefreshListener {
+public class ActivityMain extends ActivityBase {
 
-    private SwipeRefreshLayout mRefreshFeed;
-    private RecyclerView mRecyclerFeed;
+
+    private ViewPager mPager;
+    private MainPagerAdapter mPagerAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRefreshFeed = (SwipeRefreshLayout) findViewById(R.id.refresh_feed);
-        mRecyclerFeed = (RecyclerView) findViewById(R.id.recycler_feed);
-        mRecyclerFeed.setLayoutManager(new LinearLayoutManager(this));
-        mRefreshFeed.setOnRefreshListener(this);
+
     }
 
     @Override
@@ -76,19 +72,25 @@ public class ActivityMain extends ActivityBase implements SwipeRefreshLayout.OnR
         return R.id.main_root;
     }
 
+//    /**
+//     * This method is called prior to the onCreate inside this Activity. Hence initialize the ViewPager and PagerAdapter here instead of onCreate to avoid null pointer exceptions.
+//     */
+//    public void addTabs(TabLayout tabLayout) {
+//        mPager = (ViewPager) findViewById(R.id.main_root);
+//        mPagerAdapter = new MainPagerAdapter(this, getSupportFragmentManager());
+//        mPager.setAdapter(mPagerAdapter);
+//        tabLayout.setupWithViewPager(mPager);
+//    }
+
     @Override
-    public void addTabs(TabLayout tabLayout) {
-        ArrayList<TabLayout.Tab> listTabs = new ArrayList<>();
-        TabLayout.Tab tabPosts = tabLayout.newTab();
-        tabPosts.setText(R.string.tab_posts);
-        TabLayout.Tab tabStats = tabLayout.newTab();
-        tabStats.setText(R.string.tab_stats);
-        tabLayout.addTab(tabPosts);
-        tabLayout.addTab(tabStats);
+    @Nullable
+    public int getViewPagerId() {
+        return R.id.main_root;
     }
 
     @Override
-    public void onRefresh() {
-        mRefreshFeed.setRefreshing(false);
+    @Nullable
+    public PagerAdapter getPagerAdapter() {
+        return new MainPagerAdapter(this, getSupportFragmentManager());
     }
 }

@@ -1,4 +1,4 @@
-package slidenerd.vivz.fpam;
+package slidenerd.vivz.fpam.ui;
 
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -6,9 +6,12 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.view.ViewStub;
 
 import com.facebook.AccessToken;
@@ -20,6 +23,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import io.realm.Realm;
+import slidenerd.vivz.fpam.ApplicationFpam;
+import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.group.Group;
@@ -92,7 +97,15 @@ public abstract class ActivityBase extends AppCompatActivity {
         mToolbar = (Toolbar) findViewById(R.id.app_bar);
         mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
         setSupportActionBar(mToolbar);
-        addTabs(mTabLayout);
+        int viewPagerId = getViewPagerId();
+        PagerAdapter pagerAdapter = getPagerAdapter();
+        if (viewPagerId != 0 && pagerAdapter != null) {
+            ViewPager pager = (ViewPager) findViewById(viewPagerId);
+            pager.setAdapter(pagerAdapter);
+            mTabLayout.setupWithViewPager(pager);
+        } else {
+            mTabLayout.setVisibility(View.GONE);
+        }
     }
 
     private void initDrawer(Bundle savedInstanceState) {
@@ -151,7 +164,12 @@ public abstract class ActivityBase extends AppCompatActivity {
     @IdRes
     public abstract int getRootViewId();
 
-    public abstract void addTabs(TabLayout tabLayout);
+    @Nullable
+    @IdRes
+    public abstract int getViewPagerId();
+
+    @Nullable
+    public abstract PagerAdapter getPagerAdapter();
 
 }
 

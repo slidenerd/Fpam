@@ -26,7 +26,7 @@ public class FBUtils {
      * Specify the fields of the logged in user that you are interested to retrieve. Fire a Graph Request synchronously and get its JSON object.
      *
      * @param accessToken An access token needed to start session with Facebook
-     * @return an admin object that contains all details such as name, email and the profile picture used by the admin.
+     * @return an admin object that containsAll all details such as name, email and the profile picture used by the admin.
      */
     @Nullable
     public static JSONObject requestMeSync(AccessToken accessToken) throws JSONException {
@@ -41,7 +41,7 @@ public class FBUtils {
 
     /**
      * @param accessToken An access token needed to start session with Facebook
-     * @return a List containing all the groups owned by the logged in user and empty list if the logged in user doesn't own any groups or the groups were not retrieved for some reason. The JSON response is actually an object that contains an array with the name 'data' which contains all the groups.
+     * @return a List containing all the groups owned by the logged in user and empty list if the logged in user doesn't own any groups or the groups were not retrieved for some reason. The JSON response is actually an object that containsAll an array with the name 'data' which containsAll all the groups.
      * @throws JSONException
      */
     @Nullable

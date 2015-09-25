@@ -7,7 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="slidenerd.vivz.fpam.TestActivity2">
+    tools:context="slidenerd.vivz.fpam.ui.TestActivity2">
 
     <EditText
         android:id="@+id/test_input"
