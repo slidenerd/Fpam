@@ -33,6 +33,7 @@ import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
+import slidenerd.vivz.fpam.model.json.group.Groups;
 import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.JSONUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
@@ -82,12 +83,13 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
         Realm realm = null;
         try {
             realm = Realm.getDefaultInstance();
-            JSONObject jsonObject = FBUtils.requestMeSync(accessToken);
-            JSONArray jsonArray = FBUtils.requestGroupsSync(accessToken);
+            JSONObject adminObject = FBUtils.requestMeSync(accessToken);
+            JSONObject groupsObject = FBUtils.requestGroupsSync(accessToken);
             //Store the admin and list of groups associated with the admin on the UI Thread
-            Admin admin = JSONUtils.loadAdminFrom(jsonObject);
+            Admin admin = JSONUtils.loadAdminFrom(adminObject);
+            Groups groups = JSONUtils.loadGroupsFrom(groupsObject);
             DataStore.storeAdmin(realm, admin);
-            DataStore.storeGroups(realm, jsonArray);
+            DataStore.storeGroups(realm, groups);
         } catch (JSONException e) {
             L.m("" + e);
         } finally {

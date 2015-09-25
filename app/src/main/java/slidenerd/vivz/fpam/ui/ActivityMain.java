@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
 
 import org.androidannotations.annotations.EActivity;
@@ -19,10 +18,6 @@ import slidenerd.vivz.fpam.util.NavUtils;
 @EActivity
 @OptionsMenu(R.menu.menu_activity_stats)
 public class ActivityMain extends ActivityBase {
-
-
-    private ViewPager mPager;
-    private MainPagerAdapter mPagerAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,16 +66,6 @@ public class ActivityMain extends ActivityBase {
     public int getRootViewId() {
         return R.id.main_root;
     }
-
-//    /**
-//     * This method is called prior to the onCreate inside this Activity. Hence initialize the ViewPager and PagerAdapter here instead of onCreate to avoid null pointer exceptions.
-//     */
-//    public void addTabs(TabLayout tabLayout) {
-//        mPager = (ViewPager) findViewById(R.id.main_root);
-//        mPagerAdapter = new MainPagerAdapter(this, getSupportFragmentManager());
-//        mPager.setAdapter(mPagerAdapter);
-//        tabLayout.setupWithViewPager(mPager);
-//    }
 
     @Override
     @Nullable

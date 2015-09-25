@@ -45,15 +45,14 @@ public class FBUtils {
      * @throws JSONException
      */
     @Nullable
-    public static JSONArray requestGroupsSync(AccessToken accessToken) throws JSONException {
+    public static JSONObject requestGroupsSync(AccessToken accessToken) throws JSONException {
         GraphRequest request = new GraphRequest(accessToken, "me/admined_groups");
         Bundle parameters = new Bundle();
         parameters.putString("fields", "name,id,icon,unread");
         request.setParameters(parameters);
         GraphResponse response = request.executeAndWait();
         ArrayList<Group> listGroups = new ArrayList<>();
-        JSONObject jsonObject = response.getJSONObject();
-        return jsonObject.getJSONArray(Keys.JSON_KEY_DATA);
+        return response.getJSONObject();
     }
 
     /*

@@ -11,6 +11,7 @@ import io.realm.RealmResults;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.group.Groups;
 import slidenerd.vivz.fpam.util.CopyUtils;
 
 public class DataStore {
@@ -18,9 +19,9 @@ public class DataStore {
     /**
      * In the first step, check if the list of groups to be stored is empty. If we have 1-N groups to store, use shared preferences to do the same. Convert the list of groups into a JSON string and store that.
      */
-    public static void storeGroups(Realm realm, JSONArray jsonArray) {
+    public static void storeGroups(Realm realm, Groups groups) {
         realm.beginTransaction();
-        realm.createOrUpdateAllFromJson(Group.class, jsonArray);
+        realm.copyToRealmOrUpdate(groups);
         realm.commitTransaction();
     }
 
@@ -30,7 +31,6 @@ public class DataStore {
      * @return a list of groups that were retrieved from the backend, if the admin owns no groups or if there was a problem while retrieving data, then return an empty list.
      */
     public static ArrayList<Group> loadGroups(Realm realm) {
-
         RealmResults<Group> realmGroups = realm.where(Group.class).findAllSorted("name");
         return CopyUtils.duplicateGroups(realmGroups);
     }

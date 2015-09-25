@@ -45,7 +45,9 @@ public abstract class ActivityBase extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
 
     /**
-     * Get a reference to our access token. If its not valid, then let the user login once again through the Login screen.
+     * Get a reference to our access token. If the access token is not valid, redirect the user back to the login screen
+     *
+     * @return true if the user must be redirected back to the login screen else false.
      */
     private boolean shouldRedirectToLogin() {
         AccessToken accessToken = ApplicationFpam.getFacebookAccessToken();
@@ -61,39 +63,41 @@ public abstract class ActivityBase extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
-        //Perform this before the redirect to login check to avoid null pointer exceptions
+        //Perform this before redirecting to login to avoid null pointer exceptions in the subclasses since they may try to access their views inside the onCreate method and the views wont be loaded unless the ViewStub is inflated here
         initSubclassLayout();
-        //if we dont have a valid access token or its null, redirect the person back to login screen
+        //If we don't have a valid access token or its null, redirect the person back to login screen
         if (shouldRedirectToLogin()) {
             //Prevent further processing, calling finish() does not quit your activity immediately, it still runs code after finish() in the current method
             return;
         }
+        //The part of code below doesn't execute if the access token is null or invalid
         initAppBar();
         initDrawer(savedInstanceState);
     }
 
+    /**
+     * Calling setupDrawer inside the onCreate, results in a situation where the onCreate, onCreateView and onViewCreated of FragmentDrawer are not yet executed and the drawer does not associate properly with the DrawerLayout. Call setupDrawer inside onResume so that onCreate, onCreateView, onViewCreated are first executed and then this method runs inside the FragmentDrawer.
+     */
     @Override
     protected void onResume() {
         super.onResume();
-        //Calling initDrawer inside the onCreate, results in a situation where the onCreate, onCreateView and onViewCreated of FragmentDrawer are not yet executed and the drawer does not associate properly with the DrawerLayout. Call this method here so that onCreate, onCreateView, onViewCreated are first executed and then this method runs inside the FragmentDrawer.
-        mDrawer.initDrawer(mToolbar, mDrawerLayout);
+        mDrawer.setupDrawer(mToolbar, mDrawerLayout);
     }
 
     /**
-     * call this method before calling shouldRedirectToLogin to prevent crashes in the sub activities that implement this activity
+     * Call this method before calling shouldRedirectToLogin to prevent crashes in the sub activities that implement this activity. The ViewStub into which the actual layout of the subclasses implementing this Activity is loaded. Each subclass Activity is expected to have a simple container or Layout and specify its id and layout resource file name when they implement this Activity. This needs to be done regardless of whether the Activity starts for the first time or starts after a subsequent rotation.
      */
     private void initSubclassLayout() {
-        /**
-         * The ViewStub into which the actual layout of the subclasses implementing this Activity is loaded. Each subclass Activity is expected to have a simple container or Layout and specify its id and layout resource file name when they implement this Activity. This needs to be done regardless of whether the Activity starts for the first time or starts after a subsequent rotation.
-         */
         mMainContent = (ViewStub) findViewById(R.id.main_content);
         mMainContent.setInflatedId(getRootViewId());
         mMainContent.setLayoutResource(getLayoutForActivity());
         mMainContent.inflate();
     }
 
+    /**
+     * Initialize the Toolbar and Tab Layout and if we have a valid View Pager id from the subclasses and a valid Pager Adapter object, then link the Tab Layout with that View Pager else , hide the Tab Layout.
+     */
     private void initAppBar() {
-        //The statements below wont be run if access token is null or invalid
         mToolbar = (Toolbar) findViewById(R.id.app_bar);
         mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
         setSupportActionBar(mToolbar);
@@ -108,8 +112,12 @@ public abstract class ActivityBase extends AppCompatActivity {
         }
     }
 
+    /**
+     * If the drawer is created in XML, it runs code inside its onCreate, onCreateView, onViewCreated even before shouldRedirectToLogin is triggered executing unnecessary code. Rather create the drawer in code, and replace it everytime the Activity is started after a rotation.
+     *
+     * @param savedInstanceState
+     */
     private void initDrawer(Bundle savedInstanceState) {
-        //If the drawer is created in XML, it runs code inside its onCreate, onCreateView, onViewCreated even before shouldRedirectToLogin is triggered executing unnecessary code. Rather create the drawer in code, and replace it everytime the Activity is started after a rotation.
         if (savedInstanceState == null) {
             mDrawer = new FragmentDrawer_();
         } else {
@@ -119,18 +127,18 @@ public abstract class ActivityBase extends AppCompatActivity {
         getFragmentManager().beginTransaction().replace(R.id.drawer_frame_layout, mDrawer, DRAWER_FRAGMENT_TAG).commit();
     }
 
-    public void loadFeed(AccessToken accessToken, @NonNull Group group) {
-        loadFeedAsync(accessToken, group);
+    public void beforeFeedLoaded(AccessToken accessToken, @NonNull Group group) {
+        onFeedLoaded(accessToken, group);
     }
 
     @Background
-    void loadFeedAsync(AccessToken accessToken, @NonNull Group group) {
+    void onFeedLoaded(AccessToken accessToken, @NonNull Group group) {
         Realm realm = null;
         try {
             realm = Realm.getDefaultInstance();
             JSONArray jsonArray = FBUtils.requestFeedSync(accessToken, group);
             DataStore.storeFeed(realm, jsonArray);
-            onFeedLoaded();
+            afterFeedLoaded();
         } catch (JSONException e) {
             L.m("" + e);
         } finally {
@@ -141,10 +149,13 @@ public abstract class ActivityBase extends AppCompatActivity {
     }
 
     @UiThread
-    void onFeedLoaded() {
+    void afterFeedLoaded() {
 
     }
 
+    /**
+     * If the Navigation Drawer did not handle the back press, then let the Activity execute the default behavior to handle back press
+     */
     @Override
     public void onBackPressed() {
         if (!mDrawer.onBackPressed()) {
@@ -153,21 +164,29 @@ public abstract class ActivityBase extends AppCompatActivity {
     }
 
     /**
-     * @return the xml layout resource for your Activity that implements this one.
+     * @return the xml layout resource for your Activity that extends from our current one.
      */
+    @NonNull
     @LayoutRes
     public abstract int getLayoutForActivity();
 
     /**
-     * @return the ID of your root View inside your Activity's layout XML file
+     * @return the ID of your root View or ViewGroup inside your Activity's layout XML file that extends from our current one
      */
+    @NonNull
     @IdRes
     public abstract int getRootViewId();
 
+    /**
+     * @return the id of the View Pager inside the Activity's layout XML file that extends from our current one or 0 if the Activity doesn't have a View Pager.
+     */
     @Nullable
     @IdRes
     public abstract int getViewPagerId();
 
+    /**
+     * @return the PagerAdapter object that will be used to link with the ViewPager returned from getViewPagerId(). If child Activity does not use a View Pager simply return a null here and the Tab Layout won't be shown to child Activity.
+     */
     @Nullable
     public abstract PagerAdapter getPagerAdapter();
 

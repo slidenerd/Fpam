@@ -123,7 +123,7 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
         addGroupsToDrawer(mListGroups);
     }
 
-    void initDrawer(Toolbar toolbar, DrawerLayout drawerLayout) {
+    void setupDrawer(Toolbar toolbar, DrawerLayout drawerLayout) {
         mDrawerLayout = drawerLayout;
         mDrawerListener = new ActionBarDrawerToggle(mActivity,
                 mDrawerLayout,
@@ -246,7 +246,7 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
                     if (!mLastSelectedGroupId.equals(group.getId())) {
                         AccessToken accessToken = ApplicationFpam.getFacebookAccessToken();
                         if (FBUtils.isValidToken(accessToken)) {
-                            mActivity.loadFeed(accessToken, group);
+                            mActivity.beforeFeedLoaded(accessToken, group);
                         } else {
                             L.m("Did not find a good access token from fragment drawer");
                         }
