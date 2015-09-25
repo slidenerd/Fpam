@@ -6,6 +6,7 @@ import org.parceler.ParcelPropertyConverter;
 import io.realm.AttachmentsRealmProxy;
 import io.realm.RealmList;
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 import slidenerd.vivz.fpam.parcel.AttachmentsParcelConverter;
 
 @Parcel(implementations = {AttachmentsRealmProxy.class},
@@ -13,18 +14,12 @@ import slidenerd.vivz.fpam.parcel.AttachmentsParcelConverter;
         analyze = {Attachments.class})
 public class Attachments extends RealmObject {
 
+    @PrimaryKey
+    private String postId;
     private RealmList<Attachment> data = new RealmList<>();
 
     public Attachments() {
 
-    }
-
-    public Attachments(RealmList<Attachment> data) {
-        if (data == null) {
-            this.data = new RealmList<>();
-        } else {
-            this.data = data;
-        }
     }
 
     /**
@@ -42,4 +37,11 @@ public class Attachments extends RealmObject {
         this.data = data;
     }
 
+    public String getPostId() {
+        return postId;
+    }
+
+    public void setPostId(String postId) {
+        this.postId = postId;
+    }
 }

@@ -11,10 +11,11 @@ import io.realm.annotations.PrimaryKey;
         analyze = {Comment.class})
 public class Comment extends RealmObject {
 
-    private User from;
-    private String message;
     @PrimaryKey
-    private String id;
+    private String commentId;
+    private String userId;
+    private String userName;
+    private String message;
     private String created_time;
 
 
@@ -22,25 +23,12 @@ public class Comment extends RealmObject {
 
     }
 
-    public Comment(String id, String message, User from, String created_time) {
-        this.from = from;
+    public Comment(String commentId, String userId, String userName, String message, String created_time) {
+        this.commentId = commentId;
+        this.userId = userId;
+        this.userName = userName;
         this.message = message;
-        this.id = id;
         this.created_time = created_time;
-    }
-
-    /**
-     * @return The from
-     */
-    public User getFrom() {
-        return from;
-    }
-
-    /**
-     * @param from The from
-     */
-    public void setFrom(User from) {
-        this.from = from;
     }
 
     /**
@@ -58,17 +46,17 @@ public class Comment extends RealmObject {
     }
 
     /**
-     * @return The id
+     * @return The commentId
      */
-    public String getId() {
-        return id;
+    public String getCommentId() {
+        return commentId;
     }
 
     /**
-     * @param id The id
+     * @param commentId The commentId
      */
-    public void setId(String id) {
-        this.id = id;
+    public void setCommentId(String commentId) {
+        this.commentId = commentId;
     }
 
     public String getCreated_time() {
@@ -77,5 +65,21 @@ public class Comment extends RealmObject {
 
     public void setCreated_time(String created_time) {
         this.created_time = created_time;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

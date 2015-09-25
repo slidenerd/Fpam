@@ -10,15 +10,20 @@ import io.realm.annotations.PrimaryKey;
         analyze = {Post.class})
 public class Post extends RealmObject {
 
-    private User from;
+    @PrimaryKey
+    private String postId;
+
+    private String userId;
+
+    private String userName;
 
     private String message;
+
+    private String name;
 
     private String caption;
 
     private String description;
-
-    private String name;
 
     private String picture;
 
@@ -28,45 +33,8 @@ public class Post extends RealmObject {
 
     private String link;
 
-    @PrimaryKey
-    private String id;
-
-    private Comments comments;
-
-
-    private Attachments attachments;
-
     public Post() {
 
-    }
-
-    public Post(String id, User from, String message, String name, String caption, String description, String link, String picture, String type, Attachments attachments, Comments comments, String updated_time) {
-        this.from = from;
-        this.message = message;
-        this.caption = caption;
-        this.description = description;
-        this.name = name;
-        this.picture = picture;
-        this.type = type;
-        this.updated_time = updated_time;
-        this.link = link;
-        this.id = id;
-        this.comments = comments;
-        this.attachments = attachments;
-    }
-
-    /**
-     * @return The from
-     */
-    public User getFrom() {
-        return from;
-    }
-
-    /**
-     * @param from The from
-     */
-    public void setFrom(User from) {
-        this.from = from;
     }
 
     /**
@@ -168,45 +136,17 @@ public class Post extends RealmObject {
     }
 
     /**
-     * @return The id
+     * @return The postId
      */
-    public String getId() {
-        return id;
+    public String getPostId() {
+        return postId;
     }
 
     /**
-     * @param id The id
+     * @param postId The postId
      */
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    /**
-     * @return The comments
-     */
-    public Comments getComments() {
-        return comments;
-    }
-
-    /**
-     * @param comments The comments
-     */
-    public void setComments(Comments comments) {
-        this.comments = comments;
-    }
-
-    /**
-     * @return The attachments
-     */
-    public Attachments getAttachments() {
-        return attachments;
-    }
-
-    /**
-     * @param attachments The attachments
-     */
-    public void setAttachments(Attachments attachments) {
-        this.attachments = attachments;
+    public void setPostId(String postId) {
+        this.postId = postId;
     }
 
     public String getMessage() {
@@ -215,5 +155,21 @@ public class Post extends RealmObject {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

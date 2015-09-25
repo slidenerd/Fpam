@@ -10,34 +10,15 @@ import io.realm.RealmObject;
         analyze = {Attachment.class})
 public class Attachment extends RealmObject {
 
-
-    private AttachmentMedia media;
+    private String title;
     private String type;
     private String url;
+    private int width;
+    private int height;
+    private String source;
 
     public Attachment() {
 
-    }
-
-    public Attachment(String url, String type, AttachmentMedia media) {
-        this.media = media;
-        this.type = type;
-        this.url = url;
-    }
-
-
-    /**
-     * @return The media
-     */
-    public AttachmentMedia getMedia() {
-        return media;
-    }
-
-    /**
-     * @param media The media
-     */
-    public void setMedia(AttachmentMedia media) {
-        this.media = media;
     }
 
     /**
@@ -66,5 +47,37 @@ public class Attachment extends RealmObject {
      */
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 }

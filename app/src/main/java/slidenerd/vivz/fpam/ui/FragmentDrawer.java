@@ -55,8 +55,6 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
     MyPrefs_ mPref;
     @InstanceState
     int mSelectedMenuId = 0;
-    @InstanceState
-    String mLastSelectedGroupId = "";
 
     private Admin mAdmin;
     /*
@@ -243,14 +241,11 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
                 Group group = getSelectedGroup();
                 if (group != null) {
                     mActivity.setTitle(group.getName());
-                    if (!mLastSelectedGroupId.equals(group.getId())) {
-                        AccessToken accessToken = ApplicationFpam.getFacebookAccessToken();
-                        if (FBUtils.isValidToken(accessToken)) {
-                            mActivity.beforeFeedLoaded(accessToken, group);
-                        } else {
-                            L.m("Did not find a good access token from fragment drawer");
-                        }
-                        mLastSelectedGroupId = group.getId();
+                    AccessToken accessToken = ApplicationFpam.getFacebookAccessToken();
+                    if (FBUtils.isValidToken(accessToken)) {
+                        mActivity.beforeFeedLoaded(accessToken, group);
+                    } else {
+                        L.m("Did not find a good access token from fragment drawer");
                     }
                 }
                 //If the selected id is not the default one, then hide the drawer. It is default if the user has not selected anything previously and sees the drawer for the first time.

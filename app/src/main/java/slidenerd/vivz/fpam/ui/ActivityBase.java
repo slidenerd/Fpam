@@ -19,16 +19,18 @@ import com.facebook.AccessToken;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.UiThread;
-import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import io.realm.Realm;
 import slidenerd.vivz.fpam.ApplicationFpam;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
+import slidenerd.vivz.fpam.model.json.feed.Feed;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.FBUtils;
+import slidenerd.vivz.fpam.util.JSONUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
 /**
@@ -136,8 +138,9 @@ public abstract class ActivityBase extends AppCompatActivity {
         Realm realm = null;
         try {
             realm = Realm.getDefaultInstance();
-            JSONArray jsonArray = FBUtils.requestFeedSync(accessToken, group);
-            DataStore.storeFeed(realm, jsonArray);
+            JSONObject feedObject = FBUtils.requestFeedSync(accessToken, group);
+            Feed feed = JSONUtils.loadFeedFrom(group.getId(), feedObject);
+            DataStore.storeFeed(realm, feed);
             afterFeedLoaded();
         } catch (JSONException e) {
             L.m("" + e);

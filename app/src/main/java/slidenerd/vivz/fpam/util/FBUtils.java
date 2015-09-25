@@ -7,13 +7,11 @@ import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import slidenerd.vivz.fpam.Keys;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 
@@ -58,7 +56,7 @@ public class FBUtils {
     /*
     TODO implement the since parameter for requesting feeds from Facebook Graph API
      */
-    public static JSONArray requestFeedSync(AccessToken token, Group group) throws JSONException {
+    public static JSONObject requestFeedSync(AccessToken token, Group group) throws JSONException {
         ArrayList<Post> listPosts = new ArrayList<>();
         Bundle parameters = new Bundle();
         parameters.putString("fields", "from,message,caption,comments{from,message},description,name,picture,type,updated_time,attachments{media,type,url},link");
@@ -67,8 +65,6 @@ public class FBUtils {
         GraphRequest request = new GraphRequest(token, "/" + group.getId() + "/feed");
         request.setParameters(parameters);
         GraphResponse response = request.executeAndWait();
-        JSONObject jsonObject = response.getJSONObject();
-        return jsonObject.getJSONArray(Keys.JSON_KEY_DATA);
-
+        return response.getJSONObject();
     }
 }

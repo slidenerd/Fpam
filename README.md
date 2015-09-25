@@ -67,4 +67,4 @@ The current model for Feed processing takes separate model classes, one for GSON
 The Workflow
 
 When the user logs in, get the list of groups and user details and store them in Realm. 
-When the user clicks on a group, load the posts with that group id and store it in Realm. If there are more than 100 posts that are already stored for that group, delete the oldest N entries and add the new ones, update all existing posts, comments, attachments and any other detail.
+When the user clicks on a group, load the posts with that group postId and store it in Realm. If there are more than 100 posts that are already stored for that group, delete the oldest N entries and add the new ones, update all existing posts, comments, attachments and any other detail.

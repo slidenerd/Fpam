@@ -6,24 +6,21 @@ import org.parceler.ParcelPropertyConverter;
 import io.realm.CommentsRealmProxy;
 import io.realm.RealmList;
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 import slidenerd.vivz.fpam.parcel.CommentsParcelConverter;
 
 @Parcel(implementations = {CommentsRealmProxy.class},
         value = Parcel.Serialization.BEAN,
         analyze = {Comments.class})
 public class Comments extends RealmObject {
-
-
+    @PrimaryKey
+    private String postId;
     private RealmList<Comment> data = new RealmList<>();
-    private CommentPaging paging;
+    private String before;
+    private String after;
 
     public Comments() {
 
-    }
-
-    public Comments(RealmList<Comment> data, CommentPaging paging) {
-        this.data = data;
-        this.paging = paging;
     }
 
     /**
@@ -41,18 +38,27 @@ public class Comments extends RealmObject {
         this.data = data;
     }
 
-    /**
-     * @return The paging
-     */
-    public CommentPaging getPaging() {
-        return paging;
+    public String getBefore() {
+        return before;
     }
 
-    /**
-     * @param paging The paging
-     */
-    public void setPaging(CommentPaging paging) {
-        this.paging = paging;
+    public void setBefore(String before) {
+        this.before = before;
     }
 
+    public String getAfter() {
+        return after;
+    }
+
+    public void setAfter(String after) {
+        this.after = after;
+    }
+
+    public String getPostId() {
+        return postId;
+    }
+
+    public void setPostId(String postId) {
+        this.postId = postId;
+    }
 }
