@@ -17,7 +17,7 @@ import slidenerd.vivz.fpam.model.json.group.Groups;
  * Created by vivz on 24/09/15.
  */
 public class JSONUtils {
-    public static boolean contains(JSONObject jsonObject, String key) {
+    public static boolean has(JSONObject jsonObject, String key) {
         if (jsonObject != null && jsonObject.has(key) && !jsonObject.isNull(key)) {
             return true;
         } else {
@@ -26,10 +26,10 @@ public class JSONUtils {
         }
     }
 
-    public static boolean containsAll(JSONObject jsonObject, String... keys) {
+    public static boolean has(JSONObject jsonObject, String... keys) {
         boolean containsAllKeys = true;
         for (int i = 0; i < keys.length; i++) {
-            containsAllKeys = containsAllKeys && contains(jsonObject, keys[i]);
+            containsAllKeys = containsAllKeys && has(jsonObject, keys[i]);
         }
         return containsAllKeys;
     }
@@ -37,21 +37,21 @@ public class JSONUtils {
     @Nullable
     public static Admin loadAdminFrom(JSONObject adminObject) throws JSONException {
         Admin admin = null;
-        //If the feed containsAll all the fields, id email first_name and last_name
-        if (containsAll(adminObject, AdminJSONFields.ID, AdminJSONFields.EMAIL, AdminJSONFields.FIRST_NAME, AdminJSONFields.LAST_NAME)) {
+        //If the feed has all the fields, id email first_name and last_name
+        if (has(adminObject, AdminJSONFields.ID, AdminJSONFields.EMAIL, AdminJSONFields.FIRST_NAME, AdminJSONFields.LAST_NAME)) {
             admin = new Admin();
             admin.setId(adminObject.getString(AdminJSONFields.ID));
             admin.setEmail(adminObject.getString(AdminJSONFields.EMAIL));
             admin.setFirstName(adminObject.getString(AdminJSONFields.FIRST_NAME));
             admin.setLastName(adminObject.getString(AdminJSONFields.LAST_NAME));
-            //if the feed containsAll picture object
-            if (contains(adminObject, AdminJSONFields.PICTURE)) {
+            //if the feed has picture object
+            if (has(adminObject, AdminJSONFields.PICTURE)) {
                 JSONObject pictureObject = adminObject.getJSONObject(AdminJSONFields.PICTURE);
-                //if the picture object containsAll data object
-                if (contains(pictureObject, AdminJSONFields.DATA)) {
+                //if the picture object has data object
+                if (has(pictureObject, AdminJSONFields.DATA)) {
                     JSONObject dataObject = pictureObject.getJSONObject(AdminJSONFields.DATA);
-                    //if data object containsAll width, height, is_silhouette and url
-                    if (containsAll(dataObject, AdminJSONFields.WIDTH, AdminJSONFields.HEIGHT, AdminJSONFields.IS_SILHOUETTE, AdminJSONFields.URL)) {
+                    //if data object has width, height, is_silhouette and url
+                    if (has(dataObject, AdminJSONFields.WIDTH, AdminJSONFields.HEIGHT, AdminJSONFields.IS_SILHOUETTE, AdminJSONFields.URL)) {
                         admin.setWidth(dataObject.getInt(AdminJSONFields.WIDTH));
                         admin.setHeight(dataObject.getInt(AdminJSONFields.HEIGHT));
                         admin.setIsSilhouette(dataObject.getBoolean(AdminJSONFields.IS_SILHOUETTE));
@@ -64,14 +64,15 @@ public class JSONUtils {
     }
 
     @NonNull
-    public static Groups loadGroupsFrom(JSONObject groupsObject) throws JSONException {
+    public static Groups loadGroupsFrom(String adminId, JSONObject groupsObject) throws JSONException {
         Groups groups = new Groups();
+        groups.setAdminId(adminId);
         RealmList<Group> listGroups = new RealmList<>();
-        if (contains(groupsObject, GroupsJSONFields.DATA)) {
+        if (has(groupsObject, GroupsJSONFields.DATA)) {
             JSONArray arrayData = groupsObject.getJSONArray(GroupsJSONFields.DATA);
             for (int i = 0; i < arrayData.length(); i++) {
                 JSONObject groupObject = arrayData.getJSONObject(i);
-                if (containsAll(groupObject, GroupsJSONFields.ID, GroupsJSONFields.ICON, GroupsJSONFields.UNREAD, GroupsJSONFields.NAME)) {
+                if (has(groupObject, GroupsJSONFields.ID, GroupsJSONFields.ICON, GroupsJSONFields.UNREAD, GroupsJSONFields.NAME)) {
                     Group group = new Group();
                     group.setId(groupObject.getString(GroupsJSONFields.ID));
                     group.setName(groupObject.getString(GroupsJSONFields.NAME));
@@ -81,20 +82,20 @@ public class JSONUtils {
                 }
             }
         }
-        if (contains(groupsObject, GroupsJSONFields.PAGING)) {
+        if (has(groupsObject, GroupsJSONFields.PAGING)) {
             JSONObject pagingObject = groupsObject.getJSONObject(GroupsJSONFields.PAGING);
-            if (contains(pagingObject, GroupsJSONFields.CURSORS)) {
+            if (has(pagingObject, GroupsJSONFields.CURSORS)) {
                 JSONObject cursorsObject = pagingObject.getJSONObject(GroupsJSONFields.CURSORS);
-                if (containsAll(cursorsObject, GroupsJSONFields.BEFORE, GroupsJSONFields.AFTER)) {
+                if (has(cursorsObject, GroupsJSONFields.BEFORE, GroupsJSONFields.AFTER)) {
                     groups.setBefore(cursorsObject.getString(GroupsJSONFields.BEFORE));
                     groups.setAfter(cursorsObject.getString(GroupsJSONFields.AFTER));
                 }
             }
         }
-        if (contains(groupsObject, GroupsJSONFields.PREVIOUS)) {
+        if (has(groupsObject, GroupsJSONFields.PREVIOUS)) {
             groups.setPrevious(groupsObject.getString(GroupsJSONFields.PREVIOUS));
         }
-        if (contains(groupsObject, GroupsJSONFields.NEXT)) {
+        if (has(groupsObject, GroupsJSONFields.NEXT)) {
             groups.setNext(groupsObject.getString(GroupsJSONFields.NEXT));
         }
         groups.setTimestamp(System.currentTimeMillis());

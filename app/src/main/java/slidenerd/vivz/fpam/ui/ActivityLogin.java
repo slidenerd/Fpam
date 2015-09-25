@@ -21,7 +21,6 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -87,9 +86,14 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
             JSONObject groupsObject = FBUtils.requestGroupsSync(accessToken);
             //Store the admin and list of groups associated with the admin on the UI Thread
             Admin admin = JSONUtils.loadAdminFrom(adminObject);
-            Groups groups = JSONUtils.loadGroupsFrom(groupsObject);
+            if (admin == null) {
+                L.m("Fpam encountered problems downloading admin data, hence admin and groups data have not been downloaded");
+                return;
+            }
             DataStore.storeAdmin(realm, admin);
+            Groups groups = JSONUtils.loadGroupsFrom(admin.getId(), groupsObject);
             DataStore.storeGroups(realm, groups);
+
         } catch (JSONException e) {
             L.m("" + e);
         } finally {

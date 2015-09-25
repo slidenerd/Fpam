@@ -17,6 +17,7 @@ import slidenerd.vivz.fpam.parcel.GroupsParcelConverter;
         analyze = {Groups.class})
 public class Groups extends RealmObject {
     @PrimaryKey
+    private String adminId;
     private long timestamp;
     private RealmList<Group> groups = new RealmList<>();
     private String before;
@@ -28,7 +29,8 @@ public class Groups extends RealmObject {
 
     }
 
-    public Groups(long timestamp, RealmList<Group> groups, String before, String after, String previous, String next) {
+    public Groups(String adminId, long timestamp, RealmList<Group> groups, String before, String after, String previous, String next) {
+        this.adminId = adminId;
         this.timestamp = timestamp;
         this.groups = groups;
         this.before = before;
@@ -84,5 +86,13 @@ public class Groups extends RealmObject {
 
     public void setPrevious(String previous) {
         this.previous = previous;
+    }
+
+    public String getAdminId() {
+        return adminId;
+    }
+
+    public void setAdminId(String adminId) {
+        this.adminId = adminId;
     }
 }
