@@ -100,6 +100,7 @@ public class FragmentDrawer extends Fragment implements NavigationView.OnNavigat
         } else {
             mAdmin = Parcels.unwrap(savedInstanceState.getParcelable("admin"));
             mListGroups = Parcels.unwrap(savedInstanceState.getParcelable("groups"));
+            L.m("Loading From Parcler " + mAdmin.getId() + " " + mAdmin.getEmail() + " " + mAdmin.getFirstName() + " " + mAdmin.getLastName() + " " + mAdmin.getWidth() + " " + mAdmin.getHeight() + " " + mAdmin.getUrl() + " " + mAdmin.isSilhouette());
         }
     }
 

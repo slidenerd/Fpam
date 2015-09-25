@@ -1,6 +1,8 @@
 package slidenerd.vivz.fpam;
 
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.view.View;
 
 public class TestActivity1 extends ActivityBase {
 
@@ -17,5 +19,10 @@ public class TestActivity1 extends ActivityBase {
     @Override
     public int getRootViewId() {
         return R.id.main_root;
+    }
+
+    @Override
+    public void addTabs(TabLayout tabLayout) {
+        tabLayout.setVisibility(View.GONE);
     }
 }

@@ -42,35 +42,29 @@ public abstract class ActivityBase extends AppCompatActivity {
     /**
      * Get a reference to our access token. If its not valid, then let the user login once again through the Login screen.
      */
-    private void redirectToLogin(AccessToken accessToken) {
-        NavUtils.startActivityLogin(this);
-        finish();
+    private boolean shouldRedirectToLogin() {
+        AccessToken accessToken = ApplicationFpam.getFacebookAccessToken();
+        if (!FBUtils.isValidToken(accessToken)) {
+            NavUtils.startActivityLogin(this);
+            finish();
+            return true;
+        }
+        return false;
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
+        //Perform this before the redirect to login check to avoid null pointer exceptions
         initSubclassLayout();
         //if we dont have a valid access token or its null, redirect the person back to login screen
-        AccessToken accessToken = ApplicationFpam.getFacebookAccessToken();
-        if (!FBUtils.isValidToken(accessToken)) {
-            redirectToLogin(accessToken);
+        if (shouldRedirectToLogin()) {
             //Prevent further processing, calling finish() does not quit your activity immediately, it still runs code after finish() in the current method
             return;
         }
-        //The statements below wont be run if access token is null or invalid
-        mToolbar = (Toolbar) findViewById(R.id.app_bar);
-        setSupportActionBar(mToolbar);
-        initTabs();
-        //If the drawer is created in XML, it runs code inside its onCreate, onCreateView, onViewCreated even before redirectToLogin is triggered executing unnecessary code. Rather create the drawer in code, and replace it everytime the Activity is started after a rotation.
-        if (savedInstanceState == null) {
-            mDrawer = new FragmentDrawer_();
-        } else {
-            mDrawer = (FragmentDrawer_) getFragmentManager().findFragmentByTag(DRAWER_FRAGMENT_TAG);
-        }
-        getFragmentManager().beginTransaction().replace(R.id.drawer_frame_layout, mDrawer, DRAWER_FRAGMENT_TAG).commit();
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        initAppBar();
+        initDrawer(savedInstanceState);
     }
 
     @Override
@@ -81,7 +75,7 @@ public abstract class ActivityBase extends AppCompatActivity {
     }
 
     /**
-     * call this method before calling redirectToLogin to prevent crashes in the sub activities that implement this activity
+     * call this method before calling shouldRedirectToLogin to prevent crashes in the sub activities that implement this activity
      */
     private void initSubclassLayout() {
         /**
@@ -93,14 +87,23 @@ public abstract class ActivityBase extends AppCompatActivity {
         mMainContent.inflate();
     }
 
-    private void initTabs() {
+    private void initAppBar() {
+        //The statements below wont be run if access token is null or invalid
+        mToolbar = (Toolbar) findViewById(R.id.app_bar);
         mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        TabLayout.Tab tabPosts = mTabLayout.newTab();
-        tabPosts.setText(R.string.tab_posts);
-        TabLayout.Tab tabStats = mTabLayout.newTab();
-        tabStats.setText(R.string.tab_stats);
-        mTabLayout.addTab(tabPosts);
-        mTabLayout.addTab(tabStats);
+        setSupportActionBar(mToolbar);
+        addTabs(mTabLayout);
+    }
+
+    private void initDrawer(Bundle savedInstanceState) {
+        //If the drawer is created in XML, it runs code inside its onCreate, onCreateView, onViewCreated even before shouldRedirectToLogin is triggered executing unnecessary code. Rather create the drawer in code, and replace it everytime the Activity is started after a rotation.
+        if (savedInstanceState == null) {
+            mDrawer = new FragmentDrawer_();
+        } else {
+            mDrawer = (FragmentDrawer_) getFragmentManager().findFragmentByTag(DRAWER_FRAGMENT_TAG);
+        }
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        getFragmentManager().beginTransaction().replace(R.id.drawer_frame_layout, mDrawer, DRAWER_FRAGMENT_TAG).commit();
     }
 
     public void loadFeed(AccessToken accessToken, @NonNull Group group) {
@@ -147,5 +150,8 @@ public abstract class ActivityBase extends AppCompatActivity {
      */
     @IdRes
     public abstract int getRootViewId();
+
+    public abstract void addTabs(TabLayout tabLayout);
+
 }
 

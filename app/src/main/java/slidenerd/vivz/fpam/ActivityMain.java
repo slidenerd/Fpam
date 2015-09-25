@@ -3,6 +3,7 @@ package slidenerd.vivz.fpam;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +12,8 @@ import android.view.MenuItem;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+
+import java.util.ArrayList;
 
 import slidenerd.vivz.fpam.util.FileUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
@@ -71,6 +74,17 @@ public class ActivityMain extends ActivityBase implements SwipeRefreshLayout.OnR
     @Override
     public int getRootViewId() {
         return R.id.main_root;
+    }
+
+    @Override
+    public void addTabs(TabLayout tabLayout) {
+        ArrayList<TabLayout.Tab> listTabs = new ArrayList<>();
+        TabLayout.Tab tabPosts = tabLayout.newTab();
+        tabPosts.setText(R.string.tab_posts);
+        TabLayout.Tab tabStats = tabLayout.newTab();
+        tabStats.setText(R.string.tab_stats);
+        tabLayout.addTab(tabPosts);
+        tabLayout.addTab(tabStats);
     }
 
     @Override
