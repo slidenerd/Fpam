@@ -43,6 +43,28 @@ This is the screen showing the posts and comments from the currently selected gr
 The visual representation for 
 Each?
 
+The Database with posts from PoopScoop, Android Programming and IOS Programming
+
+![snap 2015-09-25 at 21 49 20](https://cloud.githubusercontent.com/assets/5139030/10105978/a8fecfd2-63cf-11e5-986e-f53d29edcd16.png)
+
+The Delete problem
+
+Fpam as of September 26 8:30 am has a drawback where if a post is deleted using Fpam, it will be deleted from the underlying database after its successfully deleted from Facebook Graph API. However if a person deletes a post from Facebook directly, the deleted post is still present in the Fpam database. An upper limit of 100 posts per group also needs to be enforced on Fpam so that it deletes the oldest post and stores the newest one when it crosses the limit. 
+
+Is the database empty, is the feed for this group being loaded the first time?
+    If yes, store the JSON feed directly
+    If no, find the list of common posts between the JSON feed and posts stored in the database.
+    There is nothing common
+      Dont process any further
+    There is something common
+      Find the list of all posts that are contained in both the JSON feed and the database. Lets call it List<C>
+      Sort these posts in order of their updated time
+      Find the updated time of the oldest common post and the newest common post
+      Find all the posts stored in the database between this time range. Lets call it List<U>
+      Compare the posts between List<C> and List<U>
+        If a post is present in List<U> but not in List<C> delete the post
+        If a post is present in List<U> and List<C> update the post
+      
 
 # Fpam
 You know what it does, don't you?
@@ -52,9 +74,6 @@ There can be posts made by people who don't exist
 This example post below is made by a person who doesn't exist on Facebook anymore or was banned
 ![snap 2015-09-18 at 22 32 38](https://cloud.githubusercontent.com/assets/5139030/9966022/e13ecb40-5e57-11e5-9c21-49724fcdd84a.png)
 
-The Database with posts from PoopScoop, Android Programming and IOS Programming
-
-![snap 2015-09-25 at 21 49 20](https://cloud.githubusercontent.com/assets/5139030/10105978/a8fecfd2-63cf-11e5-986e-f53d29edcd16.png)
 
 UPDATE 1 [September 20, 2015 9+ pm writing after a nice BR ice cream and chat]
 
