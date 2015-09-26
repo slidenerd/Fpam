@@ -12,7 +12,7 @@ import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 
 /**
- * TODO delete those objects from Fpam database which are deleted from Facebook directly by finding the common posts between JSON feed and database.
+ * TODO Each time the JSON feed is loaded, only those posts are saved and the rest are deleted, maintain a 100 posts of each group in the database. Also add comments and attachments.
  * Created by vivz on 24/09/15.
  */
 public class JSONUtils {

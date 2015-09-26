@@ -12,7 +12,7 @@ import org.androidannotations.annotations.OptionsMenu;
 
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.MainPagerAdapter;
-import slidenerd.vivz.fpam.util.FileUtils;
+import slidenerd.vivz.fpam.util.DatabaseUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
 @EActivity
@@ -54,7 +54,7 @@ public class ActivityMain extends ActivityBase {
 
     @OptionsItem(R.id.action_export_database)
     void onExportDatabaseSelected() {
-        FileUtils.exportDatabase(this);
+        DatabaseUtils.exportDatabase(this);
     }
 
     @Override
