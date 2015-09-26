@@ -187,7 +187,6 @@ public class JSONUtils {
     public static slidenerd.vivz.fpam.model.json.feed.Feed loadFeedFrom(@NonNull String groupId, @Nullable JSONObject obj) throws JSONException {
         slidenerd.vivz.fpam.model.json.feed.Feed feed = new slidenerd.vivz.fpam.model.json.feed.Feed();
         RealmList<Post> listPosts = new RealmList<>();
-
         //Set the group id for which all the posts are being retrieved.
 
         feed.setGroupId(groupId);
@@ -321,7 +320,6 @@ public class JSONUtils {
         feed.setTimestamp(System.currentTimeMillis());
 
         //Set the list of retrieved posts on the feed.
-
         feed.setListPosts(listPosts);
         return feed;
     }

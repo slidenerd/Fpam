@@ -153,7 +153,7 @@ public abstract class ActivityBase extends AppCompatActivity {
 
     @UiThread
     void afterFeedLoaded() {
-
+        L.t(this, "Feed loaded");
     }
 
     /**
