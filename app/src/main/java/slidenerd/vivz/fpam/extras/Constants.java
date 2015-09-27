@@ -1,4 +1,4 @@
-package slidenerd.vivz.fpam;
+package slidenerd.vivz.fpam.extras;
 
 /**
  * Created by vivz on 27/09/15.
@@ -9,4 +9,8 @@ public interface Constants {
     The item from the Drawer previously selected by the user. If the user has not selected anything previously, this defaults to the first item in the drawer
      */
     int MENU_START_ID = 101;
+
+    int GROUP_NONE = 0;
+
+    String GROUP_ID_NONE = "NONE";
 }

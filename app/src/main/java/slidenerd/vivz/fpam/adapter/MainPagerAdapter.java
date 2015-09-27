@@ -8,7 +8,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.ui.FragmentPosts_;
-import slidenerd.vivz.fpam.ui.FragmentStats;
+import slidenerd.vivz.fpam.ui.FragmentStats_;
 
 /**
  * Created by vivz on 25/09/15.
@@ -30,7 +30,7 @@ public class MainPagerAdapter extends FragmentStatePagerAdapter {
         if (position == POSITION_POSTS) {
             fragment = FragmentPosts_.builder().build();
         } else {
-            fragment = new FragmentStats();
+            fragment = FragmentStats_.builder().build();
         }
         return fragment;
     }

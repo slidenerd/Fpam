@@ -22,8 +22,8 @@ public class PhraseAdapter extends AbstractMutableRealmAdapter<Phrase, RecyclerV
 
     private LayoutInflater mLayoutInflater;
 
-    public PhraseAdapter(Context context, Realm realm) {
-        super(context, realm);
+    public PhraseAdapter(Context context, Realm realm, RealmResults<Phrase> results) {
+        super(context, realm, results);
         mLayoutInflater = LayoutInflater.from(context);
     }
 
@@ -57,11 +57,6 @@ public class PhraseAdapter extends AbstractMutableRealmAdapter<Phrase, RecyclerV
             Phrase phrase = getItem(position);
             itemHolder.setSpamPhrase(phrase.getPhrase());
         }
-    }
-
-    @Override
-    public RealmResults<Phrase> loadData(Realm realm) {
-        return realm.where(Phrase.class).findAllSorted("phrase");
     }
 
     public class HeaderHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

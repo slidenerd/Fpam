@@ -21,7 +21,7 @@ import org.parceler.Parcels;
 import java.util.ArrayList;
 
 import io.realm.Realm;
-import slidenerd.vivz.fpam.Constants;
+import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
@@ -38,7 +38,7 @@ public class FragmentDrawer extends Fragment {
     /*
         The list of groups that the logged in user is an admin of.
      */
-    private ArrayList<Group> mListGroups = new ArrayList<>();
+    private ArrayList<Group> mGroups = new ArrayList<>();
     private NavigationView mDrawer;
     private Context mContext;
     private ActivityBase mActivity;
@@ -68,11 +68,11 @@ public class FragmentDrawer extends Fragment {
         mRealm = Realm.getInstance(mContext);
         if (savedInstanceState == null) {
             mAdmin = DataStore.loadAdmin(mRealm);
-            mListGroups = DataStore.loadGroups(mRealm);
+            mGroups = DataStore.loadGroups(mRealm);
             L.m("Loading From Realm " + mAdmin.getId() + " " + mAdmin.getEmail() + " " + mAdmin.getFirstName() + " " + mAdmin.getLastName() + " " + mAdmin.getWidth() + " " + mAdmin.getHeight() + " " + mAdmin.getUrl() + " " + mAdmin.isSilhouette());
         } else {
             mAdmin = Parcels.unwrap(savedInstanceState.getParcelable("admin"));
-            mListGroups = Parcels.unwrap(savedInstanceState.getParcelable("groups"));
+            mGroups = Parcels.unwrap(savedInstanceState.getParcelable("groups"));
             L.m("Loading From Parceler " + mAdmin.getId() + " " + mAdmin.getEmail() + " " + mAdmin.getFirstName() + " " + mAdmin.getLastName() + " " + mAdmin.getWidth() + " " + mAdmin.getHeight() + " " + mAdmin.getUrl() + " " + mAdmin.isSilhouette());
         }
     }
@@ -91,7 +91,7 @@ public class FragmentDrawer extends Fragment {
         if (mAdmin != null) {
             addHeaderToDrawer(mAdmin);
         }
-        addGroupsToDrawer(mListGroups);
+        addGroupsToDrawer(mGroups);
     }
 
 
@@ -99,7 +99,7 @@ public class FragmentDrawer extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable("admin", Parcels.wrap(Admin.class, mAdmin));
-        outState.putParcelable("groups", Parcels.wrap(mListGroups));
+        outState.putParcelable("groups", Parcels.wrap(mGroups));
     }
 
     /**
@@ -122,7 +122,7 @@ public class FragmentDrawer extends Fragment {
     public void addGroupsToDrawer(ArrayList<Group> list) {
         Menu menu = mDrawer.getMenu();
         SubMenu subMenu = menu.addSubMenu(100, 100, 100, R.string.text_my_groups).setIcon(android.R.drawable.ic_menu_info_details);
-        if (mListGroups.isEmpty()) {
+        if (mGroups.isEmpty()) {
             MenuItem item = subMenu.add(100, 100, 100, R.string.text_no_groups);
             item.setIcon(android.R.drawable.stat_notify_error);
         } else {
@@ -146,11 +146,11 @@ public class FragmentDrawer extends Fragment {
     @Nullable
     public Group getSelectedGroup(int selectedMenuId) {
         Group group = null;
-        if (!mListGroups.isEmpty()) {
+        if (!mGroups.isEmpty()) {
             int position = selectedMenuId - Constants.MENU_START_ID;
             //if we have a valid position between 0 to number of items in the list, then retrieve the item at that position
-            if (position < mListGroups.size() && position >= 0) {
-                group = mListGroups.get(position);
+            if (position < mGroups.size() && position >= 0) {
+                group = mGroups.get(position);
             }
         }
         return group;

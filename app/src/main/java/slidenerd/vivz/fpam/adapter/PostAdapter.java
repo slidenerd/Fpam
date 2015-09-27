@@ -19,8 +19,8 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
 
     private LayoutInflater mLayoutInflater;
 
-    public PostAdapter(Context context, Realm realm) {
-        super(context, realm);
+    public PostAdapter(Context context, Realm realm, RealmResults<Post> results) {
+        super(context, realm, results);
         mLayoutInflater = LayoutInflater.from(context);
     }
 
@@ -47,13 +47,6 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
         holder.setUserName(post.getUserName());
         holder.setUpdatedTime(post.getUpdated_time());
         holder.setMessage(post.getMessage());
-    }
-
-    @Override
-    public RealmResults<Post> loadData(Realm realm) {
-        String groupId = "NONE";
-        RealmResults<Post> realmResults = realm.where(Post.class).contains("postId", groupId).findAll();
-        return realmResults;
     }
 
     public class ItemHolder extends RecyclerView.ViewHolder {

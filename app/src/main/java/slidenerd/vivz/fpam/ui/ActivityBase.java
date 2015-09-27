@@ -28,11 +28,13 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcels;
 
 import io.realm.Realm;
 import slidenerd.vivz.fpam.ApplicationFpam;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.database.DataStore;
+import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Feed;
 import slidenerd.vivz.fpam.model.json.group.Group;
@@ -53,16 +55,18 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
     @InstanceState
     int mSelectedMenuId;
 
-    private String mTitle;
+    private Group mSelectedGroup;
     /*
     The Drawer Listener responsible for providing a handy way to tie together the functionality of DrawerLayout and the framework ActionBar to implement the recommended design for navigation drawers.
      */
-    private ActionBarDrawerToggle mDrawerListener;
+    private ActionBarDrawerToggle mDrawerToggle;
     private FragmentDrawer_ mDrawer;
-    private ViewStub mMainContent;
+    private ViewStub mStub;
     private Toolbar mToolbar;
     private TabLayout mTabLayout;
     private DrawerLayout mDrawerLayout;
+    private AccessToken mAccessToken;
+
 
     /**
      * Get a reference to our access token. If the access token is not valid, redirect the user back to the login screen
@@ -70,8 +74,7 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
      * @return true if the user must be redirected back to the login screen else false.
      */
     private boolean shouldRedirectToLogin() {
-        AccessToken accessToken = ApplicationFpam.getFacebookAccessToken();
-        if (!FBUtils.isValidToken(accessToken)) {
+        if (!FBUtils.isValidToken(mAccessToken)) {
             NavUtils.startActivityLogin(this);
             finish();
             return true;
@@ -83,6 +86,7 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
+        mAccessToken = ApplicationFpam.getFacebookAccessToken();
         //Perform this before redirecting to login to avoid null pointer exceptions in the subclasses since they may try to access their views inside the onCreate method and the views wont be loaded unless the ViewStub is inflated here
         initSubclassLayout();
         //If we don't have a valid access token or its null, redirect the person back to login screen
@@ -91,8 +95,8 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
             return;
         }
         //The part of code below doesn't execute if the access token is null or invalid
-        initAppBar(savedInstanceState);
-        initDrawer(savedInstanceState);
+        initUI(savedInstanceState);
+        initTabs();
     }
 
 
@@ -100,19 +104,17 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
      * Call this method before calling shouldRedirectToLogin to prevent crashes in the sub activities that implement this activity. The ViewStub into which the actual layout of the subclasses implementing this Activity is loaded. Each subclass Activity is expected to have a simple container or Layout and specify its id and layout resource file name when they implement this Activity. This needs to be done regardless of whether the Activity starts for the first time or starts after a subsequent rotation.
      */
     private void initSubclassLayout() {
-        mMainContent = (ViewStub) findViewById(R.id.main_content);
-        mMainContent.setInflatedId(getRootViewId());
-        mMainContent.setLayoutResource(getLayoutForActivity());
-        mMainContent.inflate();
+        mStub = (ViewStub) findViewById(R.id.main_content);
+        mStub.setInflatedId(getRootViewId());
+        mStub.setLayoutResource(getLayoutForActivity());
+        mStub.inflate();
     }
 
     /**
      * Initialize the Toolbar and Tab Layout and if we have a valid View Pager id from the subclasses and a valid Pager Adapter object, then link the Tab Layout with that View Pager else , hide the Tab Layout.
      */
-    private void initAppBar(Bundle savedInstanceState) {
-        mToolbar = (Toolbar) findViewById(R.id.app_bar);
+    private void initTabs() {
         mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        setSupportActionBar(mToolbar);
         int viewPagerId = getViewPagerId();
         PagerAdapter pagerAdapter = getPagerAdapter();
         if (viewPagerId != 0 && pagerAdapter != null) {
@@ -122,12 +124,6 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
         } else {
             mTabLayout.setVisibility(View.GONE);
         }
-        if (savedInstanceState == null) {
-            mTitle = getString(R.string.title_activity_main);
-        } else {
-            mTitle = savedInstanceState.getString("selectedGroupName", getString(R.string.title_activity_main));
-        }
-        setTitle(mTitle);
     }
 
     /**
@@ -135,58 +131,62 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
      *
      * @param savedInstanceState
      */
-    private void initDrawer(Bundle savedInstanceState) {
+    private void initUI(Bundle savedInstanceState) {
+        mToolbar = (Toolbar) findViewById(R.id.app_bar);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        setSupportActionBar(mToolbar);
         if (savedInstanceState == null) {
             mDrawer = new FragmentDrawer_();
         } else {
             mDrawer = (FragmentDrawer_) getFragmentManager().findFragmentByTag(DRAWER_FRAGMENT_TAG);
+            mSelectedGroup = Parcels.unwrap(savedInstanceState.getParcelable("selectedGroup"));
         }
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         getFragmentManager().beginTransaction().replace(R.id.drawer_frame_layout, mDrawer, DRAWER_FRAGMENT_TAG).commit();
-        mDrawerListener = new ActionBarDrawerToggle(this,
+        mDrawerToggle = new ActionBarDrawerToggle(this,
                 mDrawerLayout,
                 mToolbar,
                 R.string.drawer_open,
                 R.string.drawer_close);
-        mDrawerLayout.setDrawerListener(mDrawerListener);
-        mDrawerListener.syncState();
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerToggle.syncState();
         if (!didUserSeeDrawer()) {
             show();
             markDrawerSeen();
         }
-    }
-
-    public void beforeFeedLoaded(AccessToken accessToken, @NonNull Group group) {
-        onFeedLoaded(accessToken, group);
+        setTitle(mSelectedGroup == null ? getString(R.string.title_activity_main) : mSelectedGroup.getName());
     }
 
     @Background
-    void onFeedLoaded(AccessToken accessToken, @NonNull Group group) {
-        Realm realm = null;
-        try {
-            realm = Realm.getDefaultInstance();
-            JSONObject feedObject = FBUtils.requestFeedSync(accessToken, group);
-            Feed feed = JSONUtils.loadFeedFrom(group.getId(), feedObject);
-            DataStore.storeFeed(realm, feed);
-            afterFeedLoaded(group);
-        } catch (JSONException e) {
-            L.m("" + e);
-        } finally {
-            if (realm != null) {
-                realm.close();
+    void loadFeed(@NonNull Group group) {
+        if (FBUtils.isValidToken(mAccessToken)) {
+            Realm realm = null;
+            try {
+                realm = Realm.getDefaultInstance();
+                JSONObject feedObject = FBUtils.requestFeedSync(mAccessToken, group);
+                Feed feed = JSONUtils.loadFeedFrom(group.getId(), feedObject);
+                DataStore.storeFeed(realm, feed);
+                onFeedLoaded("Feed Loaded For", group);
+            } catch (JSONException e) {
+                L.m("" + e);
+            } finally {
+                if (realm != null) {
+                    realm.close();
+                }
             }
+        } else {
+            onFeedLoaded("Did not find a valid access token while loading", group);
         }
     }
 
     @UiThread
-    void afterFeedLoaded(Group group) {
-        L.t(ActivityBase.this, "feed loaded for " + group.getName());
+    void onFeedLoaded(String message, Group group) {
+        L.t(ActivityBase.this, message + group.getName());
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString("selectedGroupName", mTitle);
+        outState.putParcelable("selectedGroup", Parcels.wrap(Group.class, mSelectedGroup));
     }
 
     /**
@@ -200,6 +200,7 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
             super.onBackPressed();
         }
     }
+
 
     @Override
     public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -220,22 +221,15 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
                 finish();
                 break;
             default:
-                Group group = mDrawer.getSelectedGroup(mSelectedMenuId);
-                if (group != null) {
-                    mTitle = group.getName();
-                    setTitle(mTitle);
-                    AccessToken accessToken = ApplicationFpam.getFacebookAccessToken();
-                    if (FBUtils.isValidToken(accessToken)) {
-                        beforeFeedLoaded(accessToken, group);
-                    } else {
-                        L.m("Did not find a good access token from fragment drawer");
-                    }
+                mSelectedGroup = mDrawer.getSelectedGroup(mSelectedMenuId);
+                if (mSelectedGroup != null) {
+                    setTitle(mSelectedGroup.getName());
+                    loadFeed(mSelectedGroup);
                 }
                 //If the selected id is not the default one, then hide the drawer. It is default if the user has not selected anything previously and sees the drawer for the first time.
-                if (mSelectedMenuId != 0) {
+                if (mSelectedMenuId != Constants.GROUP_NONE) {
                     hide();
                 }
-
                 break;
         }
         return true;
@@ -264,6 +258,7 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
         loginManager.logOut();
     }
 
+
     /**
      * @return the xml layout resource for your Activity that extends from our current one.
      */
@@ -291,6 +286,9 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
     @Nullable
     public abstract PagerAdapter getPagerAdapter();
 
+    public interface OnGroupSelectedListener {
+        void onGroupSelected(String groupId);
+    }
 
 }
 

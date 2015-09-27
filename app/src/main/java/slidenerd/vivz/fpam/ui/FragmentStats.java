@@ -7,11 +7,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.androidannotations.annotations.EFragment;
+
 import slidenerd.vivz.fpam.R;
 
 /**
  * A simple {@link Fragment} subclass.
  */
+@EFragment
 public class FragmentStats extends Fragment {
 
 

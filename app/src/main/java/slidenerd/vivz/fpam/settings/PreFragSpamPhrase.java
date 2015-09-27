@@ -16,9 +16,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.PhraseAdapter;
 import slidenerd.vivz.fpam.adapter.TouchHelper;
+import slidenerd.vivz.fpam.model.phrase.Phrase;
 
 /**
  * This fragment shows notification preferences only. It is used when the
@@ -59,7 +61,8 @@ public class PreFragSpamPhrase extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         TextView emptyView = (TextView) view.findViewById(R.id.text_empty);
-        mAdapter = new PhraseAdapter(getActivity(), realm);
+        RealmResults<Phrase> results = realm.where(Phrase.class).findAllSorted("phrase");
+        mAdapter = new PhraseAdapter(getActivity(), realm, results);
         mRecyclerSpamPhrases = (RecyclerView) view.findViewById(R.id.recycler_spam_content);
         mRecyclerSpamPhrases.setLayoutManager(new LinearLayoutManager(mContext));
         mRecyclerSpamPhrases.setAdapter(mAdapter);

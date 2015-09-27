@@ -1,6 +1,8 @@
 package slidenerd.vivz.fpam.adapter;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 
 import io.realm.Realm;
@@ -16,10 +18,10 @@ public abstract class AbstractRealmAdapter<T extends RealmObject, VH extends Rec
     protected RealmResults<T> mResults;
     private Context mContext;
 
-    public AbstractRealmAdapter(Context context, Realm realm) {
+    public AbstractRealmAdapter(Context context, Realm realm, @NonNull RealmResults<T> results) {
         //load data from subclasses
         mContext = context;
-        mResults = loadData(realm);
+        mResults = results;
     }
 
 
@@ -89,13 +91,15 @@ public abstract class AbstractRealmAdapter<T extends RealmObject, VH extends Rec
 
     public abstract boolean hasFooter();
 
+    @Nullable
+    public RealmResults<T> getData() {
+        return mResults;
+    }
 
-    public void setData(RealmResults<T> results) {
+    public void setData(@NonNull RealmResults<T> results) {
         mResults = results;
         notifyItemRangeChanged(0, results.size());
     }
-
-    protected abstract RealmResults<T> loadData(Realm realm);
 
     public enum ItemType {
         HEADER, ITEM, FOOTER;
