@@ -18,7 +18,7 @@ import android.widget.TextView;
 import io.realm.Realm;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.PhraseAdapter;
-import slidenerd.vivz.fpam.adapter.SwipeDragHelper;
+import slidenerd.vivz.fpam.adapter.TouchHelper;
 
 /**
  * This fragment shows notification preferences only. It is used when the
@@ -63,7 +63,7 @@ public class PreFragSpamPhrase extends Fragment {
         mRecyclerSpamPhrases = (RecyclerView) view.findViewById(R.id.recycler_spam_content);
         mRecyclerSpamPhrases.setLayoutManager(new LinearLayoutManager(mContext));
         mRecyclerSpamPhrases.setAdapter(mAdapter);
-        ItemTouchHelper.Callback callback = new SwipeDragHelper(mAdapter);
+        ItemTouchHelper.Callback callback = new TouchHelper(mAdapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(mRecyclerSpamPhrases);
     }

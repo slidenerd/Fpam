@@ -12,18 +12,18 @@ import android.widget.TextView;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.model.realm.SpamPhrase;
+import slidenerd.vivz.fpam.model.phrase.Phrase;
 import slidenerd.vivz.fpam.util.ValidationUtils;
 
 /**
  * Created by vivz on 29/08/15.
  */
-public class PhraseAdapter extends AbstractMutableRealmAdapter<SpamPhrase, RecyclerView.ViewHolder> {
+public class PhraseAdapter extends AbstractMutableRealmAdapter<Phrase, RecyclerView.ViewHolder> {
 
     private LayoutInflater mLayoutInflater;
 
     public PhraseAdapter(Context context, Realm realm) {
-        super(realm);
+        super(context, realm);
         mLayoutInflater = LayoutInflater.from(context);
     }
 
@@ -54,14 +54,14 @@ public class PhraseAdapter extends AbstractMutableRealmAdapter<SpamPhrase, Recyc
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ItemHolder) {
             ItemHolder itemHolder = (ItemHolder) holder;
-            SpamPhrase spamPhrase = getItem(position);
-            itemHolder.setSpamPhrase(spamPhrase.getPhrase());
+            Phrase phrase = getItem(position);
+            itemHolder.setSpamPhrase(phrase.getPhrase());
         }
     }
 
     @Override
-    public RealmResults<SpamPhrase> loadData(Realm realm) {
-        return realm.where(SpamPhrase.class).findAllSorted("phrase");
+    public RealmResults<Phrase> loadData(Realm realm) {
+        return realm.where(Phrase.class).findAllSorted("phrase");
     }
 
     public class HeaderHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -78,7 +78,7 @@ public class PhraseAdapter extends AbstractMutableRealmAdapter<SpamPhrase, Recyc
         @Override
         public void onClick(View v) {
             if (ValidationUtils.hasInput(mInputPhrase)) {
-                SpamPhrase phrase = new SpamPhrase(mInputPhrase.getText().toString().trim().toLowerCase(), System.currentTimeMillis());
+                Phrase phrase = new Phrase(mInputPhrase.getText().toString().trim().toLowerCase(), System.currentTimeMillis());
                 add(phrase, true);
                 mInputPhrase.setText("");
             }

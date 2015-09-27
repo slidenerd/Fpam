@@ -1,5 +1,6 @@
 package slidenerd.vivz.fpam.adapter;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 
 import io.realm.Realm;
@@ -11,12 +12,13 @@ public abstract class AbstractRealmAdapter<T extends RealmObject, VH extends Rec
 
     public static final int HEADER_COUNT = 1;
     public static final int FOOTER_COUNT = 1;
-
     //Our data source
     protected RealmResults<T> mResults;
+    private Context mContext;
 
-    public AbstractRealmAdapter(Realm realm) {
+    public AbstractRealmAdapter(Context context, Realm realm) {
         //load data from subclasses
+        mContext = context;
         mResults = loadData(realm);
     }
 

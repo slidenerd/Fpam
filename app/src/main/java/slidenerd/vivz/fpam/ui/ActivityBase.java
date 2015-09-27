@@ -5,20 +5,27 @@ import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewStub;
 
 import com.facebook.AccessToken;
+import com.facebook.login.LoginManager;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,6 +36,7 @@ import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Feed;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.prefs.MyPrefs_;
 import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.JSONUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
@@ -37,9 +45,19 @@ import slidenerd.vivz.fpam.util.NavUtils;
  * Created by vivz on 06/08/15.
  */
 @EActivity
-public abstract class ActivityBase extends AppCompatActivity {
+public abstract class ActivityBase extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String DRAWER_FRAGMENT_TAG = "fragment_drawer";
+    @Pref
+    MyPrefs_ mPref;
+    @InstanceState
+    int mSelectedMenuId;
+
+    private String mTitle;
+    /*
+    The Drawer Listener responsible for providing a handy way to tie together the functionality of DrawerLayout and the framework ActionBar to implement the recommended design for navigation drawers.
+     */
+    private ActionBarDrawerToggle mDrawerListener;
     private FragmentDrawer_ mDrawer;
     private ViewStub mMainContent;
     private Toolbar mToolbar;
@@ -73,18 +91,10 @@ public abstract class ActivityBase extends AppCompatActivity {
             return;
         }
         //The part of code below doesn't execute if the access token is null or invalid
-        initAppBar();
+        initAppBar(savedInstanceState);
         initDrawer(savedInstanceState);
     }
 
-    /**
-     * Calling setupDrawer inside the onCreate, results in a situation where the onCreate, onCreateView and onViewCreated of FragmentDrawer are not yet executed and the drawer does not associate properly with the DrawerLayout. Call setupDrawer inside onResume so that onCreate, onCreateView, onViewCreated are first executed and then this method runs inside the FragmentDrawer.
-     */
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mDrawer.setupDrawer(mToolbar, mDrawerLayout);
-    }
 
     /**
      * Call this method before calling shouldRedirectToLogin to prevent crashes in the sub activities that implement this activity. The ViewStub into which the actual layout of the subclasses implementing this Activity is loaded. Each subclass Activity is expected to have a simple container or Layout and specify its id and layout resource file name when they implement this Activity. This needs to be done regardless of whether the Activity starts for the first time or starts after a subsequent rotation.
@@ -99,7 +109,7 @@ public abstract class ActivityBase extends AppCompatActivity {
     /**
      * Initialize the Toolbar and Tab Layout and if we have a valid View Pager id from the subclasses and a valid Pager Adapter object, then link the Tab Layout with that View Pager else , hide the Tab Layout.
      */
-    private void initAppBar() {
+    private void initAppBar(Bundle savedInstanceState) {
         mToolbar = (Toolbar) findViewById(R.id.app_bar);
         mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
         setSupportActionBar(mToolbar);
@@ -112,6 +122,12 @@ public abstract class ActivityBase extends AppCompatActivity {
         } else {
             mTabLayout.setVisibility(View.GONE);
         }
+        if (savedInstanceState == null) {
+            mTitle = getString(R.string.title_activity_main);
+        } else {
+            mTitle = savedInstanceState.getString("selectedGroupName", getString(R.string.title_activity_main));
+        }
+        setTitle(mTitle);
     }
 
     /**
@@ -127,6 +143,17 @@ public abstract class ActivityBase extends AppCompatActivity {
         }
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         getFragmentManager().beginTransaction().replace(R.id.drawer_frame_layout, mDrawer, DRAWER_FRAGMENT_TAG).commit();
+        mDrawerListener = new ActionBarDrawerToggle(this,
+                mDrawerLayout,
+                mToolbar,
+                R.string.drawer_open,
+                R.string.drawer_close);
+        mDrawerLayout.setDrawerListener(mDrawerListener);
+        mDrawerListener.syncState();
+        if (!didUserSeeDrawer()) {
+            show();
+            markDrawerSeen();
+        }
     }
 
     public void beforeFeedLoaded(AccessToken accessToken, @NonNull Group group) {
@@ -141,7 +168,7 @@ public abstract class ActivityBase extends AppCompatActivity {
             JSONObject feedObject = FBUtils.requestFeedSync(accessToken, group);
             Feed feed = JSONUtils.loadFeedFrom(group.getId(), feedObject);
             DataStore.storeFeed(realm, feed);
-            afterFeedLoaded();
+            afterFeedLoaded(group);
         } catch (JSONException e) {
             L.m("" + e);
         } finally {
@@ -152,8 +179,14 @@ public abstract class ActivityBase extends AppCompatActivity {
     }
 
     @UiThread
-    void afterFeedLoaded() {
-        L.t(this, "Feed loaded");
+    void afterFeedLoaded(Group group) {
+        L.t(ActivityBase.this, "feed loaded for " + group.getName());
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("selectedGroupName", mTitle);
     }
 
     /**
@@ -161,9 +194,74 @@ public abstract class ActivityBase extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
-        if (!mDrawer.onBackPressed()) {
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            hide();
+        } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem menuItem) {
+        menuItem.setChecked(true);
+        mSelectedMenuId = menuItem.getItemId();
+        return navigate();
+    }
+
+    boolean navigate() {
+        switch (mSelectedMenuId) {
+            case R.id.menu_settings:
+                hide();
+                break;
+            case R.id.menu_logout:
+                logout();
+                hide();
+                NavUtils.startActivityLogin(this);
+                finish();
+                break;
+            default:
+                Group group = mDrawer.getSelectedGroup(mSelectedMenuId);
+                if (group != null) {
+                    mTitle = group.getName();
+                    setTitle(mTitle);
+                    AccessToken accessToken = ApplicationFpam.getFacebookAccessToken();
+                    if (FBUtils.isValidToken(accessToken)) {
+                        beforeFeedLoaded(accessToken, group);
+                    } else {
+                        L.m("Did not find a good access token from fragment drawer");
+                    }
+                }
+                //If the selected id is not the default one, then hide the drawer. It is default if the user has not selected anything previously and sees the drawer for the first time.
+                if (mSelectedMenuId != 0) {
+                    hide();
+                }
+
+                break;
+        }
+        return true;
+    }
+
+
+    private boolean didUserSeeDrawer() {
+        return mPref.hasSeenDrawer().getOr(false);
+    }
+
+    private void markDrawerSeen() {
+        mPref.edit().hasSeenDrawer().put(true).apply();
+    }
+
+
+    void show() {
+        mDrawerLayout.openDrawer(GravityCompat.START);
+    }
+
+    void hide() {
+        mDrawerLayout.closeDrawer(GravityCompat.START);
+    }
+
+    private void logout() {
+        LoginManager loginManager = LoginManager.getInstance();
+        loginManager.logOut();
     }
 
     /**
@@ -192,6 +290,7 @@ public abstract class ActivityBase extends AppCompatActivity {
      */
     @Nullable
     public abstract PagerAdapter getPagerAdapter();
+
 
 }
 

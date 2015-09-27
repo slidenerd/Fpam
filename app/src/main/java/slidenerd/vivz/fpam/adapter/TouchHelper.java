@@ -3,11 +3,11 @@ package slidenerd.vivz.fpam.adapter;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
-public class SwipeDragHelper extends ItemTouchHelper.Callback {
+public class TouchHelper extends ItemTouchHelper.Callback {
 
     private final OnSwipeListener mOnSwipeListener;
 
-    public SwipeDragHelper(OnSwipeListener adapter) {
+    public TouchHelper(OnSwipeListener adapter) {
         mOnSwipeListener = adapter;
     }
 

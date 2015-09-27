@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.ui.FragmentPosts;
+import slidenerd.vivz.fpam.ui.FragmentPosts_;
 import slidenerd.vivz.fpam.ui.FragmentStats;
 
 /**
@@ -28,7 +28,7 @@ public class MainPagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         Fragment fragment = null;
         if (position == POSITION_POSTS) {
-            fragment = new FragmentPosts();
+            fragment = FragmentPosts_.builder().build();
         } else {
             fragment = new FragmentStats();
         }

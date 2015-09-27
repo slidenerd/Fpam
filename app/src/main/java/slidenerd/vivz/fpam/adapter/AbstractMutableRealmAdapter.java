@@ -1,5 +1,6 @@
 package slidenerd.vivz.fpam.adapter;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 
 import io.realm.Realm;
@@ -10,8 +11,8 @@ public abstract class AbstractMutableRealmAdapter<T extends RealmObject, VH exte
 
     private Realm realm;
 
-    public AbstractMutableRealmAdapter(Realm realm) {
-        super(realm);
+    public AbstractMutableRealmAdapter(Context context, Realm realm) {
+        super(context, realm);
         this.realm = realm;
     }
 
