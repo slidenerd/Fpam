@@ -86,6 +86,20 @@ UPDATE 3 [September 20, 2015 9+ pm]
 
 The current model for Feed processing takes separate model classes, one for GSON that implements a parcelable and one for Realm that doesn't . Need to keep one single class that directly stores stuff from JSON to Realm, and eliminates the need for any intermediate GSON, the idea is also to remember the fact that only a max of 500 posts should be stored per group and when a post is deleted, all its attachments and comments also be deleted.
 
+UPDATE 4 [September 26, 2015, 10+ pm]
+
+As of now, admin, groups, posts and feed details are stored with manual JSON parsing. Each time the same group is loaded, it simply overrides or replaces what was already present.
+
+<ol>
+<li>Load feed by using since and until or a combination of them</li>
+<li>Support pagination for feeds</li>
+<li>Store comments and attachments</li>
+<li>use a sliding panel to display posts and comments</li>
+<li>Swipe to delete posts from facebook first and then from realm on success</li>
+<li>Swipe to delete comments from facebook first and then from realm on success</li>
+<li>Cascade deletion of comments for a related post<li>
+<li>Commence analytics and spam processing work</li>
+</ol>
 
 The Workflow
 
