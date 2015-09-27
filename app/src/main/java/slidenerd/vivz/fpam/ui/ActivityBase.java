@@ -111,7 +111,7 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
     }
 
     /**
-     * Initialize the Toolbar and Tab Layout and if we have a valid View Pager id from the subclasses and a valid Pager Adapter object, then link the Tab Layout with that View Pager else , hide the Tab Layout.
+     * Initialize the Toolbar and Tab Layout and if we have a valid View Pager id from the subclasses and a valid Pager Adapter object, then link the Tab Layout with that View Pager else , hidedDrawer the Tab Layout.
      */
     private void initTabs() {
         mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
@@ -150,10 +150,21 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
         if (!didUserSeeDrawer()) {
-            show();
+            showDrawer();
             markDrawerSeen();
         }
-        setTitle(mSelectedGroup == null ? getString(R.string.title_activity_main) : mSelectedGroup.getName());
+        if (mSelectedGroup == null) {
+            setTitle(getString(R.string.title_activity_main));
+        } else {
+            setTitle(mSelectedGroup.getName());
+            onGroupSelected(mSelectedGroup);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 
     @Background
@@ -195,7 +206,7 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
     @Override
     public void onBackPressed() {
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-            hide();
+            hidedDrawer();
         } else {
             super.onBackPressed();
         }
@@ -212,11 +223,11 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
     boolean navigate() {
         switch (mSelectedMenuId) {
             case R.id.menu_settings:
-                hide();
+                hidedDrawer();
                 break;
             case R.id.menu_logout:
                 logout();
-                hide();
+                hidedDrawer();
                 NavUtils.startActivityLogin(this);
                 finish();
                 break;
@@ -224,11 +235,12 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
                 mSelectedGroup = mDrawer.getSelectedGroup(mSelectedMenuId);
                 if (mSelectedGroup != null) {
                     setTitle(mSelectedGroup.getName());
+                    onGroupSelected(mSelectedGroup);
                     loadFeed(mSelectedGroup);
                 }
-                //If the selected id is not the default one, then hide the drawer. It is default if the user has not selected anything previously and sees the drawer for the first time.
+                //If the selected id is not the default one, then hidedDrawer the drawer. It is default if the user has not selected anything previously and sees the drawer for the first time.
                 if (mSelectedMenuId != Constants.GROUP_NONE) {
-                    hide();
+                    hidedDrawer();
                 }
                 break;
         }
@@ -245,11 +257,11 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
     }
 
 
-    void show() {
+    void showDrawer() {
         mDrawerLayout.openDrawer(GravityCompat.START);
     }
 
-    void hide() {
+    void hidedDrawer() {
         mDrawerLayout.closeDrawer(GravityCompat.START);
     }
 
@@ -286,9 +298,7 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
     @Nullable
     public abstract PagerAdapter getPagerAdapter();
 
-    public interface OnGroupSelectedListener {
-        void onGroupSelected(String groupId);
-    }
+    public abstract void onGroupSelected(Group group);
 
 }
 

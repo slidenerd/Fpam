@@ -17,7 +17,6 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.PostAdapter;
-import slidenerd.vivz.fpam.event.EventGroupSelected;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.widget.RecyclerViewEmptySupport;
@@ -63,8 +62,8 @@ public class FragmentPosts extends Fragment {
         mRecyclerPosts.setAdapter(mAdapter);
     }
 
-    public void onEvent(EventGroupSelected event) {
-        mGroupId = event.getGroupId();
+    public void onEvent() {
+        mGroupId = "NONE";
         RealmResults<Post> realmResults = mRealm.where(Post.class).contains("postId", mGroupId).findAll();
         mAdapter.setData(realmResults);
     }

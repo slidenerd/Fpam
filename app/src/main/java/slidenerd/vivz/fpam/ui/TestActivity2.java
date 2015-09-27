@@ -2,7 +2,6 @@ package slidenerd.vivz.fpam.ui;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
 import android.view.Menu;
 import android.view.View;
@@ -10,6 +9,7 @@ import android.widget.EditText;
 
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.log.L;
+import slidenerd.vivz.fpam.model.json.group.Group;
 
 
 public class TestActivity2 extends ActivityBase {
@@ -41,6 +41,11 @@ public class TestActivity2 extends ActivityBase {
     @Override
     public PagerAdapter getPagerAdapter() {
         return null;
+    }
+
+    @Override
+    public void onGroupSelected(Group group) {
+
     }
 
     @Override

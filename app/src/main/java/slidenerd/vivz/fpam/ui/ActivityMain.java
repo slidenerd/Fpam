@@ -1,8 +1,13 @@
 package slidenerd.vivz.fpam.ui;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.view.MenuItem;
 
@@ -11,7 +16,8 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.adapter.MainPagerAdapter;
+import slidenerd.vivz.fpam.log.L;
+import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.DatabaseUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
@@ -77,5 +83,48 @@ public class ActivityMain extends ActivityBase {
     @Nullable
     public PagerAdapter getPagerAdapter() {
         return new MainPagerAdapter(this, getSupportFragmentManager());
+    }
+
+    @Override
+    public void onGroupSelected(Group group) {
+        L.t(this, group.getName());
+    }
+
+    public class MainPagerAdapter extends FragmentStatePagerAdapter {
+        public static final int POSITION_POSTS = 0;
+        public static final int POSITION_STATS = 1;
+        public static final int TAB_COUNT = 2;
+        private Resources mResources;
+        private Bundle mArguments;
+
+        public MainPagerAdapter(Context context, FragmentManager fm) {
+            super(fm);
+            mResources = context.getResources();
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            Fragment fragment = null;
+            if (position == POSITION_POSTS) {
+                fragment = FragmentPosts_.builder().build();
+            } else {
+                fragment = FragmentStats_.builder().build();
+            }
+            return fragment;
+        }
+
+        @Override
+        public int getCount() {
+            return TAB_COUNT;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            if (position == POSITION_POSTS) {
+                return mResources.getString(R.string.tab_posts);
+            } else {
+                return mResources.getString(R.string.tab_stats);
+            }
+        }
     }
 }

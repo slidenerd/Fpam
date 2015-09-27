@@ -7,6 +7,7 @@ import android.support.v4.view.PagerAdapter;
 import android.view.View;
 
 import slidenerd.vivz.fpam.R;
+import slidenerd.vivz.fpam.model.json.group.Group;
 
 public class TestActivity1 extends ActivityBase {
 
@@ -35,5 +36,10 @@ public class TestActivity1 extends ActivityBase {
     @Override
     public PagerAdapter getPagerAdapter() {
         return null;
+    }
+
+    @Override
+    public void onGroupSelected(Group group) {
+
     }
 }
