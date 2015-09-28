@@ -40,12 +40,11 @@ public class FragmentPosts extends Fragment {
     private TextView mTextEmpty;
     private PostAdapter mAdapter;
     private Realm mRealm;
-
     private BroadcastReceiver mGroupSelectedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Group selectedGroup = Parcels.unwrap(intent.getExtras().getParcelable("selectedGroup"));
-            RealmResults<Post> realmResults = mRealm.where(Post.class).contains("postId", selectedGroup.getId()).findAll();
+            RealmResults<Post> realmResults = mRealm.where(Post.class).beginsWith("postId", selectedGroup.getId()).findAll();
             mAdapter.setData(realmResults);
         }
     };
@@ -58,7 +57,6 @@ public class FragmentPosts extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRealm = Realm.getDefaultInstance();
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGroupSelectedReceiver, new IntentFilter("group_selected"));
     }
 
 
@@ -71,19 +69,14 @@ public class FragmentPosts extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        RealmResults<Post> results = mRealm.where(Post.class).contains("postId", "NONE").findAll();
+        RealmResults<Post> results = mRealm.where(Post.class).beginsWith("postId", "NONE").findAll();
         mAdapter = new PostAdapter(getActivity(), mRealm, results);
         mTextEmpty = (TextView) view.findViewById(R.id.text_empty_posts);
         mRecyclerPosts = (RecyclerViewEmptySupport) view.findViewById(R.id.recycler_posts);
         mRecyclerPosts.setEmptyView(mTextEmpty);
         mRecyclerPosts.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerPosts.setAdapter(mAdapter);
-    }
-
-    public void onEvent() {
-        mGroupId = "NONE";
-        RealmResults<Post> realmResults = mRealm.where(Post.class).contains("postId", mGroupId).findAll();
-        mAdapter.setData(realmResults);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGroupSelectedReceiver, new IntentFilter("group_selected"));
     }
 
     @Override

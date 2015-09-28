@@ -56,7 +56,6 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
     MyPrefs_ mPref;
     @InstanceState
     int mSelectedMenuId;
-
     private Group mSelectedGroup;
     /*
     The Drawer Listener responsible for providing a handy way to tie together the functionality of DrawerLayout and the framework ActionBar to implement the recommended design for navigation drawers.
@@ -97,8 +96,7 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
             return;
         }
         //The part of code below doesn't execute if the access token is null or invalid
-        initUI(savedInstanceState);
-        initTabs();
+        initUi(savedInstanceState);
     }
 
 
@@ -113,29 +111,14 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
     }
 
     /**
-     * Initialize the Toolbar and Tab Layout and if we have a valid View Pager id from the subclasses and a valid Pager Adapter object, then link the Tab Layout with that View Pager else , hidedDrawer the Tab Layout.
-     */
-    private void initTabs() {
-        mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        int viewPagerId = getViewPagerId();
-        PagerAdapter pagerAdapter = getPagerAdapter();
-        if (viewPagerId != 0 && pagerAdapter != null) {
-            ViewPager pager = (ViewPager) findViewById(viewPagerId);
-            pager.setAdapter(pagerAdapter);
-            mTabLayout.setupWithViewPager(pager);
-        } else {
-            mTabLayout.setVisibility(View.GONE);
-        }
-    }
-
-    /**
-     * If the drawer is created in XML, it runs code inside its onCreate, onCreateView, onViewCreated even before shouldRedirectToLogin is triggered executing unnecessary code. Rather create the drawer in code, and replace it everytime the Activity is started after a rotation.
+     * If the drawer is created in XML, it runs code inside its onCreate, onCreateView, onViewCreated even before shouldRedirectToLogin is triggered executing unnecessary code. Rather create the drawer in code, and replace it everytime the Activity is started after a rotation.Initialize the Toolbar and Tab Layout and if we have a valid View Pager id from the subclasses and a valid Pager Adapter object, then link the Tab Layout with that View Pager else , hideDrawer the Tab Layout.
      *
      * @param savedInstanceState
      */
-    private void initUI(Bundle savedInstanceState) {
+    private void initUi(Bundle savedInstanceState) {
         mToolbar = (Toolbar) findViewById(R.id.app_bar);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
         setSupportActionBar(mToolbar);
         if (savedInstanceState == null) {
             mDrawer = new FragmentDrawer_();
@@ -151,16 +134,25 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
                 R.string.drawer_close);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
+        int viewPagerId = getViewPagerId();
+        PagerAdapter pagerAdapter = getPagerAdapter();
+        if (viewPagerId != 0 && pagerAdapter != null) {
+            ViewPager pager = (ViewPager) findViewById(viewPagerId);
+            pager.setAdapter(pagerAdapter);
+            mTabLayout.setupWithViewPager(pager);
+        } else {
+            mTabLayout.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         if (!didUserSeeDrawer()) {
             showDrawer();
             markDrawerSeen();
         }
-        if (mSelectedGroup == null) {
-            setTitle(getString(R.string.title_activity_main));
-        } else {
-            setTitle(mSelectedGroup.getName());
-            notifyGroupSelected(mSelectedGroup);
-        }
+        navigate();
     }
 
     @Background
@@ -187,7 +179,8 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
 
     @UiThread
     void onFeedLoaded(String message, Group group) {
-        L.t(ActivityBase.this, message + group.getName());
+        L.m(message + " " + group.getName());
+        notifyFeedLoaded(group);
     }
 
     @Override
@@ -202,7 +195,7 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
     @Override
     public void onBackPressed() {
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-            hidedDrawer();
+            hideDrawer();
         } else {
             super.onBackPressed();
         }
@@ -219,11 +212,11 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
     boolean navigate() {
         switch (mSelectedMenuId) {
             case R.id.menu_settings:
-                hidedDrawer();
+                hideDrawer();
                 break;
             case R.id.menu_logout:
                 logout();
-                hidedDrawer();
+                hideDrawer();
                 NavUtils.startActivityLogin(this);
                 finish();
                 break;
@@ -231,19 +224,18 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
                 mSelectedGroup = mDrawer.getSelectedGroup(mSelectedMenuId);
                 if (mSelectedGroup != null) {
                     setTitle(mSelectedGroup.getName());
-                    notifyGroupSelected(mSelectedGroup);
                     loadFeed(mSelectedGroup);
                 }
-                //If the selected id is not the default one, then hidedDrawer the drawer. It is default if the user has not selected anything previously and sees the drawer for the first time.
+                //If the selected id is not the default one, then hideDrawer the drawer. It is default if the user has not selected anything previously and sees the drawer for the first time.
                 if (mSelectedMenuId != Constants.GROUP_NONE) {
-                    hidedDrawer();
+                    hideDrawer();
                 }
                 break;
         }
         return true;
     }
 
-    private void notifyGroupSelected(Group group) {
+    private void notifyFeedLoaded(Group group) {
         Intent intent = new Intent("group_selected");
         intent.putExtra("selectedGroup", Parcels.wrap(Group.class, group));
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
@@ -262,7 +254,7 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
         mDrawerLayout.openDrawer(GravityCompat.START);
     }
 
-    void hidedDrawer() {
+    void hideDrawer() {
         mDrawerLayout.closeDrawer(GravityCompat.START);
     }
 

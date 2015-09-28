@@ -3,7 +3,6 @@ package slidenerd.vivz.fpam.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,8 +15,6 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.DatabaseUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
@@ -88,7 +85,6 @@ public class ActivityMain extends ActivityBase {
         public static final int POSITION_STATS = 1;
         public static final int TAB_COUNT = 2;
         private Resources mResources;
-        private Bundle mArguments;
 
         public MainPagerAdapter(Context context, FragmentManager fm) {
             super(fm);
