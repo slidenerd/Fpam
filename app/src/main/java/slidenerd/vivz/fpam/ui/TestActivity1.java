@@ -38,8 +38,4 @@ public class TestActivity1 extends ActivityBase {
         return null;
     }
 
-    @Override
-    public void onGroupSelected(Group group) {
-
-    }
 }

@@ -22,6 +22,7 @@ public abstract class AbstractRealmAdapter<T extends RealmObject, VH extends Rec
         //load data from subclasses
         mContext = context;
         mResults = results;
+        notifyDataSetChanged();
     }
 
 
@@ -98,7 +99,7 @@ public abstract class AbstractRealmAdapter<T extends RealmObject, VH extends Rec
 
     public void setData(@NonNull RealmResults<T> results) {
         mResults = results;
-        notifyItemRangeChanged(0, results.size());
+        notifyDataSetChanged();
     }
 
     public enum ItemType {

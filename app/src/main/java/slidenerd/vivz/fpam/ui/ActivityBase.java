@@ -1,5 +1,6 @@
 package slidenerd.vivz.fpam.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
@@ -7,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -157,14 +159,8 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
             setTitle(getString(R.string.title_activity_main));
         } else {
             setTitle(mSelectedGroup.getName());
-            onGroupSelected(mSelectedGroup);
+            notifyGroupSelected(mSelectedGroup);
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
     }
 
     @Background
@@ -235,7 +231,7 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
                 mSelectedGroup = mDrawer.getSelectedGroup(mSelectedMenuId);
                 if (mSelectedGroup != null) {
                     setTitle(mSelectedGroup.getName());
-                    onGroupSelected(mSelectedGroup);
+                    notifyGroupSelected(mSelectedGroup);
                     loadFeed(mSelectedGroup);
                 }
                 //If the selected id is not the default one, then hidedDrawer the drawer. It is default if the user has not selected anything previously and sees the drawer for the first time.
@@ -247,6 +243,11 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
         return true;
     }
 
+    private void notifyGroupSelected(Group group) {
+        Intent intent = new Intent("group_selected");
+        intent.putExtra("selectedGroup", Parcels.wrap(Group.class, group));
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
 
     private boolean didUserSeeDrawer() {
         return mPref.hasSeenDrawer().getOr(false);
@@ -297,8 +298,6 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
      */
     @Nullable
     public abstract PagerAdapter getPagerAdapter();
-
-    public abstract void onGroupSelected(Group group);
 
 }
 

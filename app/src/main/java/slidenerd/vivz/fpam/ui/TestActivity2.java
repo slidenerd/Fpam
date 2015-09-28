@@ -9,7 +9,6 @@ import android.widget.EditText;
 
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.group.Group;
 
 
 public class TestActivity2 extends ActivityBase {
@@ -43,10 +42,6 @@ public class TestActivity2 extends ActivityBase {
         return null;
     }
 
-    @Override
-    public void onGroupSelected(Group group) {
-
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -1,9 +1,14 @@
 package slidenerd.vivz.fpam.ui;
 
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +17,7 @@ import android.widget.TextView;
 
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
+import org.parceler.Parcels;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -19,6 +25,7 @@ import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.PostAdapter;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.model.json.feed.Post;
+import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.widget.RecyclerViewEmptySupport;
 
 /**
@@ -34,6 +41,15 @@ public class FragmentPosts extends Fragment {
     private PostAdapter mAdapter;
     private Realm mRealm;
 
+    private BroadcastReceiver mGroupSelectedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Group selectedGroup = Parcels.unwrap(intent.getExtras().getParcelable("selectedGroup"));
+            RealmResults<Post> realmResults = mRealm.where(Post.class).contains("postId", selectedGroup.getId()).findAll();
+            mAdapter.setData(realmResults);
+        }
+    };
+
     public FragmentPosts() {
         // Required empty public constructor
     }
@@ -42,7 +58,9 @@ public class FragmentPosts extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRealm = Realm.getDefaultInstance();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGroupSelectedReceiver, new IntentFilter("group_selected"));
     }
+
 
     @Nullable
     @Override
@@ -72,5 +90,6 @@ public class FragmentPosts extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         mRealm.close();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mGroupSelectedReceiver);
     }
 }

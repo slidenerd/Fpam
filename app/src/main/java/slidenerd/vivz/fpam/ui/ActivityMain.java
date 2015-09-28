@@ -25,11 +25,7 @@ import slidenerd.vivz.fpam.util.NavUtils;
 @OptionsMenu(R.menu.menu_activity_stats)
 public class ActivityMain extends ActivityBase {
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-    }
+    private MainPagerAdapter mPagerAdapter;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -82,13 +78,10 @@ public class ActivityMain extends ActivityBase {
     @Override
     @Nullable
     public PagerAdapter getPagerAdapter() {
-        return new MainPagerAdapter(this, getSupportFragmentManager());
+        mPagerAdapter = new MainPagerAdapter(this, getSupportFragmentManager());
+        return mPagerAdapter;
     }
 
-    @Override
-    public void onGroupSelected(Group group) {
-        L.t(this, group.getName());
-    }
 
     public class MainPagerAdapter extends FragmentStatePagerAdapter {
         public static final int POSITION_POSTS = 0;
