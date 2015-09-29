@@ -90,6 +90,10 @@ UPDATE 4 [September 26, 2015, 10+ pm]
 
 As of now, admin, groups, posts and feed details are stored with manual JSON parsing. Each time the same group is loaded, it simply overrides or replaces what was already present.
 
+UPDATE 5 [September 29, 2015, 10 am]
+
+Write a GSON deserializer to load admin, feed , post and other objects using GSON, use retrofit to load more pages, test database limits on how many posts are loaded for a particular group and use since and until to load data more efficiently.
+
 <ol>
 <li>Load feed by using since and until or a combination of them</li>
 <li>Support pagination for feeds</li>
