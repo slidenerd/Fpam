@@ -92,7 +92,18 @@ As of now, admin, groups, posts and feed details are stored with manual JSON par
 
 UPDATE 5 [September 29, 2015, 10 am]
 
-Write a GSON deserializer to load admin, feed , post and other objects using GSON, use retrofit to load more pages, test database limits on how many posts are loaded for a particular group and use since and until to load data more efficiently.
+<ol>
+
+<li>Gson Deserializer for Admin and Group Done</li>
+<li>Eliminated Groups class to simplify model</li>
+<li>Pagination for Groups implemented</li>
+<li>SIMPLE DELETE for POSTS IMPLEMENTED</li>
+<li>Eliminate Feed model class</li>
+<li>Write Feed deserializer</li>
+<li>Support pagination at the top and pagination at the bottom for posts</li>
+<li>Enforce database limits for storing posts</li>
+
+</ol>
 
 <ol>
 <li>Load feed by using since and until or a combination of them</li>
