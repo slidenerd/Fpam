@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.util.JSONUtils.GroupFields;
 
 public class FBUtils {
     //TODO handle errors that may arise if JSONObject is null while retrieving admin
@@ -48,19 +49,82 @@ public class FBUtils {
      */
     @Nullable
     public static ArrayList<Group> requestGroupsSync(AccessToken accessToken, Gson gson, String adminId) throws JSONException {
-        GraphRequest request = new GraphRequest(accessToken, "me/admined_groups");
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "name,id,icon,unread");
-        request.setParameters(parameters);
-        GraphResponse response = request.executeAndWait();
-        JSONObject root = response.getJSONObject();
         ArrayList<Group> listGroups = new ArrayList<>();
-        if (root != null && root.has(JSONUtils.Groups.DATA) && !root.isNull(JSONUtils.Groups.DATA)) {
-            JSONArray dataArray = root.getJSONArray(JSONUtils.Groups.DATA);
-            TypeToken<ArrayList<Group>> typeToken = new TypeToken<ArrayList<Group>>() {
-            };
-            listGroups = gson.fromJson(dataArray.toString(), typeToken.getType());
-        }
+        Bundle parameters = new Bundle();
+        TypeToken<ArrayList<Group>> typeToken = new TypeToken<ArrayList<Group>>() {
+        };
+        //The string that stores the cursor which can take us to the next page
+        String cursorAfter = null;
+        //Are there more pages in the result? By default we assume false
+        boolean hasMorePages = false;
+        //Is our loop running for the first time? By default we assume it to be true
+        boolean firstIteration = true;
+        do {
+            GraphRequest request = new GraphRequest(accessToken, "me/admined_groups");
+            parameters.putString("fields", "name,id,icon,unread");
+            //optionally set a limit of number of groups to fetch per load
+//            parameters.putInt("limit", 4);
+            if (!firstIteration) {
+                //if it is not the first iteration we add a cursor that can take us to the next page of results
+                parameters.putString("after", cursorAfter);
+            }
+            request.setParameters(parameters);
+            GraphResponse response = request.executeAndWait();
+            JSONObject root = response.getJSONObject();
+            if (root != null) {
+
+                //Check if our root contains a json array called 'data' that has all the group objects inside it
+
+                if (root.has(GroupFields.DATA) && !root.isNull(GroupFields.DATA)) {
+
+                    //retrieve our json array with group objects
+                    JSONArray dataArray = root.getJSONArray(GroupFields.DATA);
+
+                    //For each iteration, we fetch the list of groups and append all of them to what we have so far
+
+                    ArrayList<Group> groups = gson.fromJson(dataArray.toString(), typeToken.getType());
+                    listGroups.addAll(groups);
+                }
+
+                //Check if our root contains a json object called 'paging'
+
+                if (root.has(GroupFields.PAGING) && !root.isNull(GroupFields.PAGING)) {
+
+                    //retrieve the json object called 'paging'
+
+                    JSONObject paging = root.getJSONObject(GroupFields.PAGING);
+
+                    //check if our 'paging' object has a json object called 'cursors'
+
+                    if (paging != null && paging.has(GroupFields.CURSORS) && !paging.isNull(GroupFields.CURSORS)) {
+
+                        //retrieve the json object called 'cursors'
+
+                        JSONObject cursors = paging.getJSONObject(GroupFields.CURSORS);
+
+                        //check if the cursors object has a field called 'after'
+
+                        if (cursors != null && cursors.has(GroupFields.AFTER) && !cursors.isNull(GroupFields.AFTER)) {
+
+                            //retrieve the field 'after' from our 'cursors'
+
+                            cursorAfter = cursors.getString(GroupFields.AFTER);
+                        }
+                    }
+
+                    //if our 'paging' object contains a field called 'next' we have more pages to process, else we stop
+
+                    hasMorePages = (paging != null && paging.has(GroupFields.NEXT) && !paging.isNull(GroupFields.NEXT));
+                }
+            } else {
+                //if we did not get a valid response, we have no more pages to process
+                hasMorePages = false;
+            }
+
+            //mark our first iteration as complete
+
+            firstIteration = false;
+        } while (hasMorePages);
         return listGroups;
     }
 
@@ -83,6 +147,7 @@ public class FBUtils {
     /*
     TODO implement the since parameter for requesting feeds from Facebook Graph API
      */
+
     public static JSONObject requestFeedSync(AccessToken token, Group group) throws JSONException {
         ArrayList<Post> listPosts = new ArrayList<>();
         Bundle parameters = new Bundle();

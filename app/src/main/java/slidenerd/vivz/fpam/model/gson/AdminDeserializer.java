@@ -21,25 +21,25 @@ public class AdminDeserializer implements JsonDeserializer<Admin> {
         final JsonObject root = json.getAsJsonObject();
         final Admin admin = new Admin();
         //Retrieve 'id'
-        final String id = root.get(JSONUtils.Admin.ID).getAsString();
+        final String id = root.get(JSONUtils.AdminFields.ID).getAsString();
         //Retrieve 'email'
-        final String email = root.get(JSONUtils.Admin.EMAIL).getAsString();
+        final String email = root.get(JSONUtils.AdminFields.EMAIL).getAsString();
         //Retrieve 'first_name'
-        final String firstName = root.get(JSONUtils.Admin.FIRST_NAME).getAsString();
+        final String firstName = root.get(JSONUtils.AdminFields.FIRST_NAME).getAsString();
         //Retrieve 'last_name'
-        final String lastName = root.get(JSONUtils.Admin.LAST_NAME).getAsString();
+        final String lastName = root.get(JSONUtils.AdminFields.LAST_NAME).getAsString();
         //Retrieve Json object 'picture' inside root json object
-        final JsonObject pictureObject = root.getAsJsonObject(JSONUtils.Admin.PICTURE);
+        final JsonObject pictureObject = root.getAsJsonObject(JSONUtils.AdminFields.PICTURE);
         //Retrieve Json object 'data' inside 'picture' json object
-        final JsonObject dataObject = pictureObject.getAsJsonObject(JSONUtils.Admin.DATA);
+        final JsonObject dataObject = pictureObject.getAsJsonObject(JSONUtils.AdminFields.DATA);
         //Retrieve 'width' inside 'data'
-        final int width = dataObject.getAsJsonPrimitive(JSONUtils.Admin.WIDTH).getAsInt();
+        final int width = dataObject.getAsJsonPrimitive(JSONUtils.AdminFields.WIDTH).getAsInt();
         //Retrieve 'height' inside 'data'
-        final int height = dataObject.getAsJsonPrimitive(JSONUtils.Admin.HEIGHT).getAsInt();
+        final int height = dataObject.getAsJsonPrimitive(JSONUtils.AdminFields.HEIGHT).getAsInt();
         //Retrieve 'is_silhouette' inside 'data'
-        final boolean isSilhouette = dataObject.getAsJsonPrimitive(JSONUtils.Admin.IS_SILHOUETTE).getAsBoolean();
+        final boolean isSilhouette = dataObject.getAsJsonPrimitive(JSONUtils.AdminFields.IS_SILHOUETTE).getAsBoolean();
         //Retrieve 'url' inside 'data'
-        final String url = dataObject.getAsJsonPrimitive(JSONUtils.Admin.URL).getAsString();
+        final String url = dataObject.getAsJsonPrimitive(JSONUtils.AdminFields.URL).getAsString();
         //Set appropriate fields
         admin.setId(id);
         admin.setEmail(email);

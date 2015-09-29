@@ -18,10 +18,10 @@ public class GroupDeserializer implements JsonDeserializer<Group> {
     @Override
     public Group deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         final JsonObject root = json.getAsJsonObject();
-        final String name = root.get(JSONUtils.Groups.NAME).getAsString();
-        final String id = root.get(JSONUtils.Groups.ID).getAsString();
-        final String icon = root.get(JSONUtils.Groups.ICON).getAsString();
-        final int unread = root.getAsJsonPrimitive(JSONUtils.Groups.UNREAD).getAsInt();
+        final String name = root.get(JSONUtils.GroupFields.NAME).getAsString();
+        final String id = root.get(JSONUtils.GroupFields.ID).getAsString();
+        final String icon = root.get(JSONUtils.GroupFields.ICON).getAsString();
+        final int unread = root.getAsJsonPrimitive(JSONUtils.GroupFields.UNREAD).getAsInt();
         final Group group = new Group();
         group.setId(id);
         group.setName(name);

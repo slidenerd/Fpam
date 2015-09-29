@@ -18,8 +18,13 @@ public class DataStore {
      * In the first step, check if the list of groups to be stored is empty. If we have 1-N groups to store, use shared preferences to do the same. Convert the list of groups into a JSON string and store that.
      */
     public static void storeGroups(Realm realm, ArrayList<Group> listGroups) {
+        //Clear the old groups
         realm.beginTransaction();
-        realm.copyToRealmOrUpdate(listGroups);
+        realm.allObjects(Group.class).clear();
+        realm.commitTransaction();
+        //Load the new ones
+        realm.beginTransaction();
+        realm.copyToRealm(listGroups);
         realm.commitTransaction();
     }
 
@@ -40,7 +45,7 @@ public class DataStore {
      * @param admin the person using this app as an admin whose details you want to store in the backend.
      */
     public static void storeAdmin(Realm realm, Admin admin) {
-        //The Picture and PictureData classes don't have a primary key , so if we try to update Admin directly from JSON, a new entry is created for both of them each time, and hence we first remove all existing entries for each class first and then add a new entry
+        //The Picture and PictureData classes don't have a primary key , so if we try to update AdminFields directly from JSON, a new entry is created for both of them each time, and hence we first remove all existing entries for each class first and then add a new entry
         realm.beginTransaction();
         realm.copyToRealmOrUpdate(admin);
         realm.commitTransaction();

@@ -164,7 +164,7 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
                 JSONObject feedObject = FBUtils.requestFeedSync(mAccessToken, group);
                 Feed feed = JSONUtils.loadFeedFrom(group.getId(), feedObject);
                 DataStore.storeFeed(realm, feed);
-                onFeedLoaded("Feed Loaded For", group);
+                onFeedLoaded("FeedFields Loaded For", group);
             } catch (JSONException e) {
                 L.m("" + e);
             } finally {

@@ -25,11 +25,11 @@ public class JSONUtils {
 
         //Check if the root JSON contains an array called data, if yes retrieve it
 
-        if (obj != null && obj.has(Feed.DATA) && !obj.isNull(Feed.DATA)) {
+        if (obj != null && obj.has(FeedFields.DATA) && !obj.isNull(FeedFields.DATA)) {
 
             //Retrieve the JSON Array that contains all our posts
 
-            JSONArray postArray = obj.getJSONArray(Feed.DATA);
+            JSONArray postArray = obj.getJSONArray(FeedFields.DATA);
 
             for (int i = 0; i < postArray.length(); i++) {
 
@@ -43,83 +43,83 @@ public class JSONUtils {
 
                 //If the post json object contains post id, retrieve it
 
-                if (postObj != null && postObj.has(Feed.ID) && !postObj.isNull(Feed.ID)) {
+                if (postObj != null && postObj.has(FeedFields.ID) && !postObj.isNull(FeedFields.ID)) {
 
                     //Retrieve any other information associated with a post only if we have a valid post id first.
 
-                    post.setPostId(postObj.getString(Feed.ID));
+                    post.setPostId(postObj.getString(FeedFields.ID));
 
                     //Check if the json post object has an element named from that contains user information, if yes retrieve it
 
-                    if (postObj.has(Feed.FROM) && !postObj.isNull(Feed.FROM)) {
+                    if (postObj.has(FeedFields.FROM) && !postObj.isNull(FeedFields.FROM)) {
 
                         //Get the JSON object named from which contains id and name, try to retrieve either id or name or both
 
-                        JSONObject from = postObj.getJSONObject(Feed.FROM);
+                        JSONObject from = postObj.getJSONObject(FeedFields.FROM);
 
                         //If the json from object contains user id, retrieve it
 
-                        if (from != null && from.has(Feed.ID) && !from.isNull(Feed.ID)) {
+                        if (from != null && from.has(FeedFields.ID) && !from.isNull(FeedFields.ID)) {
 
-                            post.setUserId(from.getString(Feed.ID));
+                            post.setUserId(from.getString(FeedFields.ID));
 
                         }
 
                         //If the json from object has name, retrieve it
 
-                        if (from != null && from.has(Feed.NAME) && !from.isNull(Feed.NAME)) {
+                        if (from != null && from.has(FeedFields.NAME) && !from.isNull(FeedFields.NAME)) {
 
-                            post.setUserName(from.getString(Feed.NAME));
+                            post.setUserName(from.getString(FeedFields.NAME));
 
                         }
                     }
 
                     //if the json post object has a message, retrieve it
 
-                    if (postObj.has(Feed.MESSAGE) && !postObj.isNull(Feed.MESSAGE)) {
-                        post.setMessage(postObj.getString(Feed.MESSAGE));
+                    if (postObj.has(FeedFields.MESSAGE) && !postObj.isNull(FeedFields.MESSAGE)) {
+                        post.setMessage(postObj.getString(FeedFields.MESSAGE));
                     }
 
                     //if the json post object has a name, retrieve it, found only for images, links and attachments normally
 
-                    if (postObj.has(Feed.NAME) && !postObj.isNull(Feed.NAME)) {
-                        post.setName(postObj.getString(Feed.NAME));
+                    if (postObj.has(FeedFields.NAME) && !postObj.isNull(FeedFields.NAME)) {
+                        post.setName(postObj.getString(FeedFields.NAME));
                     }
 
                     //if the json post object has a caption, retrieve it, found only for images, links and attachments normally
 
-                    if (postObj.has(Feed.CAPTION) && !postObj.isNull(Feed.CAPTION)) {
-                        post.setCaption(postObj.getString(Feed.CAPTION));
+                    if (postObj.has(FeedFields.CAPTION) && !postObj.isNull(FeedFields.CAPTION)) {
+                        post.setCaption(postObj.getString(FeedFields.CAPTION));
                     }
 
                     //if the json post object has a description, retrieve it, found only for images, links and attachments normally
 
-                    if (postObj.has(Feed.DESCRIPTION) && !postObj.isNull(Feed.DESCRIPTION)) {
-                        post.setDescription(postObj.getString(Feed.DESCRIPTION));
+                    if (postObj.has(FeedFields.DESCRIPTION) && !postObj.isNull(FeedFields.DESCRIPTION)) {
+                        post.setDescription(postObj.getString(FeedFields.DESCRIPTION));
                     }
 
                     //if the json post object has a picture, retrieve it, this is optionally found in the feed
 
-                    if (postObj.has(Feed.PICTURE) && !postObj.isNull(Feed.PICTURE)) {
-                        post.setPicture(postObj.getString(Feed.PICTURE));
+                    if (postObj.has(FeedFields.PICTURE) && !postObj.isNull(FeedFields.PICTURE)) {
+                        post.setPicture(postObj.getString(FeedFields.PICTURE));
                     }
 
                     //if the json post object has a type, retrieve it
 
-                    if (postObj.has(Feed.TYPE) && !postObj.isNull(Feed.TYPE)) {
-                        post.setType(postObj.getString(Feed.TYPE));
+                    if (postObj.has(FeedFields.TYPE) && !postObj.isNull(FeedFields.TYPE)) {
+                        post.setType(postObj.getString(FeedFields.TYPE));
                     }
 
                     //if the json post object has an updated time, retrieve it
 
-                    if (postObj.has(Feed.UPDATED_TIME) && !postObj.isNull(Feed.UPDATED_TIME)) {
-                        post.setUpdated_time(postObj.getString(Feed.UPDATED_TIME));
+                    if (postObj.has(FeedFields.UPDATED_TIME) && !postObj.isNull(FeedFields.UPDATED_TIME)) {
+                        post.setUpdated_time(postObj.getString(FeedFields.UPDATED_TIME));
                     }
 
                     //if the json post object has a link, retrieve it
 
-                    if (postObj.has(Feed.LINK) && !postObj.isNull(Feed.LINK)) {
-                        post.setLink(postObj.getString(Feed.LINK));
+                    if (postObj.has(FeedFields.LINK) && !postObj.isNull(FeedFields.LINK)) {
+                        post.setLink(postObj.getString(FeedFields.LINK));
                     }
                     //Add this post object to the list of posts retrieved so far.
 
@@ -130,20 +130,20 @@ public class JSONUtils {
 
         //If the root JSON object has a paging element, retrieve its json object
 
-        if (obj != null && obj.has(Feed.PAGING) && !obj.isNull(Feed.PAGING)) {
+        if (obj != null && obj.has(FeedFields.PAGING) && !obj.isNull(FeedFields.PAGING)) {
 
-            JSONObject paging = obj.getJSONObject(Feed.PAGING);
+            JSONObject paging = obj.getJSONObject(FeedFields.PAGING);
 
             //If the paging JSON object has a previous element or next element or both retrieve it.
 
-            if (paging != null && paging.has(Feed.PREVIOUS) && !paging.isNull(Feed.PREVIOUS)) {
-                feed.setPrevious(paging.getString(Feed.PREVIOUS));
+            if (paging != null && paging.has(FeedFields.PREVIOUS) && !paging.isNull(FeedFields.PREVIOUS)) {
+                feed.setPrevious(paging.getString(FeedFields.PREVIOUS));
             }
 
             //If the paging JSON object has a next element, retrieve it
 
-            if (paging != null && paging.has(Feed.NEXT) && !paging.isNull(Feed.NEXT)) {
-                feed.setNext(paging.getString(Feed.NEXT));
+            if (paging != null && paging.has(FeedFields.NEXT) && !paging.isNull(FeedFields.NEXT)) {
+                feed.setNext(paging.getString(FeedFields.NEXT));
             }
         }
 
@@ -175,7 +175,7 @@ public class JSONUtils {
      * }
      * }
      */
-    public interface Admin {
+    public interface AdminFields {
         String ID = "id";
         String EMAIL = "email";
         String FIRST_NAME = "first_name";
@@ -214,7 +214,7 @@ public class JSONUtils {
      * }
      * }
      */
-    public interface Groups {
+    public interface GroupFields {
         String DATA = "data";
         String ID = "id";
         String NAME = "name";
@@ -486,7 +486,7 @@ public class JSONUtils {
   }
 }
      */
-    public interface Feed {
+    public interface FeedFields {
         String DATA = "data";
         String FROM = "from";
         String ID = "id";

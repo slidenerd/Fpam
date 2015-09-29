@@ -51,7 +51,7 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
         if (!setDeclinedPermissions.isEmpty()) {
             mDialog = new AlertDialog.Builder(this)
                     .setTitle("Fpam would love your approval")
-                    .setMessage("Fpam wants the following permissions from you to work \n Email: Needed to maintain your spam settings \n Groups: Needed to access a list of groups you own so that Fpam can manage them. Fpam won't post in any group without asking you. \n Friends: Fpam needs this to keep everything in sync between you and your buddy admins. Fpam won't message your friends or post on their timeline without asking you.")
+                    .setMessage("Fpam wants the following permissions from you to work \n Email: Needed to maintain your spam settings \n GroupFields: Needed to access a list of groups you own so that Fpam can manage them. Fpam won't post in any group without asking you. \n Friends: Fpam needs this to keep everything in sync between you and your buddy admins. Fpam won't message your friends or post on their timeline without asking you.")
                     .setOnCancelListener(new DialogInterface.OnCancelListener() {
                         @Override
                         public void onCancel(DialogInterface dialog) {
@@ -91,7 +91,7 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
                 return;
             }
             DataStore.storeAdmin(realm, admin);
-//            Groups groups = JSONUtils.loadGroupsFrom(admin.getId(), groupsObject);
+//            GroupFields groups = JSONUtils.loadGroupsFrom(admin.getId(), groupsObject);
             DataStore.storeGroups(realm, listGroups);
 
         } catch (JSONException e) {

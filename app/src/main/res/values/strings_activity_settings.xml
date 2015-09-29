@@ -27,7 +27,7 @@
         <item>1440</item>
     </string-array>
 
-    <!--The second setting that lets you choose the Groups you want to monitor in the background-->
+    <!--The second setting that lets you choose the GroupFields you want to monitor in the background-->
     <string name="pref_title_groups">Groups</string>
 
     <!--The second setting Under Posts-->
