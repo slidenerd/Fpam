@@ -9,109 +9,12 @@ import org.json.JSONObject;
 
 import io.realm.RealmList;
 import slidenerd.vivz.fpam.model.json.feed.Post;
-import slidenerd.vivz.fpam.model.json.group.Group;
 
 /**
  * TODO Each time the JSON feed is loaded, only those posts are saved and the rest are deleted, maintain a 100 posts of each group in the database. Also add comments and attachments.
  * Created by vivz on 24/09/15.
  */
 public class JSONUtils {
-
-    /**
-     * @param adminId The user id of the person using this app, this must not be null
-     * @param obj     The JSON Object that contains information about all groups
-     * @return A non null Groups object that either contains the set of groups retrieved or an empty array to indicate nothing was retrieved.
-     * @throws JSONException
-     */
-    @NonNull
-    public static slidenerd.vivz.fpam.model.json.group.Groups loadGroupsFrom(@NonNull String adminId, @Nullable JSONObject obj) throws JSONException {
-        slidenerd.vivz.fpam.model.json.group.Groups groups = new slidenerd.vivz.fpam.model.json.group.Groups();
-        RealmList<Group> listGroups = new RealmList<>();
-        groups.setAdminId(adminId);
-
-        //Check if our JSON object has a key called Data
-
-        if (obj != null && obj.has(Groups.DATA) && !obj.isNull(Groups.DATA)) {
-            JSONArray arr = obj.getJSONArray(Groups.DATA);
-            for (int i = 0; i < arr.length(); i++) {
-
-                //Get the root JSON object that represents a single group from our JSON Array
-
-                JSONObject current = arr.getJSONObject(i);
-
-                //To read details of each group , ensure that we have a valid ID, NAME, ICON and unread post counter
-
-                if (current != null
-                        && current.has(Groups.ID)
-                        && !current.isNull(Groups.ID)
-                        && current.has(Groups.NAME)
-                        && !current.isNull(Groups.NAME)
-                        && current.has(Groups.ICON)
-                        && !current.isNull(Groups.ICON)
-                        && current.has(Groups.UNREAD)
-                        && !current.isNull(Groups.UNREAD)) {
-
-                    Group group = new Group();
-                    group.setId(current.getString(Groups.ID));
-                    group.setName(current.getString(Groups.NAME));
-                    group.setIcon(current.getString(Groups.ICON));
-                    group.setUnread(current.getInt(Groups.UNREAD));
-
-                    //Add group the list of retrieved groups
-
-                    listGroups.add(group);
-                }
-            }
-        }
-
-        //If the root json object has paging, the retrieve it
-
-        if (obj != null && obj.has(Groups.PAGING) && !obj.isNull(Groups.PAGING)) {
-
-            JSONObject paging = obj.getJSONObject(Groups.PAGING);
-
-            //If the paging object has cursors, retrieve it
-
-            if (paging != null && paging.has(Groups.PAGING) && !paging.isNull(Groups.PAGING)) {
-
-                JSONObject cursors = paging.getJSONObject(Groups.CURSORS);
-
-                //If the cursors object contains before and after, retrieve them
-
-                if (cursors != null
-                        && cursors.has(Groups.BEFORE)
-                        && !cursors.isNull(Groups.BEFORE)
-                        && cursors.has(Groups.AFTER)
-                        && !cursors.isNull(Groups.AFTER)) {
-
-                    groups.setBefore(cursors.getString(Groups.BEFORE));
-                    groups.setAfter(cursors.getString(Groups.AFTER));
-                }
-            }
-        }
-
-        //If our root JSON Object has previous or next or both, retrieve it
-
-        if (obj != null && obj.has(Groups.PREVIOUS) && !obj.isNull(Groups.PREVIOUS)) {
-
-            groups.setPrevious(obj.getString(Groups.PREVIOUS));
-
-        }
-
-        //If our root JSON Object has next, retrieve it
-
-        if (obj != null && obj.has(Groups.NEXT) && !obj.isNull(Groups.NEXT)) {
-
-            groups.setNext(obj.getString(Groups.NEXT));
-
-        }
-
-        //Set a timestamp to indicate when groups were loaded and add the list of retrieved groups to the result.
-
-        groups.setTimestamp(System.currentTimeMillis());
-        groups.setGroups(listGroups);
-        return groups;
-    }
 
     public static slidenerd.vivz.fpam.model.json.feed.Feed loadFeedFrom(@NonNull String groupId, @Nullable JSONObject obj) throws JSONException {
         slidenerd.vivz.fpam.model.json.feed.Feed feed = new slidenerd.vivz.fpam.model.json.feed.Feed();

@@ -18,18 +18,18 @@ public class AdminDeserializer implements JsonDeserializer<Admin> {
     @Override
     public Admin deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         //Get the root JSON object
-        final JsonObject adminObject = json.getAsJsonObject();
+        final JsonObject root = json.getAsJsonObject();
         final Admin admin = new Admin();
         //Retrieve 'id'
-        final String id = adminObject.get(JSONUtils.Admin.ID).getAsString();
+        final String id = root.get(JSONUtils.Admin.ID).getAsString();
         //Retrieve 'email'
-        final String email = adminObject.get(JSONUtils.Admin.EMAIL).getAsString();
+        final String email = root.get(JSONUtils.Admin.EMAIL).getAsString();
         //Retrieve 'first_name'
-        final String firstName = adminObject.get(JSONUtils.Admin.FIRST_NAME).getAsString();
+        final String firstName = root.get(JSONUtils.Admin.FIRST_NAME).getAsString();
         //Retrieve 'last_name'
-        final String lastName = adminObject.get(JSONUtils.Admin.LAST_NAME).getAsString();
+        final String lastName = root.get(JSONUtils.Admin.LAST_NAME).getAsString();
         //Retrieve Json object 'picture' inside root json object
-        final JsonObject pictureObject = adminObject.getAsJsonObject(JSONUtils.Admin.PICTURE);
+        final JsonObject pictureObject = root.getAsJsonObject(JSONUtils.Admin.PICTURE);
         //Retrieve Json object 'data' inside 'picture' json object
         final JsonObject dataObject = pictureObject.getAsJsonObject(JSONUtils.Admin.DATA);
         //Retrieve 'width' inside 'data'

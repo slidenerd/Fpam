@@ -10,7 +10,6 @@ import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Feed;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.model.json.group.Groups;
 import slidenerd.vivz.fpam.util.CopyUtils;
 
 public class DataStore {
@@ -18,9 +17,9 @@ public class DataStore {
     /**
      * In the first step, check if the list of groups to be stored is empty. If we have 1-N groups to store, use shared preferences to do the same. Convert the list of groups into a JSON string and store that.
      */
-    public static void storeGroups(Realm realm, Groups groups) {
+    public static void storeGroups(Realm realm, ArrayList<Group> listGroups) {
         realm.beginTransaction();
-        realm.copyToRealmOrUpdate(groups);
+        realm.copyToRealmOrUpdate(listGroups);
         realm.commitTransaction();
     }
 

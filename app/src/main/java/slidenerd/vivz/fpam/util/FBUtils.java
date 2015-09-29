@@ -7,7 +7,9 @@ import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,6 +20,7 @@ import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 
 public class FBUtils {
+    //TODO handle errors that may arise if JSONObject is null while retrieving admin
     public static boolean isValidToken(AccessToken accessToken) {
         return accessToken != null && !accessToken.isExpired();
     }
@@ -36,6 +39,29 @@ public class FBUtils {
         request.setParameters(parameters);
         GraphResponse graphResponse = request.executeAndWait();
         return gson.fromJson(graphResponse.getJSONObject().toString(), Admin.class);
+    }
+
+    /**
+     * @param accessToken An access token needed to start session with Facebook
+     * @return a List containing all the groups owned by the logged in user and empty list if the logged in user doesn't own any groups or the groups were not retrieved for some reason. The JSON response is actually an object that has an array with the name 'data' which has all the groups.
+     * @throws JSONException
+     */
+    @Nullable
+    public static ArrayList<Group> requestGroupsSync(AccessToken accessToken, Gson gson, String adminId) throws JSONException {
+        GraphRequest request = new GraphRequest(accessToken, "me/admined_groups");
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "name,id,icon,unread");
+        request.setParameters(parameters);
+        GraphResponse response = request.executeAndWait();
+        JSONObject root = response.getJSONObject();
+        ArrayList<Group> listGroups = new ArrayList<>();
+        if (root != null && root.has(JSONUtils.Groups.DATA) && !root.isNull(JSONUtils.Groups.DATA)) {
+            JSONArray dataArray = root.getJSONArray(JSONUtils.Groups.DATA);
+            TypeToken<ArrayList<Group>> typeToken = new TypeToken<ArrayList<Group>>() {
+            };
+            listGroups = gson.fromJson(dataArray.toString(), typeToken.getType());
+        }
+        return listGroups;
     }
 
     /**

@@ -23,8 +23,8 @@ import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONException;
-import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -34,9 +34,8 @@ import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
-import slidenerd.vivz.fpam.model.json.group.Groups;
+import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.FBUtils;
-import slidenerd.vivz.fpam.util.JSONUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
 @EActivity(R.layout.activity_login)
@@ -86,14 +85,14 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
             Gson gson = ApplicationFpam.getGson();
             realm = Realm.getDefaultInstance();
             Admin admin = FBUtils.requestMeSync(accessToken, gson);
-            JSONObject groupsObject = FBUtils.requestGroupsSync(accessToken);
+            ArrayList<Group> listGroups = FBUtils.requestGroupsSync(accessToken, gson, admin.getId());
             if (admin == null) {
                 L.m("Fpam encountered problems downloading admin data, hence admin and groups data have not been downloaded");
                 return;
             }
             DataStore.storeAdmin(realm, admin);
-            Groups groups = JSONUtils.loadGroupsFrom(admin.getId(), groupsObject);
-            DataStore.storeGroups(realm, groups);
+//            Groups groups = JSONUtils.loadGroupsFrom(admin.getId(), groupsObject);
+            DataStore.storeGroups(realm, listGroups);
 
         } catch (JSONException e) {
             L.m("" + e);
