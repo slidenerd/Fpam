@@ -48,7 +48,7 @@ public class FBUtils {
      * @throws JSONException
      */
     @Nullable
-    public static ArrayList<Group> requestGroupsSync(AccessToken accessToken, Gson gson, String adminId) throws JSONException {
+    public static ArrayList<Group> requestGroupsSync(AccessToken accessToken, Gson gson) throws JSONException {
         ArrayList<Group> listGroups = new ArrayList<>();
         Bundle parameters = new Bundle();
         TypeToken<ArrayList<Group>> typeToken = new TypeToken<ArrayList<Group>>() {
@@ -57,17 +57,14 @@ public class FBUtils {
         String cursorAfter = null;
         //Are there more pages in the result? By default we assume false
         boolean hasMorePages = false;
-        //Is our loop running for the first time? By default we assume it to be true
-        boolean firstIteration = true;
         do {
             GraphRequest request = new GraphRequest(accessToken, "me/admined_groups");
             parameters.putString("fields", "name,id,icon,unread");
             //optionally set a limit of number of groups to fetch per load
 //            parameters.putInt("limit", 4);
-            if (!firstIteration) {
-                //if it is not the first iteration we add a cursor that can take us to the next page of results
-                parameters.putString("after", cursorAfter);
-            }
+            //for the first iteration cursorAfter = null and for subsequent iterations, it contains the value of the cursor to visit the next page of results
+            parameters.putString("after", cursorAfter);
+
             request.setParameters(parameters);
             GraphResponse response = request.executeAndWait();
             JSONObject root = response.getJSONObject();
@@ -120,10 +117,6 @@ public class FBUtils {
                 //if we did not get a valid response, we have no more pages to process
                 hasMorePages = false;
             }
-
-            //mark our first iteration as complete
-
-            firstIteration = false;
         } while (hasMorePages);
         return listGroups;
     }

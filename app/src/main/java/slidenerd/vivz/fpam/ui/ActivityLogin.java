@@ -85,13 +85,12 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
             Gson gson = ApplicationFpam.getGson();
             realm = Realm.getDefaultInstance();
             Admin admin = FBUtils.requestMeSync(accessToken, gson);
-            ArrayList<Group> listGroups = FBUtils.requestGroupsSync(accessToken, gson, admin.getId());
             if (admin == null) {
                 L.m("Fpam encountered problems downloading admin data, hence admin and groups data have not been downloaded");
                 return;
             }
+            ArrayList<Group> listGroups = FBUtils.requestGroupsSync(accessToken, gson);
             DataStore.storeAdmin(realm, admin);
-//            GroupFields groups = JSONUtils.loadGroupsFrom(admin.getId(), groupsObject);
             DataStore.storeGroups(realm, listGroups);
 
         } catch (JSONException e) {
