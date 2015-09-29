@@ -215,8 +215,8 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
                 hideDrawer();
                 break;
             case R.id.menu_logout:
-                logout();
                 hideDrawer();
+                logout();
                 NavUtils.startActivityLogin(this);
                 finish();
                 break;

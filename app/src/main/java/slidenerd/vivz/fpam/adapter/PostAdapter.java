@@ -15,13 +15,19 @@ import slidenerd.vivz.fpam.model.json.feed.Post;
 /**
  * Created by vivz on 29/08/15.
  */
-public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHolder> {
+public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHolder> implements OnSwipeListener {
 
     private LayoutInflater mLayoutInflater;
+
+    private OnDeleteListener listener;
 
     public PostAdapter(Context context, Realm realm, RealmResults<Post> results) {
         super(context, realm, results);
         mLayoutInflater = LayoutInflater.from(context);
+    }
+
+    public void setOnDeleteListener(OnDeleteListener listener) {
+        this.listener = listener;
     }
 
     @Override
@@ -47,6 +53,16 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
         holder.setUserName(post.getUserName());
         holder.setUpdatedTime(post.getUpdated_time());
         holder.setMessage(post.getMessage());
+    }
+
+    @Override
+    public void onSwipe(int position) {
+        Post post = mResults.get(position);
+        listener.onDelete(position, post);
+    }
+
+    public interface OnDeleteListener {
+        public void onDelete(int position, Post post);
     }
 
     public class ItemHolder extends RecyclerView.ViewHolder {

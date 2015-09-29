@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -121,22 +122,6 @@ public class FBUtils {
         return listGroups;
     }
 
-    /**
-     * @param accessToken An access token needed to start session with Facebook
-     * @return a List containing all the groups owned by the logged in user and empty list if the logged in user doesn't own any groups or the groups were not retrieved for some reason. The JSON response is actually an object that has an array with the name 'data' which has all the groups.
-     * @throws JSONException
-     */
-    @Nullable
-    public static JSONObject requestGroupsSync(AccessToken accessToken) throws JSONException {
-        GraphRequest request = new GraphRequest(accessToken, "me/admined_groups");
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "name,id,icon,unread");
-        request.setParameters(parameters);
-        GraphResponse response = request.executeAndWait();
-        ArrayList<Group> listGroups = new ArrayList<>();
-        return response.getJSONObject();
-    }
-
     /*
     TODO implement the since parameter for requesting feeds from Facebook Graph API
      */
@@ -151,5 +136,12 @@ public class FBUtils {
         request.setParameters(parameters);
         GraphResponse response = request.executeAndWait();
         return response.getJSONObject();
+    }
+
+    public static boolean requestDeletePost(AccessToken accessToken, String postId) throws JSONException {
+        GraphRequest graphRequest = new GraphRequest(accessToken, postId, null, HttpMethod.DELETE);
+        GraphResponse response = graphRequest.executeAndWait();
+        JSONObject jsonObject = response.getJSONObject();
+        return jsonObject != null && jsonObject.has("success") && !jsonObject.isNull("success") && jsonObject.getBoolean("success");
     }
 }
