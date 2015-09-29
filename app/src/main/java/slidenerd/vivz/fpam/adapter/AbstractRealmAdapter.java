@@ -9,6 +9,12 @@ import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
 
+/**
+ * TODO if possible add notifyXXX methods inside setData
+ *
+ * @param <T>
+ * @param <VH>
+ */
 public abstract class AbstractRealmAdapter<T extends RealmObject, VH extends RecyclerView.ViewHolder>
         extends RecyclerView.Adapter<VH> {
 
@@ -22,7 +28,7 @@ public abstract class AbstractRealmAdapter<T extends RealmObject, VH extends Rec
         //load data from subclasses
         mContext = context;
         mResults = results;
-        notifyDataSetChanged();
+        notifyItemRangeInserted(0, getItemCount());
     }
 
 
@@ -99,6 +105,7 @@ public abstract class AbstractRealmAdapter<T extends RealmObject, VH extends Rec
 
     public void setData(@NonNull RealmResults<T> results) {
         mResults = results;
+        //notifyXXX methods cause a crash due to either a bug in the recyclerview or a bug in the code
         notifyDataSetChanged();
     }
 

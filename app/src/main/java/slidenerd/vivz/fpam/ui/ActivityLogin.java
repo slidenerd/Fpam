@@ -14,6 +14,7 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.google.gson.Gson;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
@@ -28,6 +29,7 @@ import java.util.Arrays;
 import java.util.Set;
 
 import io.realm.Realm;
+import slidenerd.vivz.fpam.ApplicationFpam;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
@@ -81,11 +83,10 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
     void loadUserAndGroupsAsync(AccessToken accessToken) {
         Realm realm = null;
         try {
+            Gson gson = ApplicationFpam.getGson();
             realm = Realm.getDefaultInstance();
-            JSONObject adminObject = FBUtils.requestMeSync(accessToken);
+            Admin admin = FBUtils.requestMeSync(accessToken, gson);
             JSONObject groupsObject = FBUtils.requestGroupsSync(accessToken);
-            //Store the admin and list of groups associated with the admin on the UI Thread
-            Admin admin = JSONUtils.loadAdminFrom(adminObject);
             if (admin == null) {
                 L.m("Fpam encountered problems downloading admin data, hence admin and groups data have not been downloaded");
                 return;

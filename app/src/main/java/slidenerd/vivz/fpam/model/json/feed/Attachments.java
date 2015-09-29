@@ -7,7 +7,7 @@ import io.realm.AttachmentsRealmProxy;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
-import slidenerd.vivz.fpam.parcel.AttachmentsParcelConverter;
+import slidenerd.vivz.fpam.model.parcel.AttachmentsParcelConverter;
 
 @Parcel(implementations = {AttachmentsRealmProxy.class},
         value = Parcel.Serialization.BEAN,

@@ -6,12 +6,14 @@ import android.support.annotation.Nullable;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 
@@ -27,15 +29,14 @@ public class FBUtils {
      * @return an admin object that has all details such as name, email and the profile picture used by the admin.
      */
     @Nullable
-    public static JSONObject requestMeSync(AccessToken accessToken) throws JSONException {
+    public static Admin requestMeSync(AccessToken accessToken, Gson gson) throws JSONException {
         Bundle parameters = new Bundle();
         parameters.putString("fields", "id,email,first_name,last_name,picture.type(normal).width(200).height(200)");
         GraphRequest request = new GraphRequest(accessToken, "me");
         request.setParameters(parameters);
         GraphResponse graphResponse = request.executeAndWait();
-        return graphResponse.getJSONObject();
+        return gson.fromJson(graphResponse.getJSONObject().toString(), Admin.class);
     }
-
 
     /**
      * @param accessToken An access token needed to start session with Facebook

@@ -14,6 +14,8 @@ import org.androidannotations.annotations.EApplication;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmObject;
+import slidenerd.vivz.fpam.model.gson.AdminDeserializer;
+import slidenerd.vivz.fpam.model.json.admin.Admin;
 
 /**
  * Created by vivz on 28/07/15.
@@ -34,6 +36,7 @@ public class ApplicationFpam extends Application {
                         return false;
                     }
                 })
+                .registerTypeAdapter(Admin.class, new AdminDeserializer())
                 .create();
         return gson;
     }

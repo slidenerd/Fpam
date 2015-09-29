@@ -1,4 +1,4 @@
-package slidenerd.vivz.fpam.parcel;
+package slidenerd.vivz.fpam.model.parcel;
 
 import org.parceler.converter.CollectionParcelConverter;
 

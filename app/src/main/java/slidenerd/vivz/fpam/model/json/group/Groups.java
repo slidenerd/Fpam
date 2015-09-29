@@ -7,7 +7,7 @@ import io.realm.GroupsRealmProxy;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
-import slidenerd.vivz.fpam.parcel.GroupsParcelConverter;
+import slidenerd.vivz.fpam.model.parcel.GroupsParcelConverter;
 
 /**
  * Created by vivz on 25/09/15.

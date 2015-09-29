@@ -5,13 +5,19 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
+
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.ViewById;
 
 import slidenerd.vivz.fpam.R;
 
+@EActivity(R.layout.activity_settings)
 public class ActivitySettings extends AppCompatActivity {
 
-    private Toolbar mToolbar;
+    @ViewById(R.id.app_bar)
+    Toolbar mToolbar;
 
     /**
      * Helper method to determine if the device has an extra-large screen. For
@@ -36,16 +42,18 @@ public class ActivitySettings extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
-        mToolbar = (Toolbar) findViewById(R.id.app_bar);
-        mToolbar.setTitle(R.string.action_settings);
-        setSupportActionBar(mToolbar);
         if (savedInstanceState == null) {
             getFragmentManager()
                     .beginTransaction()
                     .replace(R.id.main_content, new PreFragMain())
                     .commit();
         }
+    }
+
+    @AfterViews
+    void afterView() {
+        mToolbar.setTitle(R.string.action_settings);
+        setSupportActionBar(mToolbar);
     }
 
     /*
@@ -61,11 +69,8 @@ public class ActivitySettings extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-        }
-        return false;
+    @OptionsItem(android.R.id.home)
+    void onHomeSelected() {
+        onBackPressed();
     }
 }

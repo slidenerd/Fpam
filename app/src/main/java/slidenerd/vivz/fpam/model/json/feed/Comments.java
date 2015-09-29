@@ -7,7 +7,7 @@ import io.realm.CommentsRealmProxy;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
-import slidenerd.vivz.fpam.parcel.CommentsParcelConverter;
+import slidenerd.vivz.fpam.model.parcel.CommentsParcelConverter;
 
 @Parcel(implementations = {CommentsRealmProxy.class},
         value = Parcel.Serialization.BEAN,
