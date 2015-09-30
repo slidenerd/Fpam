@@ -106,6 +106,7 @@ UPDATE 5 [September 29, 2015, 10 am]
 </ol>
 
 <ol>
+
 <li>Load feed by using since and until or a combination of them</li>
 <li>Support pagination for feeds</li>
 <li>Store comments and attachments</li>
@@ -114,6 +115,7 @@ UPDATE 5 [September 29, 2015, 10 am]
 <li>Swipe to delete comments from facebook first and then from realm on success</li>
 <li>Cascade deletion of comments for a related post<li>
 <li>Commence analytics and spam processing work</li>
+
 </ol>
 
 The Workflow
