@@ -150,8 +150,18 @@ The 4 pieces of information that we need to analyze are : the person who posted,
                             <li>Delete the post</li>
                             <li>Add this person to the spammers database and increment the number of posts made by him/her
                                 <ul>
-                                    <li></li>
-                                    <li></li>
+                                    <li>Is the link present in the blacklist
+                                        <ul>
+                                            <li>If Yes, increase the number of times this link was found in the blacklist</li>
+                                            <li>If No, do nothing here</li>
+                                        </ul>
+                                    </li>
+                                    <li>Is the link present in the whitelist
+                                        <ul>
+                                            <li>If Yes, increase the number of times this link was found in the whitelist</li>
+                                            <li>If No, do nothing here</li>
+                                        </ul>
+                                    </li>
                                 </ul>
                             </li>
                         </ul>    
@@ -210,7 +220,7 @@ The 4 pieces of information that we need to analyze are : the person who posted,
                                         <li>If Yes, 
                                             <ul>
                                                 <li>Delete the post</li>
-                                                <li>Add this person to the spammers database and increment the number of posts made by him/her</li>
+                                                <li>Add this person to the spammers database and increment the number of posts made by him/her and increment the number of times the spam word was found</li>
                                             </ul>
                                         </li>
                                     </ul>
