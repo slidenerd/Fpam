@@ -136,10 +136,35 @@ The 4 pieces of information that we need to analyze are : the person who posted,
     <li>Read a post and scan its message, link from its link property, picture and person who posted it</li>
     <li>Is this person present in the spammers database?</li>
     <ul>
+        <li>Regardless of whether the post is a spam or not, [for analytics purpose]
+            <ul>
+                <li>Which group is this post read from? Track the group id</li>
+                <li>How many posts have been read so far? Increment the number of posts read so far.</li>
+                <li>What are the properties of this post?
+                    <ul>
+                        <li>Language in which this post is written [Implement if possible now]</li>
+                        <li>Does it have a link tag?</li>
+                        <li>Does it have a picture tag?</li>
+                        <li>Does it have a message tag?
+                            <ul>
+                                <li>Number of words</li>
+                                <li>Number of characters</li>
+                                <li>Percentage of capslock or capital to small letters [spam posts often have capital letters in them]</li>
+                                <li>Number of emoticons detected [spam posts often use many emoticons]</li>
+                                <li>Percentage of emoticons to actual content in the post</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
         <li>If Yes, 
             <ul>
                 <li>Delete the post</li>
                 <li>Increment the number of spam posts made by the person</li>
+                <li>What time was it created?</li>
+                <li>What time was it updated?</li>
+                <li>Are the update_time and create_time the same?</li>
             </ul>
         </li>
         <li> If No,
@@ -153,12 +178,28 @@ The 4 pieces of information that we need to analyze are : the person who posted,
                                     <li>Is the link present in the blacklist [for analytics purpose]
                                         <ul>
                                             <li>If Yes, increase the number of times this link was found in the blacklist</li>
+                                            <li>Properties of this link [for analytics purpose]
+                                                <ul>
+                                                    <li>number of characters in the primary domain name [stackoverflow = 13]</li>
+                                                    <li>number of characters in the domain extension [.com = 3]</li>
+                                                    <li>type of domain extension [.com, .io, .org etc]</li>
+                                                    <li>does the url have a path</li>
+                                                </ul>
+                                            </li>
                                             <li>If No, do nothing here</li>
                                         </ul>
                                     </li>
                                     <li>Is the link present in the whitelist [for analytics purpose]
                                         <ul>
                                             <li>If Yes, increase the number of times this link was found in the whitelist</li>
+                                            <li>Properties of this link [for analytics purpose]
+                                                <ul>
+                                                    <li>number of characters in the primary domain name [stackoverflow = 13]</li>
+                                                    <li>number of characters in the domain extension [.com = 3]</li>
+                                                    <li>type of domain extension [.com, .io, .org etc]</li>
+                                                    <li>does the url have a path</li>
+                                                </ul>
+                                            </li>
                                             <li>If No, do nothing here</li>
                                         </ul>
                                     </li>
