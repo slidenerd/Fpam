@@ -131,16 +131,24 @@ The Algorithm
 
 <ul>
 
-<li>Read a post and scan its message, link, picture and person who posted it</li>
-<li>Is this person present in the spammers database?
-<ul>
-<li>If Yes, 
-<ul>
-<li>Delete the post</li>
-<li>If Yes, Increment the number of spam posts made by the person</li>
-</ul>
-</li>
-</ul>
-</li>
+    <li>Read a post and scan its message, link, picture and person who posted it</li>
+    <li>Is this person present in the spammers database?
+    <ul>
+        <li>If Yes, 
+            <ul>
+                <li>Delete the post</li>
+                <li>Increment the number of spam posts made by the person</li>
+            </ul>
+        </li>
+        <li> If No,
+            <ul>
+                <li>Are Pictures Allowed?
+                    
+                </li>
+            </ul>
+        </li>
+    
+    </ul>
+    </li>
 
 <ul>
