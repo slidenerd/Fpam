@@ -187,7 +187,31 @@ The Algorithm
                                 </li>
                             </ul>
                         </li>
-                        <li>Message with only text</li>
+                        <li>Message with only text
+                            <ul>
+                                <li>Does it have spam phrases or words?
+                                    <ul>
+                                        <li>If No, consider other aspects of this post to determine if it is a spam or not</li>
+                                        <li>If Yes, 
+                                            <ul>
+                                                <li>Delete the post</li>
+                                                <li>Is this person in the spammers database?</li>
+                                                <li>If Yes,
+                                                    <ul>
+                                                        <li>Increment the number of spam posts made by the person</li>
+                                                    </ul>
+                                                </li>
+                                                <li>If No,
+                                                    <ul>
+                                                        <li>Put the person in the spammers list</li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
                         <li>Message with only link</li>
                         <li>Message with text and link</li>
                     </ul>
