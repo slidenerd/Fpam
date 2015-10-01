@@ -132,7 +132,7 @@ The Algorithm
 <ul>
 
     <li>Read a post and scan its message, link, picture and person who posted it</li>
-    <li>Is this person present in the spammers database?
+    <li>Is this person present in the spammers database?</li>
     <ul>
         <li>If Yes, 
             <ul>
@@ -151,4 +151,4 @@ The Algorithm
     </ul>
     </li>
 
-<ul>
+</ul>
