@@ -14,7 +14,7 @@ public class PrintUtils {
                 + "\n" + post.getCaption()
                 + "\n" + post.getDescription()
                 + "\n" + post.getPicture()
-                + "\n" + post.getUpdated_time();
+                + "\n" + post.getUpdatedTime();
     }
 
     public static String toString(List<Post> listPosts) {

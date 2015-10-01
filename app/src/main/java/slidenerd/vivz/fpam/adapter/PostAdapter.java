@@ -51,18 +51,18 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
     public void onBindViewHolder(ItemHolder holder, int position) {
         Post post = getItem(position);
         holder.setUserName(post.getUserName());
-        holder.setUpdatedTime(post.getUpdated_time());
+        holder.setUpdatedTime(post.getUpdatedTime());
         holder.setMessage(post.getMessage());
     }
 
     @Override
     public void onSwipe(int position) {
         Post post = mResults.get(position);
-        listener.onDelete(position, post);
+        listener.beforeDelete(position, post);
     }
 
     public interface OnDeleteListener {
-        public void onDelete(int position, Post post);
+        public void beforeDelete(int position, Post post);
     }
 
     public class ItemHolder extends RecyclerView.ViewHolder {

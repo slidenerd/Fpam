@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.util.JSONUtils.FeedFields;
 import slidenerd.vivz.fpam.util.JSONUtils.GroupFields;
 
 public class FBUtils {
@@ -126,16 +127,32 @@ public class FBUtils {
     TODO implement the since parameter for requesting feeds from Facebook Graph API
      */
 
-    public static JSONObject requestFeedSync(AccessToken token, Group group) throws JSONException {
+    public static ArrayList<Post> requestFeedSync(AccessToken token, Gson gson, Group group) throws JSONException {
         ArrayList<Post> listPosts = new ArrayList<>();
+        TypeToken<ArrayList<Post>> typeToken = new TypeToken<ArrayList<Post>>() {
+        };
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "from,message,caption,comments{from,message},description,name,picture,type,updated_time,attachments{media,type,url},link");
+        parameters.putString("fields", "from,message,caption,comments{from,message},description,name,picture,type,updated_time,attachments{type},link,created_time");
         parameters.putString("limit", "15");
 //        parameters.putLong("since", 1442552400);
         GraphRequest request = new GraphRequest(token, "/" + group.getId() + "/feed");
         request.setParameters(parameters);
         GraphResponse response = request.executeAndWait();
-        return response.getJSONObject();
+        JSONObject root = response.getJSONObject();
+        if (root != null) {
+//Check if our root contains a json array called 'data' that has all the group objects inside it
+
+            if (root.has(FeedFields.DATA) && !root.isNull(FeedFields.DATA)) {
+
+                //retrieve our json array with group objects
+                JSONArray dataArray = root.getJSONArray(GroupFields.DATA);
+
+                //For each iteration, we fetch the list of groups and append all of them to what we have so far
+
+                listPosts = gson.fromJson(dataArray.toString(), typeToken.getType());
+            }
+        }
+        return listPosts;
     }
 
     public static boolean requestDeletePost(AccessToken accessToken, String postId) throws JSONException {

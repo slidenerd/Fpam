@@ -28,7 +28,7 @@
     <string name="tab_posts">Posts</string>
     <string name="tab_stats">Stats</string>
     <string name="user_name">User Name</string>
-    <string name="updated_time">Updated Time</string>
+    <string name="updatedTime">Updated Time</string>
     <string name="message">Message</string>
     <string name="text_empty_posts">No Posts To Display</string>
 </resources>

@@ -1,160 +1,10 @@
 package slidenerd.vivz.fpam.util;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import io.realm.RealmList;
-import slidenerd.vivz.fpam.model.json.feed.Post;
-
 /**
  * TODO Each time the JSON feed is loaded, only those posts are saved and the rest are deleted, maintain a 100 posts of each group in the database. Also add comments and attachments.
  * Created by vivz on 24/09/15.
  */
 public class JSONUtils {
-
-    public static slidenerd.vivz.fpam.model.json.feed.Feed loadFeedFrom(@NonNull String groupId, @Nullable JSONObject obj) throws JSONException {
-        slidenerd.vivz.fpam.model.json.feed.Feed feed = new slidenerd.vivz.fpam.model.json.feed.Feed();
-        RealmList<Post> listPosts = new RealmList<>();
-        //Set the group id for which all the posts are being retrieved.
-
-        feed.setGroupId(groupId);
-
-        //Check if the root JSON contains an array called data, if yes retrieve it
-
-        if (obj != null && obj.has(FeedFields.DATA) && !obj.isNull(FeedFields.DATA)) {
-
-            //Retrieve the JSON Array that contains all our posts
-
-            JSONArray postArray = obj.getJSONArray(FeedFields.DATA);
-
-            for (int i = 0; i < postArray.length(); i++) {
-
-                //Retrieve each post from our JSON Array
-
-                JSONObject postObj = postArray.getJSONObject(i);
-
-                //Construct a Post object that will contain all the details from JSON
-
-                Post post = new Post();
-
-                //If the post json object contains post id, retrieve it
-
-                if (postObj != null && postObj.has(FeedFields.ID) && !postObj.isNull(FeedFields.ID)) {
-
-                    //Retrieve any other information associated with a post only if we have a valid post id first.
-
-                    post.setPostId(postObj.getString(FeedFields.ID));
-
-                    //Check if the json post object has an element named from that contains user information, if yes retrieve it
-
-                    if (postObj.has(FeedFields.FROM) && !postObj.isNull(FeedFields.FROM)) {
-
-                        //Get the JSON object named from which contains id and name, try to retrieve either id or name or both
-
-                        JSONObject from = postObj.getJSONObject(FeedFields.FROM);
-
-                        //If the json from object contains user id, retrieve it
-
-                        if (from != null && from.has(FeedFields.ID) && !from.isNull(FeedFields.ID)) {
-
-                            post.setUserId(from.getString(FeedFields.ID));
-
-                        }
-
-                        //If the json from object has name, retrieve it
-
-                        if (from != null && from.has(FeedFields.NAME) && !from.isNull(FeedFields.NAME)) {
-
-                            post.setUserName(from.getString(FeedFields.NAME));
-
-                        }
-                    }
-
-                    //if the json post object has a message, retrieve it
-
-                    if (postObj.has(FeedFields.MESSAGE) && !postObj.isNull(FeedFields.MESSAGE)) {
-                        post.setMessage(postObj.getString(FeedFields.MESSAGE));
-                    }
-
-                    //if the json post object has a name, retrieve it, found only for images, links and attachments normally
-
-                    if (postObj.has(FeedFields.NAME) && !postObj.isNull(FeedFields.NAME)) {
-                        post.setName(postObj.getString(FeedFields.NAME));
-                    }
-
-                    //if the json post object has a caption, retrieve it, found only for images, links and attachments normally
-
-                    if (postObj.has(FeedFields.CAPTION) && !postObj.isNull(FeedFields.CAPTION)) {
-                        post.setCaption(postObj.getString(FeedFields.CAPTION));
-                    }
-
-                    //if the json post object has a description, retrieve it, found only for images, links and attachments normally
-
-                    if (postObj.has(FeedFields.DESCRIPTION) && !postObj.isNull(FeedFields.DESCRIPTION)) {
-                        post.setDescription(postObj.getString(FeedFields.DESCRIPTION));
-                    }
-
-                    //if the json post object has a picture, retrieve it, this is optionally found in the feed
-
-                    if (postObj.has(FeedFields.PICTURE) && !postObj.isNull(FeedFields.PICTURE)) {
-                        post.setPicture(postObj.getString(FeedFields.PICTURE));
-                    }
-
-                    //if the json post object has a type, retrieve it
-
-                    if (postObj.has(FeedFields.TYPE) && !postObj.isNull(FeedFields.TYPE)) {
-                        post.setType(postObj.getString(FeedFields.TYPE));
-                    }
-
-                    //if the json post object has an updated time, retrieve it
-
-                    if (postObj.has(FeedFields.UPDATED_TIME) && !postObj.isNull(FeedFields.UPDATED_TIME)) {
-                        post.setUpdated_time(postObj.getString(FeedFields.UPDATED_TIME));
-                    }
-
-                    //if the json post object has a link, retrieve it
-
-                    if (postObj.has(FeedFields.LINK) && !postObj.isNull(FeedFields.LINK)) {
-                        post.setLink(postObj.getString(FeedFields.LINK));
-                    }
-                    //Add this post object to the list of posts retrieved so far.
-
-                    listPosts.add(post);
-                }
-            }
-        }
-
-        //If the root JSON object has a paging element, retrieve its json object
-
-        if (obj != null && obj.has(FeedFields.PAGING) && !obj.isNull(FeedFields.PAGING)) {
-
-            JSONObject paging = obj.getJSONObject(FeedFields.PAGING);
-
-            //If the paging JSON object has a previous element or next element or both retrieve it.
-
-            if (paging != null && paging.has(FeedFields.PREVIOUS) && !paging.isNull(FeedFields.PREVIOUS)) {
-                feed.setPrevious(paging.getString(FeedFields.PREVIOUS));
-            }
-
-            //If the paging JSON object has a next element, retrieve it
-
-            if (paging != null && paging.has(FeedFields.NEXT) && !paging.isNull(FeedFields.NEXT)) {
-                feed.setNext(paging.getString(FeedFields.NEXT));
-            }
-        }
-
-        //Set the timestamp to indicate the time when the posts were loaded
-
-        feed.setTimestamp(System.currentTimeMillis());
-
-        //Set the list of retrieved posts on the feed.
-        feed.setListPosts(listPosts);
-        return feed;
-    }
 
     /**
      * The feed shown below is admin JSON object
@@ -513,5 +363,6 @@ public class JSONUtils {
         String AFTER = "after";
         String PREVIOUS = "previous";
         String NEXT = "next";
+        String CREATED_TIME = "created_time";
     }
 }

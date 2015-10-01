@@ -67,7 +67,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         @Override
         public void onReceive(Context context, Intent intent) {
             Group selectedGroup = Parcels.unwrap(intent.getExtras().getParcelable("selectedGroup"));
-            RealmResults<Post> realmResults = mRealm.where(Post.class).beginsWith("postId", selectedGroup.getId()).findAllSorted("updated_time", false);
+            RealmResults<Post> realmResults = mRealm.where(Post.class).beginsWith("postId", selectedGroup.getId()).findAllSorted("updatedTime", false);
             mAdapter.setData(realmResults);
         }
     };
@@ -113,15 +113,8 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(mRecyclerPosts);
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGroupSelectedReceiver, new IntentFilter("group_selected"));
-
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mRealm.close();
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mGroupSelectedReceiver);
-    }
 
     @Override
     public void onSuccess(LoginResult loginResult) {
@@ -145,16 +138,16 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     }
 
     @Override
-    public void onDelete(int position, Post post) {
+    public void beforeDelete(int position, Post post) {
         mProgressDialog.setTitle("Deleting post");
-        mProgressDialog.setMessage(post.getMessage());
+        mProgressDialog.setMessage("Post was made by " + post.getUserName());
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.show();
-        deletePostAsync(ApplicationFpam.getFacebookAccessToken(), position, post.getPostId());
+        onDelete(ApplicationFpam.getFacebookAccessToken(), position, post.getPostId());
     }
 
     @Background
-    void deletePostAsync(AccessToken accessToken, int position, String postId) {
+    void onDelete(AccessToken accessToken, int position, String postId) {
         Realm realm = null;
         try {
             realm = Realm.getDefaultInstance();
@@ -164,7 +157,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
                 realm.where(Post.class).equalTo("postId", postId).findFirst().removeFromRealm();
                 realm.commitTransaction();
             }
-            onPostDeleted(position, outcome);
+            afterDelete(position, outcome);
         } catch (JSONException e) {
             L.m(e + "");
         } finally {
@@ -175,10 +168,17 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     }
 
     @UiThread
-    void onPostDeleted(int position, boolean success) {
+    void afterDelete(int position, boolean success) {
         if (success) {
             mAdapter.notifyItemRemoved(position);
         }
         mProgressDialog.dismiss();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mRealm.close();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mGroupSelectedReceiver);
     }
 }

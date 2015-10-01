@@ -33,6 +33,13 @@ public class PreFragMain extends PreferenceFragment {
                     .addToBackStack(getString(R.string.key_spam))
                     .commit();
         }
+        if (preference.getKey().equals(getString(R.string.key_groups))) {
+            getFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main_content, new PreFragGroups_())
+                    .addToBackStack(getString(R.string.key_groups))
+                    .commit();
+        }
         return false;
     }
 }

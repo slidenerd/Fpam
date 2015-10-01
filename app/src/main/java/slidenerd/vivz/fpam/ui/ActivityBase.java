@@ -29,8 +29,9 @@ import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.parceler.Parcels;
+
+import java.util.ArrayList;
 
 import io.realm.Realm;
 import slidenerd.vivz.fpam.ApplicationFpam;
@@ -38,11 +39,10 @@ import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.feed.Feed;
+import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.prefs.MyPrefs_;
 import slidenerd.vivz.fpam.util.FBUtils;
-import slidenerd.vivz.fpam.util.JSONUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
 /**
@@ -161,9 +161,8 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
             Realm realm = null;
             try {
                 realm = Realm.getDefaultInstance();
-                JSONObject feedObject = FBUtils.requestFeedSync(mAccessToken, group);
-                Feed feed = JSONUtils.loadFeedFrom(group.getId(), feedObject);
-                DataStore.storeFeed(realm, feed);
+                ArrayList<Post> listPosts = FBUtils.requestFeedSync(mAccessToken, ApplicationFpam.getGson(), group);
+                DataStore.storeFeed(realm, listPosts);
                 onFeedLoaded("FeedFields Loaded For", group);
             } catch (JSONException e) {
                 L.m("" + e);

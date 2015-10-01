@@ -25,7 +25,7 @@ public class CopyUtils {
     public static ArrayList<Post> duplicatePosts(RealmResults<Post> realmPosts) {
         ArrayList<Post> listPosts = new ArrayList<>();
 //        for (Post realmPost : realmPosts) {
-//            Post post = new Post(realmPost.getPostId(), realmPost.getFrom(), realmPost.getMessage(), realmPost.getName(), realmPost.getCaption(), realmPost.getDescription(), realmPost.getLink(), realmPost.getPicture(), realmPost.getType(), realmPost.getAttachments(), realmPost.getComments(), realmPost.getUpdated_time());
+//            Post post = new Post(realmPost.getPostId(), realmPost.getFrom(), realmPost.getMessage(), realmPost.getName(), realmPost.getCaption(), realmPost.getDescription(), realmPost.getLink(), realmPost.getPicture(), realmPost.getType(), realmPost.getAttachments(), realmPost.getComments(), realmPost.getUpdatedTime());
 //            listPosts.add(post);
 //        }
         return listPosts;

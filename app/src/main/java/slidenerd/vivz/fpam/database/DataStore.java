@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
-import slidenerd.vivz.fpam.model.json.feed.Feed;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.CopyUtils;
@@ -63,9 +62,9 @@ public class DataStore {
         return CopyUtils.duplicateAdmin(src);
     }
 
-    public static void storeFeed(Realm realm, Feed feed) {
+    public static void storeFeed(Realm realm, ArrayList<Post> listPosts) {
         realm.beginTransaction();
-        realm.copyToRealmOrUpdate(feed);
+        realm.copyToRealmOrUpdate(listPosts);
         realm.commitTransaction();
     }
 

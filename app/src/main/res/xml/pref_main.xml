@@ -8,7 +8,7 @@
         android:entryValues="@array/pref_scan_frequency_values"
         android:key="@string/key_scan_frequency"
         android:title="@string/pref_header_scan" />
-    <slidenerd.vivz.fpam.widget.MultiGroupsSelectPreference
+    <Preference
         android:key="@string/key_groups"
         android:summary="@string/pref_summary_groups"
         android:title="@string/pref_title_groups" />

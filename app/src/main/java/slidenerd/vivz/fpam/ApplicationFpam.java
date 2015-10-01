@@ -16,7 +16,9 @@ import io.realm.RealmConfiguration;
 import io.realm.RealmObject;
 import slidenerd.vivz.fpam.model.gson.AdminDeserializer;
 import slidenerd.vivz.fpam.model.gson.GroupDeserializer;
+import slidenerd.vivz.fpam.model.gson.PostDeserializer;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
+import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 
 /**
@@ -40,6 +42,7 @@ public class ApplicationFpam extends Application {
                 })
                 .registerTypeAdapter(Admin.class, new AdminDeserializer())
                 .registerTypeAdapter(Group.class, new GroupDeserializer())
+                .registerTypeAdapter(Post.class, new PostDeserializer())
                 .create();
         return gson;
     }

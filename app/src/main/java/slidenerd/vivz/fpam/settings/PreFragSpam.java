@@ -24,7 +24,7 @@ public class PreFragSpam extends PreferenceFragment {
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         if (preference.getKey().equals(getString(R.string.key_spam_content))) {
-            getFragmentManager().beginTransaction().replace(R.id.main_content, new PreFragSpamPhrase()).addToBackStack(getString(R.string.key_spam_content)).commit();
+            getFragmentManager().beginTransaction().replace(R.id.main_content, new PreFragSpamPhrase_()).addToBackStack(getString(R.string.key_spam_content)).commit();
         }
         return false;
     }
