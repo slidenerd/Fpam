@@ -148,7 +148,12 @@ The 4 pieces of information that we need to analyze are : the person who posted,
                     <li>If No,
                         <ul>
                             <li>Delete the post</li>
-                            <li>Add this person to the spammers database and increment the number of posts made by him/her</li>
+                            <li>Add this person to the spammers database and increment the number of posts made by him/her
+                                <ul>
+                                    <li></li>
+                                    <li></li>
+                                </ul>
+                            </li>
                         </ul>    
                     </li>
                     <li>If Yes, jump to picture allowed</li>
