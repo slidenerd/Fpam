@@ -262,6 +262,38 @@ The Algorithm
                         </li>
                     </ul>
                 </li>
+                <li>
+                    If Yes,
+                    <ul>
+                        <li>Is the link present in the blacklist?
+                            <ul>
+                                <li>Delete the post</li>
+                                <li>Is this person in the spammers database?</li>
+                                <li>If Yes,
+                                    <ul>
+                                        <li>Increment the number of spam posts made by the person</li>
+                                    </ul>
+                                </li>
+                                <li>If No,
+                                    <ul>
+                                        <li>Put the person in the spammers list</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>Is the link present in the whitelist?
+                            <ul>
+                                <li>Approve the post</li>
+                            </ul>
+                        </li>
+                        <li>Is the link uncategorized?
+                            <ul>
+                                <li>Store the post ids of all the posts that contain this link?</li>
+                                <li>Add this link to the list that needs admin approval only once</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
             </ul>
         </li>
     
