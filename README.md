@@ -118,7 +118,25 @@ UPDATE 5 [September 29, 2015, 10 am]
 
 </ol>
 
+UPDATE 6, Oct 1 , 2015 [9:30 am - 1:30 pm]
+Hired Neel Raj by paying him 5000 bucks upfront for Fpam App design. 
+
+
 The Workflow
 
 When the user logs in, get the list of groups and user details and store them in Realm. 
 When the user clicks on a group, load the posts with that group postId and store it in Realm. If there are more than 100 posts that are already stored for that group, delete the oldest N entries and add the new ones, update all existing posts, comments, attachments and any other detail.
+
+The Algorithm
+
+<ul>
+
+<li>Read a post and scan its message, link, picture and person who posted it</li>
+<li>Is this person present in the spammers database?
+<ul>
+<li>If Yes, Delete the post</li>
+<li>If Yes, Increment the number of spam posts made by the person</li>
+</ul>
+</li>
+
+<ul>
