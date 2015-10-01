@@ -146,17 +146,7 @@ The Algorithm
                 <li>If No,
                     <ul>
                         <li>Delete the post</li>
-                        <li>Is this person in the spammers database?</li>
-                        <li>If Yes,
-                            <ul>
-                                <li>Increment the number of spam posts made by the person</li>
-                            </ul>
-                        </li>
-                        <li>If No,
-                            <ul>
-                                <li>Put the person in the spammers list</li>
-                            </ul>
-                        </li>
+                        <li>Add this person to the spammers database and increment the number of posts made by him/her</li>
                     </ul>
                 </li>
                 <li>If Yes, jump to message processing</li>
@@ -169,17 +159,7 @@ The Algorithm
                                         <li>If No, 
                                             <ul>
                                                 <li>Delete the post</li>
-                                                <li>Is this person in the spammers database?</li>
-                                                <li>If Yes,
-                                                    <ul>
-                                                        <li>Increment the number of spam posts made by the person</li>
-                                                    </ul>
-                                                </li>
-                                                <li>If No,
-                                                    <ul>
-                                                        <li>Put the person in the spammers list</li>
-                                                    </ul>
-                                                </li>
+                                                <li>Add this person to the spammers database and increment the number of posts made by him/her</li>
                                             </ul>
                                         </li>
                                         <li>If Yes, <b>What to do if picture is found here?</b></li>   
@@ -195,17 +175,7 @@ The Algorithm
                                         <li>If Yes, 
                                             <ul>
                                                 <li>Delete the post</li>
-                                                <li>Is this person in the spammers database?</li>
-                                                <li>If Yes,
-                                                    <ul>
-                                                        <li>Increment the number of spam posts made by the person</li>
-                                                    </ul>
-                                                </li>
-                                                <li>If No,
-                                                    <ul>
-                                                        <li>Put the person in the spammers list</li>
-                                                    </ul>
-                                                </li>
+                                                <li>Add this person to the spammers database and increment the number of posts made by him/her</li>
                                             </ul>
                                         </li>
                                     </ul>
@@ -225,17 +195,7 @@ The Algorithm
                                         <li>If Yes, 
                                             <ul>
                                                 <li>Delete the post</li>
-                                                <li>Is this person in the spammers database?</li>
-                                                <li>If Yes,
-                                                    <ul>
-                                                        <li>Increment the number of spam posts made by the person</li>
-                                                    </ul>
-                                                </li>
-                                                <li>If No,
-                                                    <ul>
-                                                        <li>Put the person in the spammers list</li>
-                                                    </ul>
-                                                </li>
+                                                <li>Add this person to the spammers database and increment the number of posts made by him/her</li>
                                             </ul>
                                         </li>
                                     </ul>
@@ -249,17 +209,7 @@ The Algorithm
                 <li>If No,
                     <ul>
                         <li>Delete the post</li>
-                        <li>Is this person in the spammers database?</li>
-                        <li>If Yes,
-                            <ul>
-                                <li>Increment the number of spam posts made by the person</li>
-                            </ul>
-                        </li>
-                        <li>If No,
-                            <ul>
-                                <li>Put the person in the spammers list</li>
-                            </ul>
-                        </li>
+                        <li>Add this person to the spammers database and increment the number of posts made by him/her</li>
                     </ul>
                 </li>
                 <li>
@@ -268,17 +218,7 @@ The Algorithm
                         <li>Is the link present in the blacklist?
                             <ul>
                                 <li>Delete the post</li>
-                                <li>Is this person in the spammers database?</li>
-                                <li>If Yes,
-                                    <ul>
-                                        <li>Increment the number of spam posts made by the person</li>
-                                    </ul>
-                                </li>
-                                <li>If No,
-                                    <ul>
-                                        <li>Put the person in the spammers list</li>
-                                    </ul>
-                                </li>
+                                <li>Add this person to the spammers database and increment the number of posts made by him/her</li>
                             </ul>
                         </li>
                         <li>Is the link present in the whitelist?
