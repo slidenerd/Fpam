@@ -182,7 +182,7 @@ The Algorithm
                                                 </li>
                                             </ul>
                                         </li>
-                                        <li>If Yes, <b>What to do if picture or link is found here?</b></li>   
+                                        <li>If Yes, <b>What to do if picture is found here?</b></li>   
                                     </ul>
                                 </li>
                             </ul>
@@ -214,10 +214,15 @@ The Algorithm
                         </li>
                         <li>Message with only link
                             <ul>
-                                <li><b>Process the link</b></li>
+                                <li><b>Process Link</b></li>
                             </ul>
                         </li>
-                        <li>Message with text and link</li>
+                        <li>Message with text and link
+                            <ul>
+                                <li>Process Text</li>
+                                <li>Process Link</li>
+                            </ul>
+                        </li>
                     </ul>
                 </li>
                 <li> Are Links Allowed?</li>
@@ -235,7 +240,7 @@ The Algorithm
                                 <li>Put the person in the spammers list</li>
                             </ul>
                         </li>
-                        <li>If Yes, <b>Process Links</b></li>
+                        <li>If Yes, <b>Process Link</b></li>
                     </ul>
                 </li>
             </ul>
