@@ -241,7 +241,9 @@ The 4 pieces of information that we need to analyze are : the person who posted,
                                         <li>If Yes, 
                                             <ul>
                                                 <li>Delete the post</li>
-                                                <li>Add this person to the spammers database and increment the number of posts made by him/her and increment the number of times the spam word was found</li>
+                                                <li>Add this person to the spammers database</li>
+                                                <li>Increment the number of posts made by him/her.</li>
+                                                <li>Increment the number of times the spam word or words were found</li>
                                             </ul>
                                         </li>
                                     </ul>
@@ -261,7 +263,9 @@ The 4 pieces of information that we need to analyze are : the person who posted,
                                         <li>If Yes, 
                                             <ul>
                                                 <li>Delete the post</li>
-                                                <li>Add this person to the spammers database and increment the number of posts made by him/her and increment the number of times the spam word was found</li>
+                                                <li>Add this person to the spammers database</li>
+                                                <li>Increment the number of posts made by him/her.</li>
+                                                <li>Increment the number of times the spam word or words were found</li>
                                             </ul>
                                         </li>
                                     </ul>
@@ -272,6 +276,16 @@ The 4 pieces of information that we need to analyze are : the person who posted,
                     </ul>
                 </li>
                 <li>For link processing
+                    <ul>
+                        <li>Regardless of where the link is found, analyze properties of this link [for analytics purpose]
+                            <ul>
+                                <li>number of characters in the primary domain name [stackoverflow = 13]</li>
+                                <li>number of characters in the domain extension [.com = 3]</li>
+                                <li>type of domain extension [.com, .io, .org etc]</li>
+                                <li>does the url have a path</li>
+                            </ul>
+                        </li>
+                    </ul>
                     <ul>
                         <li>Is the link present in the blacklist?
                             <ul>
