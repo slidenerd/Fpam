@@ -142,8 +142,22 @@ The Algorithm
         </li>
         <li> If No,
             <ul>
-                <li>Are Pictures Allowed?
-                    
+                <li>Are Pictures Allowed?</li>
+                <li>If No,
+                    <ul>
+                        <li>Delete the post</li>
+                        <li>Is this person in the spammers database?</li>
+                        <li>If Yes,
+                            <ul>
+                                <li>Increment the number of spam posts made by the person</li>
+                            </ul>
+                        </li>
+                        <li>If No,
+                            <ul>
+                                <li>Put the person in the spammers list</li>
+                            </ul>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </li>
