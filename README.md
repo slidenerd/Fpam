@@ -214,7 +214,7 @@ The Algorithm
                         </li>
                         <li>Message with only link in its contents
                             <ul>
-                                <li><b>Process Link</b></li>
+                                <li><b>jump to separate link tag processsing</b></li>
                             </ul>
                         </li>
                         <li>Message with text and link in its contents
@@ -240,7 +240,7 @@ The Algorithm
                                         </li>
                                     </ul>
                                 </li>
-                                <li>Process Link</li>
+                                <li>jump to separate link tag processing</li>
                             </ul>
                         </li>
                     </ul>
@@ -260,7 +260,6 @@ The Algorithm
                                 <li>Put the person in the spammers list</li>
                             </ul>
                         </li>
-                        <li>If Yes, <b>Process Link</b></li>
                     </ul>
                 </li>
             </ul>
