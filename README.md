@@ -300,8 +300,7 @@ The 4 pieces of information that we need to analyze are : the person who posted,
                         </li>
                         <li>Is the link uncategorized?
                             <ul>
-                                <li>Store the post ids of all the posts that contain this link?</li>
-                                <li>Add this link to the list that needs admin approval only once</li>
+                                <li>Store this link in a data structure where the link is unique and a single link points to several post ids.</li>
                             </ul>
                         </li>
                     </ul>
