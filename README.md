@@ -129,6 +129,8 @@ When the user clicks on a group, load the posts with that group postId and store
 
 The Algorithm
 
+The 4 pieces of information that we need to analyze are : the person who posted, the message that was posted if any, the link tag if any and the picture if any. The message that was posted may be of 4 types 1) no message or no text 2) only text 3) message with only a link inside its contents 4)message with text and one or more link in its contents.
+
 <ul>
 
     <li>Read a post and scan its message, link from its link property, picture and person who posted it</li>
@@ -142,6 +144,14 @@ The Algorithm
         </li>
         <li> If No,
             <ul>
+                <li>Are link tags allowed?</li>
+                    <li>If No,
+                        <ul>
+                            <li>Delete the post</li>
+                            <li>Add this person to the spammers database and increment the number of posts made by him/her</li>
+                        </ul>    
+                    </li>
+                    <li>If Yes, jump to picture allowed</li>
                 <li>Are Pictures Allowed?</li>
                 <li>If No,
                     <ul>
@@ -171,11 +181,11 @@ The Algorithm
                             <ul>
                                 <li>Does it have spam phrases or words?
                                     <ul>
-                                        <li>If No, jump to separate link tag processing</li>
+                                        <li>If No, jump to link processing</li>
                                         <li>If Yes, 
                                             <ul>
                                                 <li>Delete the post</li>
-                                                <li>Add this person to the spammers database and increment the number of posts made by him/her</li>
+                                                <li>Add this person to the spammers database and increment the number of posts made by him/her and increment the number of times the spam word was found</li>
                                             </ul>
                                         </li>
                                     </ul>
@@ -184,7 +194,7 @@ The Algorithm
                         </li>
                         <li>Message with only link in its contents
                             <ul>
-                                <li><b>jump to separate link tag processsing</b></li>
+                                <li><b>jump to link processsing</b></li>
                             </ul>
                         </li>
                         <li>Message with text and link in its contents
@@ -200,20 +210,12 @@ The Algorithm
                                         </li>
                                     </ul>
                                 </li>
-                                <li>jump to separate link tag processing</li>
+                                <li>jump to link processing</li>
                             </ul>
                         </li>
                     </ul>
                 </li>
-                <li> Are Links Allowed in the form of a link tag?</li>
-                <li>If No,
-                    <ul>
-                        <li>Delete the post</li>
-                        <li>Add this person to the spammers database and increment the number of posts made by him/her</li>
-                    </ul>
-                </li>
-                <li>
-                    If Yes,
+                <li>For link processing
                     <ul>
                         <li>Is the link present in the blacklist?
                             <ul>
