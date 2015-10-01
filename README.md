@@ -160,6 +160,38 @@ The Algorithm
                     </ul>
                 </li>
                 <li>If Yes, consider other aspects of this post to determine if it is a spam or not</li>
+                <li>What type of message is it?
+                    <ul>
+                        <li>Message with no text
+                            <ul>
+                                <li>Are empty messages allowed?
+                                    <ul>
+                                        <li>If No, 
+                                            <ul>
+                                                <li>Delete the post</li>
+                                                <li>Is this person in the spammers database?</li>
+                                                <li>If Yes,
+                                                    <ul>
+                                                        <li>Increment the number of spam posts made by the person</li>
+                                                    </ul>
+                                                </li>
+                                                <li>If No,
+                                                    <ul>
+                                                        <li>Put the person in the spammers list</li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li></li>   
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>Message with only text</li>
+                        <li>Message with only link</li>
+                        <li>Message with text and link</li>
+                    </ul>
+                </li>
                 <li> Are Links Allowed?</li>
                 <li>If No,
                     <ul>
