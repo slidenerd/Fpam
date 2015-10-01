@@ -182,7 +182,7 @@ The Algorithm
                                                 </li>
                                             </ul>
                                         </li>
-                                        <li></li>   
+                                        <li>If Yes, <b>What to do if picture or link is found here?</b></li>   
                                     </ul>
                                 </li>
                             </ul>
