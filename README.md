@@ -131,7 +131,7 @@ The Algorithm
 
 <ul>
 
-    <li>Read a post and scan its message, link, picture and person who posted it</li>
+    <li>Read a post and scan its message, link from its link property, picture and person who posted it</li>
     <li>Is this person present in the spammers database?</li>
     <ul>
         <li>If Yes, 
@@ -159,7 +159,7 @@ The Algorithm
                         </li>
                     </ul>
                 </li>
-                <li>If Yes, consider other aspects of this post to determine if it is a spam or not</li>
+                <li>If Yes, jump to message processing</li>
                 <li>What type of message is it?
                     <ul>
                         <li>Message with no text
@@ -191,7 +191,7 @@ The Algorithm
                             <ul>
                                 <li>Does it have spam phrases or words?
                                     <ul>
-                                        <li>If No, consider other aspects of this post to determine if it is a spam or not</li>
+                                        <li>If No, jump to separate link tag processing</li>
                                         <li>If Yes, 
                                             <ul>
                                                 <li>Delete the post</li>
@@ -212,20 +212,40 @@ The Algorithm
                                 </li>
                             </ul>
                         </li>
-                        <li>Message with only link
+                        <li>Message with only link in its contents
                             <ul>
                                 <li><b>Process Link</b></li>
                             </ul>
                         </li>
-                        <li>Message with text and link
+                        <li>Message with text and link in its contents
                             <ul>
-                                <li>Process Text</li>
+                                <li>Does it have spam phrases or words?
+                                    <ul>
+                                        <li>If No, jump to message link processing</li>
+                                        <li>If Yes, 
+                                            <ul>
+                                                <li>Delete the post</li>
+                                                <li>Is this person in the spammers database?</li>
+                                                <li>If Yes,
+                                                    <ul>
+                                                        <li>Increment the number of spam posts made by the person</li>
+                                                    </ul>
+                                                </li>
+                                                <li>If No,
+                                                    <ul>
+                                                        <li>Put the person in the spammers list</li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
                                 <li>Process Link</li>
                             </ul>
                         </li>
                     </ul>
                 </li>
-                <li> Are Links Allowed?</li>
+                <li> Are Links Allowed in the form of a link tag?</li>
                 <li>If No,
                     <ul>
                         <li>Delete the post</li>
