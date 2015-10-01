@@ -212,7 +212,11 @@ The Algorithm
                                 </li>
                             </ul>
                         </li>
-                        <li>Message with only link</li>
+                        <li>Message with only link
+                            <ul>
+                                <li><b>Process the link</b></li>
+                            </ul>
+                        </li>
                         <li>Message with text and link</li>
                     </ul>
                 </li>
