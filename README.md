@@ -92,9 +92,21 @@ As of now, admin, groups, posts and feed details are stored with manual JSON par
 
 UPDATE 5 [September 29, 2015, 10 am]
 
-Write a GSON deserializer to load admin, feed , post and other objects using GSON, use retrofit to load more pages, test database limits on how many posts are loaded for a particular group and use since and until to load data more efficiently.
+<ol>
+
+<li>Gson Deserializer for Admin and Group Done</li>
+<li>Eliminated Groups class to simplify model</li>
+<li>Pagination for Groups implemented</li>
+<li>SIMPLE DELETE for POSTS IMPLEMENTED</li>
+<li>Eliminate Feed model class</li>
+<li>Write Feed deserializer</li>
+<li>Support pagination at the top and pagination at the bottom for posts</li>
+<li>Enforce database limits for storing posts</li>
+
+</ol>
 
 <ol>
+
 <li>Load feed by using since and until or a combination of them</li>
 <li>Support pagination for feeds</li>
 <li>Store comments and attachments</li>
@@ -103,9 +115,200 @@ Write a GSON deserializer to load admin, feed , post and other objects using GSO
 <li>Swipe to delete comments from facebook first and then from realm on success</li>
 <li>Cascade deletion of comments for a related post<li>
 <li>Commence analytics and spam processing work</li>
+
 </ol>
+
+UPDATE 6, Oct 1 , 2015 [9:30 am - 1:30 pm]
+Hired Neel Raj by paying him 5000 bucks upfront for Fpam App design. 
+
 
 The Workflow
 
 When the user logs in, get the list of groups and user details and store them in Realm. 
 When the user clicks on a group, load the posts with that group postId and store it in Realm. If there are more than 100 posts that are already stored for that group, delete the oldest N entries and add the new ones, update all existing posts, comments, attachments and any other detail.
+
+The Algorithm
+
+The 4 pieces of information that we need to analyze are : the person who posted, the message that was posted if any, the link tag if any and the picture if any. The message that was posted may be of 4 types 1) no message or no text 2) only text 3) message with only a link inside its contents 4)message with text and one or more link in its contents.
+
+<ul>
+
+    <li>Read a post and scan its message, link from its link property, picture and person who posted it</li>
+    <li>Is this person present in the spammers database?</li>
+    <ul>
+        <li>Regardless of whether the post is a spam or not, [for analytics purpose]
+            <ul>
+                <li>Which group is this post read from? Track the group id</li>
+                <li>How many posts have been read so far? Increment the number of posts read so far.</li>
+                <li>What are the properties of this post?
+                    <ul>
+                        <li>Language in which this post is written [Implement if possible now]</li>
+                        <li>Does it have a link tag?</li>
+                        <li>Does it have a picture tag?</li>
+                        <li>Does it have a message tag?
+                            <ul>
+                                <li>Number of words</li>
+                                <li>Number of characters</li>
+                                <li>Percentage of capslock or capital to small letters [spam posts often have capital letters in them]</li>
+                                <li>Number of emoticons detected [spam posts often use many emoticons]</li>
+                                <li>Percentage of emoticons to actual content in the post</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li>If Yes, 
+            <ul>
+                <li>Delete the post</li>
+                <li>Increment the number of spam posts made by the person</li>
+                <li>What time was it created?</li>
+                <li>What time was it updated?</li>
+                <li>Are the update_time and create_time the same?</li>
+            </ul>
+        </li>
+        <li> If No,
+            <ul>
+                <li>Are link tags allowed?</li>
+                    <li>If No,
+                        <ul>
+                            <li>Delete the post</li>
+                            <li>Add this person to the spammers database and increment the number of posts made by him/her
+                                <ul>
+                                    <li>Is the link present in the blacklist [for analytics purpose]
+                                        <ul>
+                                            <li>If Yes, increase the number of times this link was found in the blacklist</li>
+                                            <li>Properties of this link [for analytics purpose]
+                                                <ul>
+                                                    <li>number of characters in the primary domain name [stackoverflow = 13]</li>
+                                                    <li>number of characters in the domain extension [.com = 3]</li>
+                                                    <li>type of domain extension [.com, .io, .org etc]</li>
+                                                    <li>does the url have a path</li>
+                                                </ul>
+                                            </li>
+                                            <li>If No, do nothing here</li>
+                                        </ul>
+                                    </li>
+                                    <li>Is the link present in the whitelist [for analytics purpose]
+                                        <ul>
+                                            <li>If Yes, increase the number of times this link was found in the whitelist</li>
+                                            <li>Properties of this link [for analytics purpose]
+                                                <ul>
+                                                    <li>number of characters in the primary domain name [stackoverflow = 13]</li>
+                                                    <li>number of characters in the domain extension [.com = 3]</li>
+                                                    <li>type of domain extension [.com, .io, .org etc]</li>
+                                                    <li>does the url have a path</li>
+                                                </ul>
+                                            </li>
+                                            <li>If No, do nothing here</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>    
+                    </li>
+                    <li>If Yes, jump to picture allowed</li>
+                <li>Are Pictures Allowed?</li>
+                <li>If No,
+                    <ul>
+                        <li>Delete the post</li>
+                        <li>Add this person to the spammers database and increment the number of posts made by him/her</li>
+                    </ul>
+                </li>
+                <li>If Yes, jump to message processing</li>
+                <li>What type of message is it?
+                    <ul>
+                        <li>Message with no text
+                            <ul>
+                                <li>Are empty messages allowed?
+                                    <ul>
+                                        <li>If No, 
+                                            <ul>
+                                                <li>Delete the post</li>
+                                                <li>Add this person to the spammers database and increment the number of posts made by him/her</li>
+                                            </ul>
+                                        </li>
+                                        <li>If Yes, <b>What to do if picture is found here?</b></li>   
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>Message with only text
+                            <ul>
+                                <li>Does it have spam phrases or words?
+                                    <ul>
+                                        <li>If No, jump to link processing</li>
+                                        <li>If Yes, 
+                                            <ul>
+                                                <li>Delete the post</li>
+                                                <li>Add this person to the spammers database</li>
+                                                <li>Increment the number of posts made by him/her.</li>
+                                                <li>Increment the number of times the spam word or words were found</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>Message with only link in its contents
+                            <ul>
+                                <li><b>jump to link processsing</b></li>
+                            </ul>
+                        </li>
+                        <li>Message with text and link in its contents
+                            <ul>
+                                <li>Does it have spam phrases or words?
+                                    <ul>
+                                        <li>If No, jump to message link processing</li>
+                                        <li>If Yes, 
+                                            <ul>
+                                                <li>Delete the post</li>
+                                                <li>Add this person to the spammers database</li>
+                                                <li>Increment the number of posts made by him/her.</li>
+                                                <li>Increment the number of times the spam word or words were found</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>jump to link processing</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>For link processing
+                    <ul>
+                        <li>Regardless of where the link is found, analyze properties of this link [for analytics purpose]
+                            <ul>
+                                <li>number of characters in the primary domain name [stackoverflow = 13]</li>
+                                <li>number of characters in the domain extension [.com = 3]</li>
+                                <li>type of domain extension [.com, .io, .org etc]</li>
+                                <li>does the url have a path</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>Is the link present in the blacklist?
+                            <ul>
+                                <li>Delete the post</li>
+                                <li>Add this person to the spammers database and increment the number of posts made by him/her</li>
+                            </ul>
+                        </li>
+                        <li>Is the link present in the whitelist?
+                            <ul>
+                                <li>Approve the post</li>
+                            </ul>
+                        </li>
+                        <li>Is the link uncategorized?
+                            <ul>
+                                <li>Store this link in a data structure where the link is unique and a single link points to several post ids.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    
+    </ul>
+    </li>
+
+</ul>
