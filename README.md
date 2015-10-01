@@ -159,6 +159,8 @@ The Algorithm
                         </li>
                     </ul>
                 </li>
+                <li>If Yes, consider other aspects of this post to determine if it is a spam or not
+                <li>
             </ul>
         </li>
     
