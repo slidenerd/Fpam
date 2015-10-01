@@ -150,13 +150,13 @@ The 4 pieces of information that we need to analyze are : the person who posted,
                             <li>Delete the post</li>
                             <li>Add this person to the spammers database and increment the number of posts made by him/her
                                 <ul>
-                                    <li>Is the link present in the blacklist
+                                    <li>Is the link present in the blacklist [for analytics purpose]
                                         <ul>
                                             <li>If Yes, increase the number of times this link was found in the blacklist</li>
                                             <li>If No, do nothing here</li>
                                         </ul>
                                     </li>
-                                    <li>Is the link present in the whitelist
+                                    <li>Is the link present in the whitelist [for analytics purpose]
                                         <ul>
                                             <li>If Yes, increase the number of times this link was found in the whitelist</li>
                                             <li>If No, do nothing here</li>
