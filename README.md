@@ -175,6 +175,7 @@ The Algorithm
                                 <li>Put the person in the spammers list</li>
                             </ul>
                         </li>
+                        <li>If Yes, <b>Process Links</b></li>
                     </ul>
                 </li>
             </ul>
