@@ -125,15 +125,21 @@ UPDATE 7, Oct 2, 2015 [8:20pm]
 
 What would complete Fpam?
 <ol>
-<li></li>
-<li></li>
-<li></li>
-<li></li>
-<li></li>
-<li></li>
-<li></li>
-<li></li>
-<li></li>
+<li>Create the IntentService for API<21 and JobScheduler Service for API>21 [HIGH]</li>
+<li>Make a viable approach to detect duplicate posts [MODERATE]</li>
+<li>Determine if a spammer must be blocked instantly or after 3 tries in a viable way [MODERATE]</li>
+<li>Show images of the post along with caption, links, description [HIGH]</li>
+<li>Show comments in a sliding panel and let people swipe to delete comments [HIGH]</li>
+<li>Add morphing animation to turn the facebook login button into something with a progress bar [LOW]</li>
+<li>Show a tutorial for how to use the app at the login screen [LOW]</li>
+<li>Add rate my app feature [MODERATE]</li>
+<li>Make a mechanism to find all groups a person owns and message other admins in random intervals of time to promote the app [LOW]</li>
+<li>Exempt yourself from spam processing [HIGH]</li>
+<li>Create Analytics database [HIGH]</li>
+<li>Collect analytics data [HIGH]</li>
+<li>Sync analytics data from app to server [HIGH]</li>
+<li>Enforce database limits for posts stored [HIGH]</li>
+<li>Figure out scrap post deletion [post deleted from facebook but present in fpam database] [HIGH]</li>
 </ol>
 
 The Workflow
