@@ -6,6 +6,7 @@ import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.LocalBroadcastManager;
@@ -38,6 +39,7 @@ import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
 /**
+ * TODO display title the right way
  * Created by vivz on 06/08/15.
  */
 @EActivity
@@ -54,6 +56,7 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
     /*
     The Drawer Listener responsible for providing a handy way to tie together the functionality of DrawerLayout and the framework ActionBar to implement the recommended design for navigation drawers.
      */
+    private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private FragmentDrawer_ mDrawer;
     private ViewStub mStub;
@@ -110,6 +113,7 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
      * @param savedInstanceState
      */
     private void initUi(Bundle savedInstanceState) {
+        mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_layout);
         mToolbar = (Toolbar) findViewById(R.id.app_bar);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
@@ -140,6 +144,7 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
         } else {
             mTabLayout.setVisibility(View.GONE);
         }
+
     }
 
     @Override

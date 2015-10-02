@@ -7,7 +7,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
-import java.text.SimpleDateFormat;
 
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.util.JSONUtils.FeedFields;
@@ -34,10 +33,18 @@ public class PostDeserializer implements JsonDeserializer<Post> {
         post.setType(type);
 
         final JsonObject fromObject = root.getAsJsonObject(FeedFields.FROM);
-        final String userId = fromObject.get(FeedFields.ID).getAsString();
-        final String userName = fromObject.get(FeedFields.NAME).getAsString();
-        post.setUserId(userId);
-        post.setUserName(userName);
+        if (fromObject != null) {
+            final JsonElement userIdElement = fromObject.get(FeedFields.ID);
+            final JsonElement userNameElement = fromObject.get(FeedFields.NAME);
+            if (userIdElement != null) {
+                final String userId = userIdElement.getAsString();
+                post.setUserId(userId);
+            }
+            if (userNameElement != null) {
+                final String userName = userNameElement.getAsString();
+                post.setUserName(userName);
+            }
+        }
 
         final JsonElement messageElement = root.get(FeedFields.MESSAGE);
         if (messageElement != null) {

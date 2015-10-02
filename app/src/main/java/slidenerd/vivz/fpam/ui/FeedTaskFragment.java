@@ -49,6 +49,7 @@ public class FeedTaskFragment extends Fragment {
         setRetainInstance(true);
     }
 
+
     @Background
     void loadFeed(@NonNull Group group, AccessToken accessToken) {
         if (FBUtils.isValidToken(accessToken)) {

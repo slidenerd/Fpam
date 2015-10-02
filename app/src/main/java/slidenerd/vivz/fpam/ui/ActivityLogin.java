@@ -108,8 +108,9 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
 
     @Override
     public void onError(FacebookException e) {
-        L.t(ActivityLogin.this, "Facebook Servers couldn't connect to Fpam " + e);
+        L.t(ActivityLogin.this, "Couldn't connect with Facebook Servers " + e);
     }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -124,6 +125,5 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
         NavUtils.startActivityStats(ActivityLogin.this);
         finish();
     }
-
 
 }
