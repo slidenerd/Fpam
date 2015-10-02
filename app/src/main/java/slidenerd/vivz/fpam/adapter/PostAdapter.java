@@ -2,10 +2,14 @@ package slidenerd.vivz.fpam.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -19,7 +23,9 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
 
     private LayoutInflater mLayoutInflater;
 
-    private OnDeleteListener listener;
+    private OnDeleteListener mListener;
+
+    private SimpleDateFormat mFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
     public PostAdapter(Context context, Realm realm, RealmResults<Post> results) {
         super(context, realm, results);
@@ -27,7 +33,7 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
     }
 
     public void setOnDeleteListener(OnDeleteListener listener) {
-        this.listener = listener;
+        this.mListener = listener;
     }
 
     @Override
@@ -58,7 +64,7 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
     @Override
     public void onSwipe(int position) {
         Post post = mResults.get(position);
-        listener.beforeDelete(position, post);
+        mListener.beforeDelete(position, post);
     }
 
     public interface OnDeleteListener {
@@ -82,7 +88,15 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
             mTextUserName.setText(userName);
         }
 
-        public void setUpdatedTime(String updatedTime) {
+        public void setUpdatedTime(String updatedTimeRaw) {
+            long updatedTimeInMillis = 0;
+            try {
+                updatedTimeInMillis = mFormat.parse(updatedTimeRaw).getTime();
+            } catch (ParseException e) {
+                updatedTimeInMillis = -1;
+            }
+            long now = System.currentTimeMillis();
+            String updatedTime = updatedTimeInMillis > 0 ? (String) DateUtils.getRelativeTimeSpanString(updatedTimeInMillis, now, DateUtils.SECOND_IN_MILLIS) : "NA";
             mTextUpdatedTime.setText(updatedTime);
         }
 

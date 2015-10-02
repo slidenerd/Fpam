@@ -14,6 +14,7 @@ import slidenerd.vivz.fpam.util.CopyUtils;
 public class DataStore {
 
     /**
+     * TODO Limit number of entries stored per group
      * In the first step, check if the list of groups to be stored is empty. If we have 1-N groups to store, use shared preferences to do the same. Convert the list of groups into a JSON string and store that.
      */
     public static void storeGroups(Realm realm, ArrayList<Group> listGroups) {

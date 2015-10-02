@@ -7,14 +7,18 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.util.JSONUtils.FeedFields;
 
 /**
+ * TODO Add appropriate comments
  * Created by vivz on 01/10/15.
  */
 public class PostDeserializer implements JsonDeserializer<Post> {
+
+
     @Override
     public Post deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject root = json.getAsJsonObject();
@@ -23,6 +27,7 @@ public class PostDeserializer implements JsonDeserializer<Post> {
         final String createdTime = root.get(FeedFields.CREATED_TIME).getAsString();
         final String updatedTime = root.get(FeedFields.UPDATED_TIME).getAsString();
         final String type = root.get(FeedFields.TYPE).getAsString();
+
         post.setPostId(postId);
         post.setCreatedTime(createdTime);
         post.setUpdatedTime(updatedTime);

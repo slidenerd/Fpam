@@ -5,6 +5,9 @@ import org.parceler.Parcel;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
+/**
+ * TODO deal with attachments in some way
+ */
 @Parcel(implementations = {Post.class},
         value = Parcel.Serialization.BEAN,
         analyze = {Post.class})
