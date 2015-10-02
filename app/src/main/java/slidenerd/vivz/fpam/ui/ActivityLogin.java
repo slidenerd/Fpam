@@ -14,35 +14,27 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
-import com.google.gson.Gson;
 
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsMenu;
-import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
-import org.json.JSONException;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
 
-import io.realm.Realm;
-import slidenerd.vivz.fpam.ApplicationFpam;
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.admin.Admin;
-import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
 @EActivity(R.layout.activity_login)
 @OptionsMenu(R.menu.menu_activity_login)
-public class ActivityLogin extends AppCompatActivity implements FacebookCallback<LoginResult> {
+public class ActivityLogin extends AppCompatActivity implements FacebookCallback<LoginResult>, TaskFragment.TaskCallback {
+    private static final String TAG_TASK_FRAGMENT = "task_fragment";
     @ViewById(R.id.progress)
     ProgressBar mProgress;
+    private TaskFragment_ mTaskFragment;
     private CallbackManager mCallbackManager;
     private AlertDialog mDialog;
 
@@ -71,50 +63,22 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
         } else {
             if (FBUtils.isValidToken(accessToken)) {
                 mProgress.setVisibility(View.VISIBLE);
-                loadUserAndGroupsAsync(accessToken);
+                mTaskFragment.loadUserAndGroupsAsync(accessToken);
             } else {
                 L.m("access token is null or expired");
             }
         }
     }
 
-    @Background
-    void loadUserAndGroupsAsync(AccessToken accessToken) {
-        Realm realm = null;
-        try {
-            Gson gson = ApplicationFpam.getGson();
-            realm = Realm.getDefaultInstance();
-            Admin admin = FBUtils.requestMeSync(accessToken, gson);
-            if (admin == null) {
-                L.m("Fpam encountered problems downloading admin data, hence admin and groups data have not been downloaded");
-                return;
-            }
-            ArrayList<Group> listGroups = FBUtils.requestGroupsSync(accessToken, gson);
-            DataStore.storeAdmin(realm, admin);
-            DataStore.storeGroups(realm, listGroups);
-
-        } catch (JSONException e) {
-            L.m("" + e);
-        } finally {
-            if (realm != null) {
-                realm.close();
-            }
-            onUserAndGroupsLoaded();
-        }
-
-    }
-
-    @UiThread
-    void onUserAndGroupsLoaded() {
-        mProgress.setVisibility(View.GONE);
-        NavUtils.startActivityStats(ActivityLogin.this);
-        finish();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCallbackManager = CallbackManager.Factory.create();
+        mTaskFragment = (TaskFragment_) getSupportFragmentManager().findFragmentByTag(TAG_TASK_FRAGMENT);
+        if (mTaskFragment == null) {
+            mTaskFragment = new TaskFragment_();
+            getSupportFragmentManager().beginTransaction().add(mTaskFragment, TAG_TASK_FRAGMENT).commit();
+        }
     }
 
     /**
@@ -130,7 +94,6 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
         loginManager.registerCallback(mCallbackManager, this);
         loginManager.logInWithReadPermissions(this, Arrays.asList("email", "user_managed_groups", "user_friends"));
     }
-
 
     @Override
     public void onSuccess(LoginResult loginResult) {
@@ -154,4 +117,13 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
         super.onActivityResult(requestCode, resultCode, data);
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
+
+    @Override
+    public void onUserAndGroupsLoaded() {
+        mProgress.setVisibility(View.GONE);
+        NavUtils.startActivityStats(ActivityLogin.this);
+        finish();
+    }
+
+
 }

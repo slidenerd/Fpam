@@ -30,7 +30,7 @@
             android:layout_alignParentRight="true"
             android:paddingBottom="4dp"
             android:paddingTop="4dp"
-            android:text="@string/updatedTime"
+            android:text="@string/updated_time"
             android:textColor="@color/colorAccent" />
 
         <TextView

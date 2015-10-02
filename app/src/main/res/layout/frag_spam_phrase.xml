@@ -18,6 +18,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="@string/no_spam_phrases_found"
+        android:text="@string/text_empty_phrases"
         android:visibility="gone" />
 </FrameLayout>
