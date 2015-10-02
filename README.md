@@ -94,12 +94,12 @@ UPDATE 5 [September 29, 2015, 10 am]
 
 <ol>
 
-<li>Gson Deserializer for Admin and Group Done</li>
-<li>Eliminated Groups class to simplify model</li>
-<li>Pagination for Groups implemented</li>
-<li>SIMPLE DELETE for POSTS IMPLEMENTED</li>
-<li>Eliminate Feed model class</li>
-<li>Write Feed deserializer</li>
+<li><b>Gson Deserializer for Admin and Group Done</b></li>
+<li><b>Eliminated Groups class to simplify model</b></li>
+<li><b>Pagination for Groups implemented</b></li>
+<li><b>SIMPLE DELETE for POSTS IMPLEMENTED</b></li>
+<li><b>Eliminate Feed model class</b></li>
+<li><b>Write Feed deserializer</b></li>
 <li>Support pagination at the top and pagination at the bottom for posts</li>
 <li>Enforce database limits for storing posts</li>
 
@@ -111,7 +111,7 @@ UPDATE 5 [September 29, 2015, 10 am]
 <li>Support pagination for feeds</li>
 <li>Store comments and attachments</li>
 <li>use a sliding panel to display posts and comments</li>
-<li>Swipe to delete posts from facebook first and then from realm on success</li>
+<li><b>Swipe to delete posts from facebook first and then from realm on success</b></li>
 <li>Swipe to delete comments from facebook first and then from realm on success</li>
 <li>Cascade deletion of comments for a related post<li>
 <li>Commence analytics and spam processing work</li>
@@ -121,6 +121,20 @@ UPDATE 5 [September 29, 2015, 10 am]
 UPDATE 6, Oct 1 , 2015 [9:30 am - 1:30 pm]
 Hired Neel Raj by paying him 5000 bucks upfront for Fpam App design. 
 
+UPDATE 7, Oct 2, 2015 [8:20pm]
+
+What would complete Fpam?
+<ol>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+</ol>
 
 The Workflow
 
