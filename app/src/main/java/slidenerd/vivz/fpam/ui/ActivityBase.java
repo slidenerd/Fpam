@@ -23,23 +23,15 @@ import android.view.ViewStub;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.InstanceState;
-import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.sharedpreferences.Pref;
-import org.json.JSONException;
 import org.parceler.Parcels;
 
-import java.util.ArrayList;
-
-import io.realm.Realm;
 import slidenerd.vivz.fpam.ApplicationFpam;
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.prefs.MyPrefs_;
 import slidenerd.vivz.fpam.util.FBUtils;
@@ -49,13 +41,15 @@ import slidenerd.vivz.fpam.util.NavUtils;
  * Created by vivz on 06/08/15.
  */
 @EActivity
-public abstract class ActivityBase extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public abstract class ActivityBase extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, FeedTaskFragment.TaskCallback {
 
     public static final String DRAWER_FRAGMENT_TAG = "fragment_drawer";
+    private static final String TAG_TASK_FRAGMENT = "task_fragment";
     @Pref
     MyPrefs_ mPref;
     @InstanceState
     int mSelectedMenuId;
+    private FeedTaskFragment_ mTaskFragment;
     private Group mSelectedGroup;
     /*
     The Drawer Listener responsible for providing a handy way to tie together the functionality of DrawerLayout and the framework ActionBar to implement the recommended design for navigation drawers.
@@ -120,8 +114,11 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
         setSupportActionBar(mToolbar);
+        mTaskFragment = (FeedTaskFragment_) getSupportFragmentManager().findFragmentByTag(TAG_TASK_FRAGMENT);
         if (savedInstanceState == null) {
             mDrawer = new FragmentDrawer_();
+            mTaskFragment = new FeedTaskFragment_();
+            getSupportFragmentManager().beginTransaction().add(mTaskFragment, TAG_TASK_FRAGMENT).commit();
         } else {
             mDrawer = (FragmentDrawer_) getFragmentManager().findFragmentByTag(DRAWER_FRAGMENT_TAG);
             mSelectedGroup = Parcels.unwrap(savedInstanceState.getParcelable("selectedGroup"));
@@ -155,32 +152,6 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
         navigate();
     }
 
-    @Background
-    void loadFeed(@NonNull Group group) {
-        if (FBUtils.isValidToken(mAccessToken)) {
-            Realm realm = null;
-            try {
-                realm = Realm.getDefaultInstance();
-                ArrayList<Post> listPosts = FBUtils.requestFeedSync(mAccessToken, ApplicationFpam.getGson(), group);
-                DataStore.storeFeed(realm, listPosts);
-                onFeedLoaded("FeedFields Loaded For", group);
-            } catch (JSONException e) {
-                L.m("" + e);
-            } finally {
-                if (realm != null) {
-                    realm.close();
-                }
-            }
-        } else {
-            onFeedLoaded("Did not find a valid access token while loading", group);
-        }
-    }
-
-    @UiThread
-    void onFeedLoaded(String message, Group group) {
-        L.m(message + " " + group.getName());
-        notifyFeedLoaded(group);
-    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -223,7 +194,7 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
                 mSelectedGroup = mDrawer.getSelectedGroup(mSelectedMenuId);
                 if (mSelectedGroup != null) {
                     setTitle(mSelectedGroup.getName());
-                    loadFeed(mSelectedGroup);
+                    mTaskFragment.loadFeed(mSelectedGroup, ApplicationFpam.getFacebookAccessToken());
                 }
                 //If the selected id is not the default one, then hideDrawer the drawer. It is default if the user has not selected anything previously and sees the drawer for the first time.
                 if (mSelectedMenuId != Constants.GROUP_NONE) {
@@ -262,6 +233,11 @@ public abstract class ActivityBase extends AppCompatActivity implements Navigati
         loginManager.logOut();
     }
 
+    @Override
+    public void onFeedLoaded(String message, Group group) {
+        L.m(message + " " + group.getName());
+        notifyFeedLoaded(group);
+    }
 
     /**
      * @return the xml layout resource for your Activity that extends from our current one.

@@ -3,10 +3,10 @@ package slidenerd.vivz.fpam.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 
 import com.facebook.AccessToken;
-import com.google.gson.Gson;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EFragment;
@@ -19,15 +19,15 @@ import io.realm.Realm;
 import slidenerd.vivz.fpam.ApplicationFpam;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.admin.Admin;
+import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.FBUtils;
 
 @EFragment
-public class TaskFragment extends Fragment {
+public class FeedTaskFragment extends Fragment {
     TaskCallback mCallback;
 
-    public TaskFragment() {
+    public FeedTaskFragment() {
 
     }
 
@@ -50,29 +50,31 @@ public class TaskFragment extends Fragment {
     }
 
     @Background
-    void loadUserAndGroupsAsync(AccessToken accessToken) {
-        Realm realm = null;
-        try {
-            Gson gson = ApplicationFpam.getGson();
-            realm = Realm.getDefaultInstance();
-            Admin admin = FBUtils.requestMeSync(accessToken, gson);
-            if (admin == null) {
-                L.m("Fpam encountered problems downloading admin data, hence admin and groups data have not been downloaded");
-                return;
+    void loadFeed(@NonNull Group group, AccessToken accessToken) {
+        if (FBUtils.isValidToken(accessToken)) {
+            Realm realm = null;
+            try {
+                realm = Realm.getDefaultInstance();
+                ArrayList<Post> listPosts = FBUtils.requestFeedSync(accessToken, ApplicationFpam.getGson(), group);
+                DataStore.storeFeed(realm, listPosts);
+                onFeedLoaded("FeedFields Loaded For", group);
+            } catch (JSONException e) {
+                L.m("" + e);
+            } finally {
+                if (realm != null) {
+                    realm.close();
+                }
             }
-            ArrayList<Group> listGroups = FBUtils.requestGroupsSync(accessToken, gson);
-            DataStore.storeAdmin(realm, admin);
-            DataStore.storeGroups(realm, listGroups);
-
-        } catch (JSONException e) {
-            L.m("" + e);
-        } finally {
-            if (realm != null) {
-                realm.close();
-            }
-            onUserAndGroupsLoaded();
+        } else {
+            onFeedLoaded("Did not find a valid access token while loading", group);
         }
+    }
 
+    @UiThread
+    void onFeedLoaded(String message, Group group) {
+        if (mCallback != null) {
+            mCallback.onFeedLoaded(message, group);
+        }
     }
 
     @Override
@@ -81,14 +83,7 @@ public class TaskFragment extends Fragment {
         mCallback = null;
     }
 
-    @UiThread
-    void onUserAndGroupsLoaded() {
-        if (mCallback != null) {
-            mCallback.onUserAndGroupsLoaded();
-        }
-    }
-
     interface TaskCallback {
-        void onUserAndGroupsLoaded();
+        void onFeedLoaded(String message, Group group);
     }
 }

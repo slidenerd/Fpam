@@ -69,6 +69,8 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
             Group selectedGroup = Parcels.unwrap(intent.getExtras().getParcelable("selectedGroup"));
             RealmResults<Post> realmResults = mRealm.where(Post.class).beginsWith("postId", selectedGroup.getId()).findAllSorted("updatedTime", false);
             mAdapter.setData(realmResults);
+            if (!realmResults.isEmpty())
+                mRecyclerPosts.smoothScrollToPosition(0);
         }
     };
 

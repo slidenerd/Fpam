@@ -30,11 +30,11 @@ import slidenerd.vivz.fpam.util.NavUtils;
 
 @EActivity(R.layout.activity_login)
 @OptionsMenu(R.menu.menu_activity_login)
-public class ActivityLogin extends AppCompatActivity implements FacebookCallback<LoginResult>, TaskFragment.TaskCallback {
+public class ActivityLogin extends AppCompatActivity implements FacebookCallback<LoginResult>, LoginTaskFragment.TaskCallback {
     private static final String TAG_TASK_FRAGMENT = "task_fragment";
     @ViewById(R.id.progress)
     ProgressBar mProgress;
-    private TaskFragment_ mTaskFragment;
+    private LoginTaskFragment_ mTaskFragment;
     private CallbackManager mCallbackManager;
     private AlertDialog mDialog;
 
@@ -74,9 +74,9 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCallbackManager = CallbackManager.Factory.create();
-        mTaskFragment = (TaskFragment_) getSupportFragmentManager().findFragmentByTag(TAG_TASK_FRAGMENT);
+        mTaskFragment = (LoginTaskFragment_) getSupportFragmentManager().findFragmentByTag(TAG_TASK_FRAGMENT);
         if (mTaskFragment == null) {
-            mTaskFragment = new TaskFragment_();
+            mTaskFragment = new LoginTaskFragment_();
             getSupportFragmentManager().beginTransaction().add(mTaskFragment, TAG_TASK_FRAGMENT).commit();
         }
     }
