@@ -11,6 +11,8 @@ import com.google.gson.GsonBuilder;
 
 import org.androidannotations.annotations.EApplication;
 
+import java.util.Set;
+
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmObject;
@@ -25,7 +27,9 @@ import slidenerd.vivz.fpam.model.json.group.Group;
  * Created by vivz on 28/07/15.
  */
 @EApplication
-public class ApplicationFpam extends Application {
+public class Fpam extends Application {
+
+    private static final String PUBLISH_ACTIONS = "publish_actions";
 
     public static Gson getGson() {
         Gson gson = new GsonBuilder()
@@ -47,8 +51,26 @@ public class ApplicationFpam extends Application {
         return gson;
     }
 
-    public static AccessToken getFacebookAccessToken() {
+    public boolean hasToken() {
+        AccessToken token = getToken();
+        return token != null && !token.isExpired();
+    }
+
+    public AccessToken getToken() {
         return AccessToken.getCurrentAccessToken();
+    }
+
+    public boolean hasPermissionsPublishActions() {
+        if (hasToken()) {
+            AccessToken token = getToken();
+            Set<String> permissions = token.getPermissions();
+            return !permissions.isEmpty() && permissions.contains(PUBLISH_ACTIONS);
+        }
+        return false;
+    }
+
+    public boolean shouldRedirectToLogin() {
+        return !hasToken();
     }
 
     @Override

@@ -30,11 +30,11 @@ import slidenerd.vivz.fpam.util.NavUtils;
 
 @EActivity(R.layout.activity_login)
 @OptionsMenu(R.menu.menu_activity_login)
-public class ActivityLogin extends AppCompatActivity implements FacebookCallback<LoginResult>, LoginTaskFragment.TaskCallback {
+public class ActivityLogin extends AppCompatActivity implements FacebookCallback<LoginResult>, TaskFragmentLogin.TaskCallback {
     private static final String TAG_TASK_FRAGMENT = "task_fragment";
     @ViewById(R.id.progress)
     ProgressBar mProgress;
-    private LoginTaskFragment_ mTaskFragment;
+    private TaskFragmentLogin_ mTaskFragment;
     private CallbackManager mCallbackManager;
     private AlertDialog mDialog;
 
@@ -74,9 +74,9 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCallbackManager = CallbackManager.Factory.create();
-        mTaskFragment = (LoginTaskFragment_) getSupportFragmentManager().findFragmentByTag(TAG_TASK_FRAGMENT);
+        mTaskFragment = (TaskFragmentLogin_) getSupportFragmentManager().findFragmentByTag(TAG_TASK_FRAGMENT);
         if (mTaskFragment == null) {
-            mTaskFragment = new LoginTaskFragment_();
+            mTaskFragment = new TaskFragmentLogin_();
             getSupportFragmentManager().beginTransaction().add(mTaskFragment, TAG_TASK_FRAGMENT).commit();
         }
     }
@@ -111,7 +111,6 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
         L.t(ActivityLogin.this, "Couldn't connect with Facebook Servers " + e);
     }
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -122,8 +121,7 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
     @Override
     public void onUserAndGroupsLoaded() {
         mProgress.setVisibility(View.GONE);
-        NavUtils.startActivityStats(ActivityLogin.this);
+        NavUtils.startActivityChild(ActivityLogin.this);
         finish();
     }
-
 }

@@ -24,6 +24,7 @@ import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 
+import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
@@ -32,11 +33,10 @@ import org.json.JSONException;
 import org.parceler.Parcels;
 
 import java.util.Arrays;
-import java.util.Set;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import slidenerd.vivz.fpam.ApplicationFpam;
+import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.PostAdapter;
 import slidenerd.vivz.fpam.adapter.TouchHelper;
@@ -54,6 +54,8 @@ import slidenerd.vivz.fpam.widget.RecyclerViewEmptySupport;
 @EFragment
 public class FragmentPosts extends Fragment implements FacebookCallback<LoginResult>, PostAdapter.OnDeleteListener {
 
+    @App
+    Fpam mApplication;
     @InstanceState
     String mGroupId = Constants.GROUP_ID_NONE;
     private RecyclerViewEmptySupport mRecyclerPosts;
@@ -85,11 +87,11 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         mCallbackManager = CallbackManager.Factory.create();
         mLoginManager = LoginManager.getInstance();
         mLoginManager.registerCallback(mCallbackManager, this);
-        AccessToken accessToken = ApplicationFpam.getFacebookAccessToken();
-        Set<String> permissions = accessToken.getPermissions();
-        if (!permissions.contains("publish_actions")) {
+
+        if (!mApplication.hasPermissionsPublishActions()) {
             mLoginManager.logInWithPublishPermissions(FragmentPosts.this, Arrays.asList("publish_actions"));
         }
+
         mProgressDialog = new ProgressDialog(getActivity());
     }
 
@@ -145,7 +147,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         mProgressDialog.setMessage("Post was made by " + post.getUserName());
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.show();
-        onDelete(ApplicationFpam.getFacebookAccessToken(), position, post.getPostId());
+        onDelete(mApplication.getToken(), position, post.getPostId());
     }
 
     @Background

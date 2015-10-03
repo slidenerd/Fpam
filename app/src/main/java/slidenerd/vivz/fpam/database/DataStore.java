@@ -60,7 +60,7 @@ public class DataStore {
     public static Admin loadAdmin(Realm realm) {
         //read the picture data first
         Admin src = realm.where(Admin.class).findFirst();
-        return CopyUtils.duplicateAdmin(src);
+        return src != null ? CopyUtils.duplicateAdmin(src) : null;
     }
 
     public static void storeFeed(Realm realm, ArrayList<Post> listPosts) {

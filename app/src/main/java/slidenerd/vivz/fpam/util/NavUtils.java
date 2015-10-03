@@ -6,9 +6,7 @@ import android.content.Intent;
 import slidenerd.vivz.fpam.settings.ActivitySettings_;
 import slidenerd.vivz.fpam.ui.ActivityCache_;
 import slidenerd.vivz.fpam.ui.ActivityLogin_;
-import slidenerd.vivz.fpam.ui.ActivityMain_;
-import slidenerd.vivz.fpam.settings.ActivitySettings;
-import slidenerd.vivz.fpam.ui.ActivityLogin_;
+import slidenerd.vivz.fpam.ui.Child_;
 
 /**
  * Created by vivz on 28/07/15.
@@ -18,10 +16,6 @@ public class NavUtils {
         ActivityLogin_.intent(context).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP).start();
     }
 
-    public static void startActivityStats(Context context) {
-        ActivityMain_.intent(context).start();
-    }
-
     public static void startActivityCache(Context context) {
         ActivityCache_.intent(context).start();
     }
@@ -29,5 +23,9 @@ public class NavUtils {
     public static void startActivitySettings(Context context) {
         Intent intent = new Intent(context, ActivitySettings_.class);
         context.startActivity(intent);
+    }
+
+    public static void startActivityChild(Context context) {
+        Child_.intent(context).start();
     }
 }

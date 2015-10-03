@@ -1,29 +1,29 @@
 package slidenerd.vivz.fpam.ui;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.view.LayoutInflater;
+import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ViewById;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
 
 import io.realm.Realm;
-import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.database.DataStore;
+import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.group.Group;
@@ -31,20 +31,21 @@ import slidenerd.vivz.fpam.model.json.group.Group;
 /**
  * A simple {@link Fragment} subclass.
  */
-@EFragment
-public class FragmentDrawer extends Fragment {
+@EFragment(R.layout.drawer)
+public class Drawer extends Fragment {
 
-    private Admin mAdmin;
+    @ViewById(R.id.nav_view)
+    NavigationView mDrawer;
     /*
         The list of groups that the logged in user is an admin of.
      */
     private ArrayList<Group> mGroups = new ArrayList<>();
-    private NavigationView mDrawer;
+    private Admin mAdmin;
     private Context mContext;
-    private ActivityBase mActivity;
+    private Main mActivity;
     private Realm mRealm;
 
-    public FragmentDrawer() {
+    public Drawer() {
         // Required empty public constructor
     }
 
@@ -52,14 +53,14 @@ public class FragmentDrawer extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         this.mContext = context;
-        this.mActivity = (ActivityBase) context;
+        this.mActivity = (Main) context;
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         this.mContext = activity;
-        this.mActivity = (ActivityBase) activity;
+        this.mActivity = (Main) activity;
     }
 
     @Override
@@ -69,24 +70,16 @@ public class FragmentDrawer extends Fragment {
         if (savedInstanceState == null) {
             mAdmin = DataStore.loadAdmin(mRealm);
             mGroups = DataStore.loadGroups(mRealm);
-            L.m("Loading From Realm " + mAdmin.getId() + " " + mAdmin.getEmail() + " " + mAdmin.getFirstName() + " " + mAdmin.getLastName() + " " + mAdmin.getWidth() + " " + mAdmin.getHeight() + " " + mAdmin.getUrl() + " " + mAdmin.isSilhouette());
+            L.m("Loading From Realm ");
         } else {
             mAdmin = Parcels.unwrap(savedInstanceState.getParcelable("admin"));
             mGroups = Parcels.unwrap(savedInstanceState.getParcelable("groups"));
-            L.m("Loading From Parceler " + mAdmin.getId() + " " + mAdmin.getEmail() + " " + mAdmin.getFirstName() + " " + mAdmin.getLastName() + " " + mAdmin.getWidth() + " " + mAdmin.getHeight() + " " + mAdmin.getUrl() + " " + mAdmin.isSilhouette());
+            L.m("Loading From Parceler ");
         }
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_drawer, container, false);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        mDrawer = (NavigationView) view.findViewById(R.id.drawer_frame_layout);
+    @AfterViews
+    public void onViewCreated() {
         mDrawer.setNavigationItemSelectedListener(mActivity);
         if (mAdmin != null) {
             addHeaderToDrawer(mAdmin);
@@ -109,9 +102,11 @@ public class FragmentDrawer extends Fragment {
      */
 
     public void addHeaderToDrawer(@NonNull Admin admin) {
-        View headerView = mDrawer.inflateHeaderView(R.layout.drawer_header);
-        TextView textUser = (TextView) headerView.findViewById(R.id.text_user);
-        textUser.setText(admin.getFirstName() + " " + admin.getLastName());
+        View headerView = mDrawer.inflateHeaderView(R.layout.nav_header_main);
+        TextView textUserName = (TextView) headerView.findViewById(R.id.text_username);
+        TextView textEmail = (TextView) headerView.findViewById(R.id.text_email);
+        textUserName.setText(admin.getFirstName() + " " + admin.getLastName());
+        textEmail.setText(admin.getEmail());
     }
 
     /**
@@ -145,15 +140,8 @@ public class FragmentDrawer extends Fragment {
      */
     @Nullable
     public Group getSelectedGroup(int selectedMenuId) {
-        Group group = null;
-        if (!mGroups.isEmpty()) {
-            int position = selectedMenuId - Constants.MENU_START_ID;
-            //if we have a valid position between 0 to number of items in the list, then retrieve the item at that position
-            if (position < mGroups.size() && position >= 0) {
-                group = mGroups.get(position);
-            }
-        }
-        return group;
+        int sPosition = selectedMenuId - Constants.MENU_START_ID;
+        return !mGroups.isEmpty() && sPosition < mGroups.size() ? mGroups.get(sPosition) : null;
     }
 
     @Override

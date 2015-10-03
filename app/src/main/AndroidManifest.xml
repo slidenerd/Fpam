@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:name=".ApplicationFpam_"
+        android:name=".Fpam_"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -26,15 +26,7 @@
         <activity
             android:name=".ui.ActivityLogin_"
             android:label="@string/title_activity_login" />
-        <activity
-            android:name=".ui.ActivityMain_"
-            android:label="@string/title_activity_main">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <activity
             android:name=".ui.ActivityCache_"
             android:label="@string/title_activity_cache" />
@@ -47,11 +39,15 @@
             android:exported="false" />
 
         <activity
-            android:name=".ui.TestActivity1"
-            android:label="@string/title_activity_test1"></activity>
-        <activity
-            android:name=".ui.TestActivity2"
-            android:label="@string/title_activity_test2"></activity>
+            android:name=".ui.Child_"
+            android:label="@string/title_activity_child"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

@@ -15,13 +15,10 @@
     <string name="key_links_blacklist">key_links_blacklist</string>
     <string name="key_links_whitelist">key_links_whitelist</string>
     <string name="text_empty_phrases">You have not added any spam words or phrases yet. What do you say we add some stuff to kick the spammers out?</string>
-    <string name="title_activity_test1">Test 1</string>
-
     <string name="hello_world">Hello world!</string>
-    <string name="title_activity_test2">Test 2</string>
     <string name="already_added_item">You already added this item %s</string>
 
-<!-- TODO: Remove or change this placeholder text -->
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="fragment_drawer_tag">fragment_drawer</string>
     <string name="title_export_database">Export Database</string>
@@ -31,4 +28,10 @@
     <string name="updated_time">Updated Time</string>
     <string name="message">Message</string>
     <string name="text_empty_posts">No Posts To Display</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="title_activity_child">Fpam</string>
+    <string name="text_placeholder_name">Vladimir Makarov</string>
+    <string name="text_placeholder_email">vivek.officialr@gmail.com</string>
 </resources>
