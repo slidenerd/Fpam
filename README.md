@@ -179,163 +179,231 @@ Analytics [Overall for each post]
 </ul>
 
 <ul>
-
-    <li>Read a post and scan its message [includes name, caption, description if present], LINK_TAG, picture and person who posted it</li>
-    <li>Is this person present in the spammers database?</li>
-    <li>A POST at this point may contain anything [LINK_TAG, picture, message etc]</li>
-    <ul>
-        <li>Regardless of whether the post is a spam or not, [for analytics purpose]</li>
-        <li>If THE PERSON IS A KNOWN SPAMMER, 
-            <ul>
-                <li>Delete the post</li>
-                <li>Increment the number of spam posts made by the person</li>
-                <li>What time was it created?</li>
-                <li>What time was it updated?</li>
-                <li>Are the update_time and create_time the same? This gives data regarding whether spammers come back and update their posts or they simply keep the same content</li>
-            </ul>
-        </li>
-        <li> If THE PERSON IS NOT IN THE SPAMMER's DATABASE, process each aspect of the post with priority to eliminate the post as fast as possible
-            <ul>
-                <li>Are LINK_TAG posts allowed? A POST at this point may contain anything [LINK_TAG, picture, message etc]</li>
-                    <li>If LINK_TAG posts are not allowed,
-                        <ul>
-                            <li>Delete the post</li>
-                            <li>Add this person to the spammers database and increment the number of posts made by him/her
-                                <ul>
-                                    <li>Is the link present in the blacklist [for analytics purpose]
-                                        <ul>
-                                            <li>If Yes, increase the number of times this link was found in the blacklist</li>
-                                            <li>Properties of this link [for analytics purpose]
-                                                <ul>
-                                                    <li>number of characters in the primary domain name [stackoverflow = 13]</li>
-                                                    <li>number of characters in the domain extension [.com = 3]</li>
-                                                    <li>type of domain extension [.com, .io, .org etc]</li>
-                                                    <li>does the url have a path</li>
-                                                </ul>
-                                            </li>
-                                            <li>If No, do nothing here</li>
-                                        </ul>
-                                    </li>
-                                    <li>Is the link present in the whitelist [for analytics purpose]
-                                        <ul>
-                                            <li>If Yes, increase the number of times this link was found in the whitelist</li>
-                                            <li>Properties of this link [for analytics purpose]
-                                                <ul>
-                                                    <li>number of characters in the primary domain name [stackoverflow = 13]</li>
-                                                    <li>number of characters in the domain extension [.com = 3]</li>
-                                                    <li>type of domain extension [.com, .io, .org etc]</li>
-                                                    <li>does the url have a path</li>
-                                                </ul>
-                                            </li>
-                                            <li>If No, do nothing here</li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>    
-                    </li>
-                    <li>If Yes, jump to picture allowed</li>
-                <li>Are Pictures Allowed?</li>
-                <li>If No,
-                    <ul>
-                        <li>Delete the post</li>
-                        <li>Add this person to the spammers database and increment the number of posts made by him/her</li>
-                    </ul>
-                </li>
-                <li>If Yes, jump to message processing</li>
-                <li>What type of message is it?
-                    <ul>
-                        <li>Message with no text
-                            <ul>
-                                <li>Are empty messages allowed?
-                                    <ul>
-                                        <li>If No, 
-                                            <ul>
-                                                <li>Delete the post</li>
-                                                <li>Add this person to the spammers database and increment the number of posts made by him/her</li>
-                                            </ul>
-                                        </li>
-                                        <li>If Yes, <b>What to do if picture is found here?</b></li>   
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>Message with only text
-                            <ul>
-                                <li>Does it have spam phrases or words?
-                                    <ul>
-                                        <li>If No, jump to link processing</li>
-                                        <li>If Yes, 
-                                            <ul>
-                                                <li>Delete the post</li>
-                                                <li>Add this person to the spammers database</li>
-                                                <li>Increment the number of posts made by him/her.</li>
-                                                <li>Increment the number of times the spam word or words were found</li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>Message with only link in its contents
-                            <ul>
-                                <li><b>jump to link processsing</b></li>
-                            </ul>
-                        </li>
-                        <li>Message with text and link in its contents
-                            <ul>
-                                <li>Does it have spam phrases or words?
-                                    <ul>
-                                        <li>If No, jump to message link processing</li>
-                                        <li>If Yes, 
-                                            <ul>
-                                                <li>Delete the post</li>
-                                                <li>Add this person to the spammers database</li>
-                                                <li>Increment the number of posts made by him/her.</li>
-                                                <li>Increment the number of times the spam word or words were found</li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li>jump to link processing</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-                <li>For link processing
-                    <ul>
-                        <li>Regardless of where the link is found, analyze properties of this link [for analytics purpose]
-                            <ul>
-                                <li>number of characters in the primary domain name [stackoverflow = 13]</li>
-                                <li>number of characters in the domain extension [.com = 3]</li>
-                                <li>type of domain extension [.com, .io, .org etc]</li>
-                                <li>does the url have a path</li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <ul>
-                        <li>Is the link present in the blacklist?
-                            <ul>
-                                <li>Delete the post</li>
-                                <li>Add this person to the spammers database and increment the number of posts made by him/her</li>
-                            </ul>
-                        </li>
-                        <li>Is the link present in the whitelist?
-                            <ul>
-                                <li>Approve the post</li>
-                            </ul>
-                        </li>
-                        <li>Is the link uncategorized?
-                            <ul>
-                                <li>Store this link in a data structure where the link is unique and a single link points to several post ids.</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </li>
-    
-    </ul>
-    </li>
-
+	<dl>
+		<dt>CONTENT</dt>
+		<dd>A post contains several optional fields such as name, message, caption, description, link and the person who posted it (person is optional as well) which will be referred to henceforth as CONTENT</dd>
+		<dt>MESSAGE</dt>
+		<dd>A post may or may not contain data for the json tag message which will be referred to henceforth as MESSAGE</dd>
+		<dt>LINK_CONTENT</dt>
+		<dd>A post may has 0 to many links inside the message json tag which will be referred to henceforth as LINK_CONTENT </dd>
+		<dt>LINK_TAG</dt>
+		<dd>A post may have 0 or 1 link tag in its json feed which will be referred to henceforth as LINK_TAG</dd>
+		<dt>LINK_SET</dt>
+		<dd>A post may contain 0 to many LINK_CONTENT or LINK_TAG items which will be combined referred to henceforth as LINK_SET</dd>
+		<dt>NON EXISTING USER</dt>
+		<dd>The data of a person making a post may or may not be available depending on whether the person's facebook profile is intact on Facebook. If there is no data regarding the person who made a post, that post is considered rogue and attributed to a fictional user called NON EXISTING USER</dd>
+	</dl>
+	<li>Extract the set of all links from a post which consitute the LINK_SET. The goal of the algorithm is to decide if a post is spam as fast as possible.
+	<ol>
+		<li>Read a post</li>
+		<li>Is there a person available for this post? {A person may be null if he/she was banned or doesnt exist on Facebook anymore}
+		<ul>
+			<li>If PERSON not available,
+			<ol>
+				<li>Delete the post</li>
+				<li>Find the group id where this post was made.</li>
+				<li>Increment the number of posts made by NON EXISTING USER for that group id</li>
+				<li>Skip FURTHER PROCESSING</li>
+			</ol>
+			</li>
+			<li>If PERSON is available, PROCESS THE PERSON</li>
+		</ul>
+		</li>
+		<li>PROCESS THE PERSON
+		<ul>
+			<li>Is the person in the SPAMMERS database?
+			<ol>
+				<li>Delete the post</li>
+				<li>Note the group id where this post was made</li>
+				<li>Increment the number of spam posts made by this person under that group id</li>
+				<li>Note the created time of this post [analytics]</li>
+				<li>Note the updated time of this post [analytics]</li>
+				<li>Note whether created time and updated time are same or different? [analytics]</li>
+				<li>Skip FURTHER PROCESSING</li>
+			</ol>
+			</li>
+			<li>If the person is NOT present in the SPAMMERS database, process that element first on the basis of which we can instantly classify this as a SPAM post or GOOD post. The post can be eliminated very quickly as SPAM if PICTURES are not allowed by the admin or LINK_SET is not allowed by the admin. The post will require significant amount of processing to check for spam words and even more processing if has to check LINK_SET since it requires admin approval. Jump to CHECK FOR PICTURE</li>
+		</ul>
+		</li>
+		<li>CHECK FOR PICTURE, does the post contain a picture?
+			<ul>
+				<li>If NO PICTURE is found, jump to PROCESS THE CONTENT</li>
+				<li>If PICTURE is found, has the admin allowed posts to be made that contain a PICTURE?
+				<ul>
+					<li>If NOT ALLOWED,
+					<ol>
+						<li>Delete the post</li>
+						<li>Note the group id where this post was made</li>
+						<li>Add this person to the SPAMMERS database</li>
+						<li>Increment the number of spam posts made by this person under that group id</li>
+						<li>Note the created time of this post [analytics]</li>
+						<li>Note the updated time of this post [analytics]</li>
+						<li>Note whether created time and updated time are same or different [analytics]</li>
+						<li>Skip FURTHER PROCESSING</li>
+					</ol>
+					</li>
+					<li>If ALLOWED, it means our post at this post contains a PICTURE for certain and may include other optional entities which would be CONTENT or LINK_SET Jump to PROCESS THE CONTENT</li>
+				</ul>
+				</li>
+			</ul>
+		</li>
+		<li>PROCESS THE CONTENT, What type of content is it? There are 4 types of posts 
+		<dl>
+			<dt>MESSAGE_EMPTY</dt>
+			<dd>A post with no message tag data but may contain data in the other fields such as name, caption, description which will referred to henceforth as MESSAGE_EMPTY</dd>
+			<dl>MESSAGE_ONLY_LINK</dl>
+			<dd>A post with message tag that has only a link in it also known as LINK_CONTENT and may contain data in the other fields such as name, caption, description which will be referred to henceforth as MESSAGE_ONLY_LINK</dd>
+			<dl>MESSAGE_TEXT</dl>
+			<dd>A post with message tag that has only text and may contain data in the other fields such as name, caption, description which will be referred to henceforth as MESSAGE_TEXT</dd>
+			<dl>MESSAGE_TEXT_AND_LINK</dl>
+			<dd>A post with message that that has text and LINK_CONTENT and may contain data in the other fields such as name, caption, description which will be referred to henceforth as MESSAGE_TEXT_AND_LINK</dd>
+		</dl>
+		<ol>
+			<li>For a post of type MESSAGE_EMPTY
+			<ul>
+				<li>If MESSAGE is NOT found, does the ADMIN allow empty posts? or posts that do not have a MESSAGE in them?
+					<ul>
+						<li>If no which implies that post is empty and the admin doesnt allow it,
+						<ol>
+							<li>Delete the post</li>
+							<li>Note the group id where this post was made</li>
+							<li>Add this person to the SPAMMERS database</li>
+							<li>Increment the number of spam posts made by this person under that group id</li>
+							<li>Note the created time of this post [analytics]</li>
+							<li>Note the updated time of this post [analytics]</li>
+							<li>Note whether created time and updated time are same or different [analytics]</li>
+							<li>Skip FURTHER PROCESSING</li>
+						</ol> 
+						</li>
+						<li>If yes which implies that the post has a message which is empty and the admin allows it, but we need to process the other elements  such as {name, caption, description}, does this post contain OPTIONAL elements? 
+						<ul>
+							<li>When the post contains only OPTIONAL elements, PROCESS OPTIONAL ELEMENTS</li>
+							<li>When the post contains only LINK_SET, PROCESS LINK SET</li>
+							<li>When the post has no OPTIONAL elements  and no LINK_SET delete the post since there is nothing meaningful in the post</li>
+							<li>When the post has both OPTIONAL elements and LINK_SET, first PROCESS OPTIONAL ELEMENTS and then based on the outcome {if its a spam or not} PROCESS LINK SET {if it was not spam from the previous step}</li>
+						</ul>
+						</li>
+					</ul>
+				</li>
+			</ul>
+			</li>
+			<li>For a post of type MESSAGE_TEXT, does the post contain words or phrases that match with one or more words or phrases from the spam database?
+			<ul>
+				<li>If NO MATCH found, 
+				<ul>
+					<li>When the post contains only OPTIONAL elements, PROCESS OPTIONAL ELEMENTS</li>
+					<li>When the post contains only LINK_SET, PROCESS LINK SET</li>
+					<li>When the post has no OPTIONAL_ELEMENTS and no LINK_SET approve the post</li>
+					<li>When the post has both OPTIONAL elements and LINK_SET, first PROCESS OPTIONAL ELEMENTS and then based on the outcome {if its a spam or not} PROCESS LINK SET {if it was not spam from the previous step}</li>
+				</ul>
+				</li>
+				<li>If one or more matches are found, 
+				<ol>
+					<li>Delete the post</li>
+					<li>Note the group id where this post was made</li>
+					<li>Add this person to the SPAMMERS database</li>
+					<li>Increment the number of spam posts made by this person under that group id</li>
+					<li>Increment the counter of each spam word that was a match [analytics]</li>
+					<li>Note the created time of this post [analytics]</li>
+					<li>Note the updated time of this post [analytics]</li>
+					<li>Note whether created time and updated time are same or different [analytics]</li>
+					<li>Skip FURTHER PROCESSING</li>
+				</ol>
+				</li>
+			</ul>
+			</li>
+			<li>For a post of type MESSAGE_ONLY_LINK, our job is to classify a post as spam as fast as possible with minimal user input. Since the post has only a LINK_CONTENT and optional elements, the LINK_CONTENT will require manual admin approval but the optional elements such as caption, name or description can be used to indicate if a post must be classfied as spam or not
+			<ul>
+				<li>When the post contains only OPTIONAL elements, PROCESS OPTIONAL ELEMENTS</li>
+				<li>When the post contains only LINK_SET, PROCESS LINK SET</li>
+				<li>Since we already have a LINK_CONTENT, we dont encounter a case where the post has neither OPTIONALS nor LINK_SET</li>
+				<li>When the post has both OPTIONAL elements and LINK_SET, first PROCESS OPTIONAL ELEMENTS and then based on the outcome {if its a spam or not} PROCESS LINK SET {if it was not spam from the previous step}</li>
+			</ul>
+			</li>
+			<li>For a post of type MESSAGE_TEXT_AND_LINK, lets first process the message part that may tell us if it is a spam by simply doing spam word comparisons, if the outcome of the spam word comparisons is not conclusive, then PROCESS OPTIONAL ELEMENTS and depending on the outcome there, make a further jump to PROCESS LINK SET 
+			<ul>
+				<li>Does the post contain words or phrases that match with one or more words or phrases from the spam database?
+				<ul>
+					<li>If NO MATCH found, 
+					<ul>
+						<li>When the post contains only OPTIONAL elements, PROCESS OPTIONAL ELEMENTS and then based on the outcome {if its a spam or not}, PROCESS LINK SET{if it was not spam from the previous step}</li>
+						<li>When the post contains only LINK_SET, PROCESS LINK SET</li>
+						<li>Since we already have a LINK_CONTENT, we dont encounter a case where the post has neither OPTIONALS nor LINK_SET</li>
+						<li>When the post has both OPTIONAL elements and LINK_SET, PROCESS OPTIONAL ELEMENTS and then based on the outcome {if its a spam or not}, PROCESS LINK SET{if it was not spam from the previous step}</li>
+					</ul>
+					</li>
+					<li>If one or more matches are found, 
+					<ol>
+						<li>Delete the post</li>
+						<li>Note the group id where this post was made</li>
+						<li>Add this person to the SPAMMERS database</li>
+						<li>Increment the number of spam posts made by this person under that group id</li>
+						<li>Increment the counter of each spam word that was a match [analytics]</li>
+						<li>Note the created time of this post [analytics]</li>
+						<li>Note the updated time of this post [analytics]</li>
+						<li>Note whether created time and updated time are same or different [analytics]</li>
+						<li>Skip FURTHER PROCESSING</li>
+					</ol>
+					</li>
+				</ul>
+				</li>
+			</ul>
+			</li>
+		</ol>
+		</li>
+		<li>PROCESS OPTIONAL ELEMENTS
+		<ul>
+			<li>Does the combination of the optional elements name, description, caption contain words or phrases that match with one or more words or phrases from the spam database?
+			<ul>
+				<li>If NO MATCH found, then jump to PROCESS LINK SET</li>
+				<li>If one or more matches are found, 
+				<ol>
+					<li>Delete the post</li>
+					<li>Note the group id where this post was made</li>
+					<li>Add this person to the SPAMMERS database</li>
+					<li>Increment the number of spam posts made by this person under that group id</li>
+					<li>Increment the counter of each spam word that was a match [analytics]</li>
+					<li>Note the created time of this post [analytics]</li>
+					<li>Note the updated time of this post [analytics]</li>
+					<li>Note whether created time and updated time are same or different [analytics]</li>
+					<li>Skip FURTHER PROCESSING</li>
+				</ol>
+				</li>
+			</ul>
+			</li>
+		</ul>
+		</li>
+		<li>PROCESS LINK SET, the link can be either in the whitelist or in the blacklist or it can be uncategorized currently which means the admin must approve it
+		<ol>
+			<li>Is the link present in the blacklist?
+			<ol>
+				<li>Delete the post</li>
+				<li>Note the group id where this post was made</li>
+				<li>Add this person to the SPAMMERS database</li>
+				<li>Increment the number of spam posts made by this person under that group id</li>
+				<li>Increment the number of times this link was found in the blacklist for that group id</li>
+				<li>Note the created time of this post [analytics]</li>
+				<li>Note the updated time of this post [analytics]</li>
+				<li>Note whether created time and updated time are same or different [analytics]</li>
+				<li>Skip FURTHER PROCESSING</li>
+			</ol>
+			</li>
+			<li>Is the link present in the whitelist?
+			<ol>
+				<li>Approve the post</li>
+				<li>Note the group id where this post was made</li>
+				<li>Increment the number of total posts made</li>
+			</ol>
+			</li>
+			<li>Is the link uncategorized?
+			<ol>
+				<li>Extract the base url of this link</li>
+				<li>Add this base url to the unique set of urls that need approval</li>
+				<li>Associate this post id along with the set of other post ids that rely on the approval of the admin for this url</li>
+			</ol>
+			</li>
+		</ol>
+		</li>
+	</ol>
+	</li>
 </ul>
