@@ -149,48 +149,55 @@ When the user clicks on a group, load the posts with that group postId and store
 
 The Algorithm
 
-The 4 pieces of information that we need to analyze are : the person who posted, the message that was posted if any, the link tag if any and the picture if any. The message that was posted may be of 4 types 1) no message or no text 2) only text 3) message with only a link inside its contents 4)message with text and one or more link in its contents.
+There are some important considerations about how data is processed with Fpam, links may be from facebook either in the picture section or the link section or the message section. The question is on how to deal with links from Facebook.
+
+A link/links found within the description or caption or message will be hence forth called LINK_CONTENT and a link found within the link tag in the json feed if it is non null will be hence forth called LINK_TAG.
+
+The 4 pieces of information that we need to analyze are : the person who posted, the message that was posted if any, the LINK_TAG if any and the picture if any. The message that was posted may be of 4 types 1) no message or no text 2) only text 3) message with only LINK_CONTENT inside its contents 4)message with text and one or more LINK_CONTENT in its contents.
+
+Analytics [Overall for each post]
+
+<ul>
+    <li>Which group is this post read from? Track the group id</li>
+    <li>How many posts have been read so far? Increment the number of posts read so far.</li>
+    <li>What are the properties of this post?
+        <ul>
+            <li>Language in which this post is written [Implement if possible now]</li>
+            <li>Does it have a link tag?</li>
+            <li>Does it have a picture tag?</li>
+            <li>Does it have a message tag?
+                <ul>
+                    <li>Number of words</li>
+                    <li>Number of characters</li>
+                    <li>Percentage of capslock or capital to small letters [spam posts often have capital letters in them]</li>
+                    <li>Number of emoticons detected [spam posts often use many emoticons]</li>
+                    <li>Percentage of emoticons to actual content in the post</li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+</ul>
 
 <ul>
 
-    <li>Read a post and scan its message, link from its link property, picture and person who posted it</li>
+    <li>Read a post and scan its message [includes name, caption, description if present], LINK_TAG, picture and person who posted it</li>
     <li>Is this person present in the spammers database?</li>
+    <li>A POST at this point may contain anything [LINK_TAG, picture, message etc]</li>
     <ul>
-        <li>Regardless of whether the post is a spam or not, [for analytics purpose]
-            <ul>
-                <li>Which group is this post read from? Track the group id</li>
-                <li>How many posts have been read so far? Increment the number of posts read so far.</li>
-                <li>What are the properties of this post?
-                    <ul>
-                        <li>Language in which this post is written [Implement if possible now]</li>
-                        <li>Does it have a link tag?</li>
-                        <li>Does it have a picture tag?</li>
-                        <li>Does it have a message tag?
-                            <ul>
-                                <li>Number of words</li>
-                                <li>Number of characters</li>
-                                <li>Percentage of capslock or capital to small letters [spam posts often have capital letters in them]</li>
-                                <li>Number of emoticons detected [spam posts often use many emoticons]</li>
-                                <li>Percentage of emoticons to actual content in the post</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </li>
-        <li>If Yes, 
+        <li>Regardless of whether the post is a spam or not, [for analytics purpose]</li>
+        <li>If THE PERSON IS A KNOWN SPAMMER, 
             <ul>
                 <li>Delete the post</li>
                 <li>Increment the number of spam posts made by the person</li>
                 <li>What time was it created?</li>
                 <li>What time was it updated?</li>
-                <li>Are the update_time and create_time the same?</li>
+                <li>Are the update_time and create_time the same? This gives data regarding whether spammers come back and update their posts or they simply keep the same content</li>
             </ul>
         </li>
-        <li> If No,
+        <li> If THE PERSON IS NOT IN THE SPAMMER's DATABASE, process each aspect of the post with priority to eliminate the post as fast as possible
             <ul>
-                <li>Are link tags allowed?</li>
-                    <li>If No,
+                <li>Are LINK_TAG posts allowed? A POST at this point may contain anything [LINK_TAG, picture, message etc]</li>
+                    <li>If LINK_TAG posts are not allowed,
                         <ul>
                             <li>Delete the post</li>
                             <li>Add this person to the spammers database and increment the number of posts made by him/her
