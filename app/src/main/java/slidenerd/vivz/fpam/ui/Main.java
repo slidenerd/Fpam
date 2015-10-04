@@ -1,5 +1,6 @@
 package slidenerd.vivz.fpam.ui;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -39,6 +40,7 @@ public abstract class Main extends AppCompatActivity
 
     @App
     Fpam mApplication;
+    private ProgressDialog mProgress;
     private TaskFragmentFeed_ mTask;
     private Drawer_ mDrawer;
     private FloatingActionButton mFab;
@@ -89,6 +91,7 @@ public abstract class Main extends AppCompatActivity
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
+        mProgress = new ProgressDialog(this);
         onCreateUserInterface(tabLayout, mainContentView);
     }
 
@@ -132,7 +135,7 @@ public abstract class Main extends AppCompatActivity
                     return false;
                 }
                 setTitle(group.getName());
-                mTask.loadFeed(group, mApplication.getToken());
+                mTask.beforeLoadFeed(group, mApplication.getToken());
                 break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -141,7 +144,15 @@ public abstract class Main extends AppCompatActivity
     }
 
     @Override
-    public void onFeedLoaded(String message, Group group) {
+    public void beforeFeedLoaded(String message) {
+        mProgress.setTitle("Loading...");
+        mProgress.setMessage(message);
+        mProgress.show();
+    }
+
+    @Override
+    public void afterFeedLoaded(String message, Group group) {
+        mProgress.dismiss();
         Snackbar.make(mFab, message + " " + group.getName(), Snackbar.LENGTH_LONG)
                 .setAction("Yay!", null).show();
         notifyFeedLoaded(group);

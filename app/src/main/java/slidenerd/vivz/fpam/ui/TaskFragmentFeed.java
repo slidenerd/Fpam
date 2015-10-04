@@ -50,15 +50,22 @@ public class TaskFragmentFeed extends Fragment {
     }
 
 
+    void beforeLoadFeed(@NonNull Group group, AccessToken accessToken) {
+        if (mCallback != null) {
+            mCallback.beforeFeedLoaded("Loading posts for the group " + group.getName());
+        }
+        onLoadFeed(group, accessToken);
+    }
+
     @Background
-    void loadFeed(@NonNull Group group, AccessToken accessToken) {
+    void onLoadFeed(@NonNull Group group, AccessToken accessToken) {
         if (FBUtils.isValidToken(accessToken)) {
             Realm realm = null;
             try {
                 realm = Realm.getDefaultInstance();
                 ArrayList<Post> listPosts = FBUtils.requestFeedSync(accessToken, Fpam.getGson(), group);
                 DataStore.storeFeed(realm, listPosts);
-                onFeedLoaded("FeedFields Loaded For", group);
+                afterFeedLoaded("FeedFields Loaded For", group);
             } catch (JSONException e) {
                 L.m("" + e);
             } finally {
@@ -67,14 +74,14 @@ public class TaskFragmentFeed extends Fragment {
                 }
             }
         } else {
-            onFeedLoaded("Did not find a valid access token while loading", group);
+            afterFeedLoaded("Did not find a valid access token while loading", group);
         }
     }
 
     @UiThread
-    void onFeedLoaded(String message, Group group) {
+    void afterFeedLoaded(String message, Group group) {
         if (mCallback != null) {
-            mCallback.onFeedLoaded(message, group);
+            mCallback.afterFeedLoaded(message, group);
         } else {
             L.m("callback was null");
         }
@@ -87,6 +94,8 @@ public class TaskFragmentFeed extends Fragment {
     }
 
     interface TaskCallback {
-        void onFeedLoaded(String message, Group group);
+        void beforeFeedLoaded(String message);
+
+        void afterFeedLoaded(String message, Group group);
     }
 }
