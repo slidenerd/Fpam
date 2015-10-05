@@ -49,7 +49,6 @@ public class TaskFragmentFeed extends Fragment {
         setRetainInstance(true);
     }
 
-
     void beforeLoadFeed(@NonNull Group group, AccessToken accessToken) {
         if (mCallback != null) {
             mCallback.beforeFeedLoaded("Loading posts for the group " + group.getName());

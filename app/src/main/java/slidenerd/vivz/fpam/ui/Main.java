@@ -30,6 +30,7 @@ import org.parceler.Parcels;
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.util.DatabaseUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
 @EActivity
@@ -55,8 +56,6 @@ public abstract class Main extends AppCompatActivity
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        ImageView imageBackdrop = (ImageView) findViewById(R.id.app_bar_backdrop);
 
         mFab = (FloatingActionButton) findViewById(R.id.fab);
         mFab.setOnClickListener(new View.OnClickListener() {
@@ -113,6 +112,12 @@ public abstract class Main extends AppCompatActivity
     @OptionsItem(R.id.action_settings)
     boolean onSettingsSelected() {
         NavUtils.startActivitySettings(this);
+        return true;
+    }
+
+    @OptionsItem(R.id.action_export)
+    boolean onExportDatabaseSelected() {
+        DatabaseUtils.exportDatabase(this);
         return true;
     }
 

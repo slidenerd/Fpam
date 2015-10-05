@@ -6,4 +6,9 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_export"
+        android:orderInCategory="200"
+        android:title="@string/title_export_database"
+        app:showAsAction="never" />
 </menu>
