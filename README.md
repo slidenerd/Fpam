@@ -142,6 +142,21 @@ What would complete Fpam?
 <li>Figure out scrap post deletion [post deleted from facebook but present in fpam database] [HIGH]</li>
 </ol>
 
+UPDATE 8, Oct 5, 2015 [4:30pm]
+
+Make the MVP of fpam capable of only blocking people in v1. This will ensure the app is released aptly, before 17th October 2015. 
+
+<h3>Things needed for the MVP Fpam v1.0</h3>
+<ul>
+	<li>Process only spammers in v1.0</li>
+	<li>let admin decide which groups to scan</li>
+	<li>If a post is deleted, mark the person as a spammer and block all further posts from that person for all groups.</li>
+	<li>A spammer is a member of usually more than one group and as such, keep a track of the user id, user name of the spammer, list of group ids where he is a member of and the number of times he or she has spammed.</li>
+	<li>Enable spam filtering for both posts and comments {show the dual pane with posts and comments} and delete the post or comment on swipe and add the person to the blacklist if he/she is not already a member</li>
+	<li>Send data about spammers to the server fpam.io with the same information, [userid, username, list of group ids where the spammer is a member of and the number of spam posts he or she has made] corresponding to a user id or the person using the app fpam.</li>
+</ul>
+
+
 The Workflow
 
 When the user logs in, get the list of groups and user details and store them in Realm. 
