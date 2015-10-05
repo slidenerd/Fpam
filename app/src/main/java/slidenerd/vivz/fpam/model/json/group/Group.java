@@ -20,6 +20,8 @@ public class Group extends RealmObject {
 
     private int unread;
 
+    private boolean isMonitored;
+
     public Group() {
 
     }
@@ -88,4 +90,11 @@ public class Group extends RealmObject {
         this.unread = unread;
     }
 
+    public boolean isMonitored() {
+        return isMonitored;
+    }
+
+    public void setIsMonitored(boolean isMonitored) {
+        this.isMonitored = isMonitored;
+    }
 }

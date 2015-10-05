@@ -14,17 +14,17 @@ import slidenerd.vivz.fpam.R;
 /**
  * Created by vivz on 30/09/15.
  */
-@EFragment(R.layout.frag_groups)
-public class PreFragGroups extends Fragment {
+@EFragment(R.layout.settings_spammers)
+public class SettingsFragmentSpammers extends Fragment {
 
     @ViewById(R.id.text_empty)
     TextView mTextEmpty;
-    @ViewById(R.id.recycler_groups)
-    RecyclerView mRecyclerGroups;
+    @ViewById(R.id.recycler_spammers)
+    RecyclerView mRecyclerSpammers;
 
     @AfterViews
     void onViewCreated() {
-        mRecyclerGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerGroups.setHasFixedSize(true);
+        mRecyclerSpammers.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerSpammers.setHasFixedSize(true);
     }
 }

@@ -14,7 +14,7 @@ import org.androidannotations.annotations.ViewById;
 import slidenerd.vivz.fpam.R;
 
 @EActivity(R.layout.activity_settings)
-public class ActivitySettings extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
 
     @ViewById(R.id.app_bar)
     Toolbar mToolbar;
@@ -29,7 +29,7 @@ public class ActivitySettings extends AppCompatActivity {
     }
 
     /*
-    Note: We have not added the main fragment to the back stack, which means on pressing back both the Main Fragment and ActivitySettings Activity will exit together
+    Note: We have not added the main fragment to the back stack, which means on pressing back both the Main Fragment and SettingsActivity Activity will exit together
      */
 
     /**
@@ -45,7 +45,7 @@ public class ActivitySettings extends AppCompatActivity {
         if (savedInstanceState == null) {
             getFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.main_content, new PreFragMain())
+                    .replace(R.id.main_content, new SettingsFragmentMain())
                     .commit();
         }
     }
@@ -57,7 +57,7 @@ public class ActivitySettings extends AppCompatActivity {
     }
 
     /*
-    If we have more than 0 items on our back stack, it means one of the Preference Fragments was added to our back stack in which case, we pop the topmost item containing that Fragment which exposes the root ActivitySettings screen once again.
+    If we have more than 0 items on our back stack, it means one of the Preference Fragments was added to our back stack in which case, we pop the topmost item containing that Fragment which exposes the root SettingsActivity screen once again.
      */
     @Override
     public void onBackPressed() {

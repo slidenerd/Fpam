@@ -3,7 +3,7 @@ package slidenerd.vivz.fpam.util;
 import android.content.Context;
 import android.content.Intent;
 
-import slidenerd.vivz.fpam.settings.ActivitySettings_;
+import slidenerd.vivz.fpam.settings.SettingsActivity_;
 import slidenerd.vivz.fpam.ui.ActivityCache_;
 import slidenerd.vivz.fpam.ui.ActivityLogin_;
 import slidenerd.vivz.fpam.ui.Child_;
@@ -21,7 +21,7 @@ public class NavUtils {
     }
 
     public static void startActivitySettings(Context context) {
-        Intent intent = new Intent(context, ActivitySettings_.class);
+        Intent intent = new Intent(context, SettingsActivity_.class);
         context.startActivity(intent);
     }
 

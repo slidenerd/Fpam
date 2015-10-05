@@ -10,7 +10,7 @@ import android.preference.PreferenceScreen;
 import slidenerd.vivz.fpam.R;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-public class PreFragMain extends PreferenceFragment {
+public class SettingsFragmentMain extends PreferenceFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,24 +19,17 @@ public class PreFragMain extends PreferenceFragment {
 
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
-        if (preference.getKey().equals(getString(R.string.key_posts))) {
-            getFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.main_content, new PreFragPost())
-                    .addToBackStack(getString(R.string.key_posts))
-                    .commit();
-        }
-        if (preference.getKey().equals(getString(R.string.key_spam))) {
-            getFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.main_content, new PreFragSpam())
-                    .addToBackStack(getString(R.string.key_spam))
-                    .commit();
-        }
         if (preference.getKey().equals(getString(R.string.key_groups))) {
             getFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.main_content, new PreFragGroups_())
+                    .replace(R.id.main_content, new SettingsFragmentGroups_())
+                    .addToBackStack(getString(R.string.key_groups))
+                    .commit();
+        }
+        if (preference.getKey().equals(getString(R.string.key_spammers))) {
+            getFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main_content, new SettingsFragmentSpammers_())
                     .addToBackStack(getString(R.string.key_groups))
                     .commit();
         }

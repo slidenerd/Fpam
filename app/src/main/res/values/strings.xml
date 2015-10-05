@@ -34,4 +34,7 @@
     <string name="title_activity_child">Fpam</string>
     <string name="text_placeholder_name">Vladimir Makarov</string>
     <string name="text_placeholder_email">vivek.officialr@gmail.com</string>
+    <string name="text_no_spammers">No spammers added yet</string>
+    <string name="text_scan_groups">Which Groups Do You Want To Monitor?</string>
+    <string name="text_placeholder_group_name">Placeholder Group Name</string>
 </resources>
