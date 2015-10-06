@@ -156,6 +156,27 @@ Make the MVP of fpam capable of only blocking people in v1. This will ensure the
 	<li>Send data about spammers to the server fpam.io with the same information, [userid, username, list of group ids where the spammer is a member of and the number of spam posts he or she has made] corresponding to a user id or the person using the app fpam.</li>
 </ul>
 
+UPDATE 9, Oct 6, 2015 [11 pm]
+
+<h3>What completes v1 Fpam</h3>
+
+<ol>
+	<li>Save the choice of groups the admin has opted to monitor in the background</li>
+	<li>Calculate the past 24 hour activity of each group</li>
+	<li>Let the admin save feeds only for the past 24 hours, 1 week, 2 weeks or 1 month and enforce that on the database</li>
+	<li>Create the spammer database that contains a list of blocked people and their activity in each group</li>
+	<li>Enforce the removal of posts by blocked people in addition to the ones the admin deletes</li>
+	<li>Create the IntentService and Jobscheduler service to monitor certain groups and remove spam posts in the bg</li>
+	<li>Add likes summary from the json feed and display it along with comments summary in the UI</li>
+	<li>Add comments from json in the database</li>
+	<li>Display comments in the separate panel</li>
+	<li>Create analytics related database tables</li>
+	<li>Discuss analytics UI with Neel Raj who is the current UI designer</li>
+	<li>Sync analytics data with fpam.io and have its mysql databases in store currently.</li>
+	<li>Add advertisements to the app</li>
+	<li>Add animations wherever appropriate and tutorial screen for the app</li>
+	<li>Complete all UI design process</li>
+</ol>
 
 The Workflow
 
