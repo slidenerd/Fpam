@@ -7,7 +7,7 @@
         android:entries="@array/pref_scan_frequency_titles"
         android:entryValues="@array/pref_scan_frequency_values"
         android:key="@string/key_scan_frequency"
-        android:title="@string/pref_header_scan" />
+        android:title="@string/pref_monitor" />
     <Preference
         android:key="@string/key_groups"
         android:summary="@string/pref_summary_groups"

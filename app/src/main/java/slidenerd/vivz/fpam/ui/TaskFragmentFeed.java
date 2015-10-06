@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 
 import com.facebook.AccessToken;
 
+import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
@@ -22,9 +23,12 @@ import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.FBUtils;
+import slidenerd.vivz.fpam.util.PostUtils;
 
 @EFragment
 public class TaskFragmentFeed extends Fragment {
+    @App
+    Fpam mApplication;
     TaskCallback mCallback;
 
     public TaskFragmentFeed() {
@@ -58,13 +62,16 @@ public class TaskFragmentFeed extends Fragment {
 
     @Background
     void onLoadFeed(@NonNull Group group, AccessToken accessToken) {
-        if (FBUtils.isValidToken(accessToken)) {
+        if (mApplication.hasToken()) {
             Realm realm = null;
             try {
                 realm = Realm.getDefaultInstance();
                 ArrayList<Post> listPosts = FBUtils.requestFeedSync(accessToken, Fpam.getGson(), group);
                 DataStore.storeFeed(realm, listPosts);
-                afterFeedLoaded("FeedFields Loaded For", group);
+                PostUtils.sortByCreatedTime(listPosts);
+                ArrayList<Post> listPostsLast24Hours = PostUtils.getPostsLast24Hours(listPosts);
+                String postingFrequency = PostUtils.calculatePostingFrequency(listPostsLast24Hours);
+                afterFeedLoaded("FeedFields Loaded With Frequency " + postingFrequency + " for", group);
             } catch (JSONException e) {
                 L.m("" + e);
             } finally {

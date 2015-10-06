@@ -18,13 +18,8 @@ public class DataStore {
      * In the first step, check if the list of groups to be stored is empty. If we have 1-N groups to store, use shared preferences to do the same. Convert the list of groups into a JSON string and store that.
      */
     public static void storeGroups(Realm realm, ArrayList<Group> listGroups) {
-        //Clear the old groups
         realm.beginTransaction();
-        realm.allObjects(Group.class).clear();
-        realm.commitTransaction();
-        //Load the new ones
-        realm.beginTransaction();
-        realm.copyToRealm(listGroups);
+        realm.copyToRealmOrUpdate(listGroups);
         realm.commitTransaction();
     }
 

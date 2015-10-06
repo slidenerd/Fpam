@@ -344,7 +344,7 @@ public class JSONUtils {
         String MESSAGE = "message";
         String CAPTION = "caption";
         String DESCRIPTION = "description";
-        String PICTURE = "picture";
+        String PICTURE = "full_picture";
         String TYPE = "type";
         String UPDATED_TIME = "updated_time";
         String LINK = "link";

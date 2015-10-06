@@ -2,7 +2,7 @@
     <!--The title of our Settings Activity-->
     <string name="title_activity_settings">Settings</string>
     <!--The first setting for Active Scan-->
-    <string name="pref_header_scan">Active Scan</string>
+    <string name="pref_monitor">Monitor Spam</string>
     <string name="key_scan_frequency">key_scan_frequency</string>
     <string-array name="pref_scan_frequency_titles">
         <item>Never</item>

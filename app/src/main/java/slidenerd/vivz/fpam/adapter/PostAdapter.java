@@ -6,9 +6,11 @@ import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.text.ParseException;
+import com.squareup.picasso.Picasso;
+
 import java.text.SimpleDateFormat;
 
 import io.realm.Realm;
@@ -21,6 +23,7 @@ import slidenerd.vivz.fpam.model.json.feed.Post;
  */
 public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHolder> implements OnSwipeListener {
 
+    private Context mContext;
     private LayoutInflater mLayoutInflater;
 
     private OnDeleteListener mListener;
@@ -29,6 +32,7 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
 
     public PostAdapter(Context context, Realm realm, RealmResults<Post> results) {
         super(context, realm, results);
+        mContext = context;
         mLayoutInflater = LayoutInflater.from(context);
     }
 
@@ -59,6 +63,7 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
         holder.setUserName(post.getUserName());
         holder.setUpdatedTime(post.getUpdatedTime());
         holder.setMessage(post.getMessage());
+        holder.setPicture(post.getPicture());
     }
 
     @Override
@@ -76,32 +81,37 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
         private TextView mTextUserName;
         private TextView mTextUpdatedTime;
         private TextView mTextMessage;
+        private ImageView mPicture;
 
         public ItemHolder(View itemView) {
             super(itemView);
             mTextUserName = (TextView) itemView.findViewById(R.id.user_name);
             mTextUpdatedTime = (TextView) itemView.findViewById(R.id.updated_time);
             mTextMessage = (TextView) itemView.findViewById(R.id.message);
+            mPicture = (ImageView) itemView.findViewById(R.id.picture);
         }
 
         public void setUserName(String userName) {
             mTextUserName.setText(userName);
         }
 
-        public void setUpdatedTime(String updatedTimeRaw) {
-            long updatedTimeInMillis = 0;
-            try {
-                updatedTimeInMillis = mFormat.parse(updatedTimeRaw).getTime();
-            } catch (ParseException e) {
-                updatedTimeInMillis = -1;
-            }
+        public void setUpdatedTime(long updatedTimeMillis) {
             long now = System.currentTimeMillis();
-            String updatedTime = updatedTimeInMillis > 0 ? (String) DateUtils.getRelativeTimeSpanString(updatedTimeInMillis, now, DateUtils.SECOND_IN_MILLIS) : "NA";
+            String updatedTime = updatedTimeMillis > 0 ? (String) DateUtils.getRelativeTimeSpanString(updatedTimeMillis, now, DateUtils.SECOND_IN_MILLIS) : "NA";
             mTextUpdatedTime.setText(updatedTime);
         }
 
         public void setMessage(String message) {
             mTextMessage.setText(message);
+        }
+
+        public void setPicture(String picture) {
+            if (picture != null && !picture.toString().trim().isEmpty()) {
+                mPicture.setVisibility(View.VISIBLE);
+                Picasso.with(mContext).load(picture).into(mPicture);
+            } else {
+                mPicture.setVisibility(View.GONE);
+            }
         }
     }
 }

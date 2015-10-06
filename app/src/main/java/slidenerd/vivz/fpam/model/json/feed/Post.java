@@ -32,9 +32,9 @@ public class Post extends RealmObject {
 
     private String type;
 
-    private String createdTime;
+    private long createdTime;
 
-    private String updatedTime;
+    private long updatedTime;
 
     private String link;
 
@@ -115,14 +115,14 @@ public class Post extends RealmObject {
     /**
      * @return The updatedTime
      */
-    public String getUpdatedTime() {
+    public long getUpdatedTime() {
         return updatedTime;
     }
 
     /**
      * @param updatedTime The updatedTime
      */
-    public void setUpdatedTime(String updatedTime) {
+    public void setUpdatedTime(long updatedTime) {
         this.updatedTime = updatedTime;
     }
 
@@ -178,11 +178,11 @@ public class Post extends RealmObject {
         this.userName = userName;
     }
 
-    public String getCreatedTime() {
+    public long getCreatedTime() {
         return createdTime;
     }
 
-    public void setCreatedTime(String createdTime) {
+    public void setCreatedTime(long createdTime) {
         this.createdTime = createdTime;
     }
 }

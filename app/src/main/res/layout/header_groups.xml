@@ -6,6 +6,6 @@
     android:orientation="vertical"
     android:padding="16dp"
     android:text="@string/text_scan_groups"
-    android:textAppearance="@style/TextAppearance.AppCompat.Body1">
+    android:textAppearance="@style/TextAppearance.AppCompat.Subhead">
 
 </TextView>

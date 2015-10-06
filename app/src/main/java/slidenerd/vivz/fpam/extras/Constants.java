@@ -10,7 +10,6 @@ public interface Constants {
      */
     int MENU_START_ID = 101;
 
-    int GROUP_NONE = 0;
-
     String GROUP_ID_NONE = "NONE";
+    int NA = -1;
 }

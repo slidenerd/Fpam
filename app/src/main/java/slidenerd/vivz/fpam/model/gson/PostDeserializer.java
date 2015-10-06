@@ -9,6 +9,7 @@ import com.google.gson.JsonParseException;
 import java.lang.reflect.Type;
 
 import slidenerd.vivz.fpam.model.json.feed.Post;
+import slidenerd.vivz.fpam.util.DateUtils;
 import slidenerd.vivz.fpam.util.JSONUtils.FeedFields;
 
 /**
@@ -17,19 +18,18 @@ import slidenerd.vivz.fpam.util.JSONUtils.FeedFields;
  */
 public class PostDeserializer implements JsonDeserializer<Post> {
 
-
     @Override
     public Post deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject root = json.getAsJsonObject();
         Post post = new Post();
         final String postId = root.get(FeedFields.ID).getAsString();
-        final String createdTime = root.get(FeedFields.CREATED_TIME).getAsString();
-        final String updatedTime = root.get(FeedFields.UPDATED_TIME).getAsString();
+        final String createdTimeString = root.get(FeedFields.CREATED_TIME).getAsString();
+        final String updatedTimeString = root.get(FeedFields.UPDATED_TIME).getAsString();
         final String type = root.get(FeedFields.TYPE).getAsString();
 
         post.setPostId(postId);
-        post.setCreatedTime(createdTime);
-        post.setUpdatedTime(updatedTime);
+        post.setCreatedTime(DateUtils.getFBFormattedTime(createdTimeString));
+        post.setUpdatedTime(DateUtils.getFBFormattedTime(updatedTimeString));
         post.setType(type);
 
         final JsonObject fromObject = root.getAsJsonObject(FeedFields.FROM);
