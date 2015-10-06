@@ -29,8 +29,9 @@
             android:layout_gravity="bottom"
             app:layout_collapseMode="pin"
             app:layout_scrollFlags="enterAlways"
+            app:tabIndicatorColor="@android:color/white"
             app:tabSelectedTextColor="@android:color/white"
-            app:tabTextColor="@color/colorAccent" />
+            app:tabTextColor="#88FFFFFF" />
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_main" />

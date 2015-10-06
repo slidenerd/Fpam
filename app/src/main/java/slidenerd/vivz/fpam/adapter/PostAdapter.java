@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -17,6 +18,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.model.json.feed.Post;
+import slidenerd.vivz.fpam.util.DisplayUtils;
 
 /**
  * Created by vivz on 29/08/15.
@@ -28,13 +30,22 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
 
     private OnDeleteListener mListener;
 
+    private int screenWidth;
+
+    private int imageViewHeight;
+
     private SimpleDateFormat mFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
     public PostAdapter(Context context, Realm realm, RealmResults<Post> results) {
         super(context, realm, results);
         mContext = context;
         mLayoutInflater = LayoutInflater.from(context);
+
+        screenWidth = DisplayUtils.getWidthPixels(mContext);
+        imageViewHeight = (int) (screenWidth * 9.0 / 16.0);
+
     }
+
 
     public void setOnDeleteListener(OnDeleteListener listener) {
         this.mListener = listener;
@@ -54,6 +65,10 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
     public ItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = mLayoutInflater.inflate(R.layout.row_post, parent, false);
         ItemHolder holder = new ItemHolder(view);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(screenWidth, imageViewHeight);
+        layoutParams.addRule(RelativeLayout.BELOW, holder.mTextMessage.getId());
+        new RelativeLayout.LayoutParams(screenWidth, imageViewHeight);
+        holder.mPicture.setLayoutParams(layoutParams);
         return holder;
     }
 
@@ -89,6 +104,7 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
             mTextUpdatedTime = (TextView) itemView.findViewById(R.id.updated_time);
             mTextMessage = (TextView) itemView.findViewById(R.id.message);
             mPicture = (ImageView) itemView.findViewById(R.id.picture);
+
         }
 
         public void setUserName(String userName) {
