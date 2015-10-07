@@ -178,6 +178,11 @@ Make the MVP of fpam capable of only blocking people in v1. This will ensure the
 	<li>Complete all UI design process</li>
 </ol>
 
+<h4>UPDATE 10, Oct 7, 2015, 11 am</h4>
+<p>I loaded the feed for Android Programming yesterday at 11 pm, with 15 posts in total, deleted roughly 5 of them keeping 10 posts in the database, today morning loaded the feed again with 15 fresh posts and deleted roughly 7 of them and made an interesting observation, the posts saved from yesterday were present below the posts saved today morning but a lot of posts that were made at midnight were missing, as of this date, the app does not query posts since the last time the feed is loaded, after discsussions with Neel Rak, Vijai Chander, and Prakhar Singh, I concluded that the app must load all feeds from yesterday night till today morning when it displays information to the user to maintain eventual consistency</p>
+<p>One option as discussed with Neel Raj is to load all posts from yesterday night till today morning and save them to the database, but the issue here lies if the time interval is large. For example, if I loaded the feed last a week ago and today i load them in the morning, the app would load every post for the entire week, this number would be small for a group like Swift Programming which has only 2000 members but for a large group like Android Programming could run into 500 posts. So the setting of letting the admin store posts only for 24 hours  or 1 week or 2 weeks would store more posts for an Active group and less posts for an inactive group.</p>
+<p>Here is the final workaround. Create a setting that lets the admin decide how many posts stored be cached, in the database, whether its last 20 or 50 or 100. If the feed of a group is being loaded for the first time, load the standard 15 results and store the timestamp at that instant. If the feed of a group is being loaded subsequently, then load all posts from the timestamp till now. If the number of posts exceeds the limit set by the admin, then remove all old posts and store the 100 posts. This covers feed consistency</p>
+
 <h3>The Workflow</h3>
 
 When the user logs in, get the list of groups and user details and store them in Realm. 
