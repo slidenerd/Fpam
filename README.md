@@ -193,7 +193,7 @@ Make the MVP of fpam capable of only blocking people in v1. This will ensure the
 	<dt>
 		LIST_POSTS
 	</dt>
-	<dd>The list of posts that were retrieved from the JSON feed. The number of entries in this list is either less than the LIMIT or equal to it but never GREATER</dd>
+	<dd>The list of posts that are stored one by one from the JSON feed. We add posts once by one to this list as long as either we have no more posts to store because pagination doesnt exist anymore or we hit the limit. The number of entries in this list is either less than the LIMIT or equal to it but never GREATER</dd>
 	<dt>
 		OVERSHOOT
 	</dt>
