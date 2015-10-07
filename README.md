@@ -1,6 +1,6 @@
 
 
-Screens [September 24, 2015, 5:20 pm]
+<h3>Screens [September 24, 2015, 5:20 pm]</h3>
 
 <b>Login Screen</b>
 
@@ -26,7 +26,7 @@ This is the screen showing the posts and comments from the currently selected gr
 
 ![snap 2015-09-24 at 21 18 19](https://cloud.githubusercontent.com/assets/5139030/10078328/ccb9309e-6301-11e5-99d5-d36cea9e81ed.png)
 
-<h2>What statistics?</h2>
+<h3>What statistics?</h3>
 <ol>
 <li>% spam posts</li>
 <li>% spam comments</li>
@@ -47,7 +47,7 @@ The Database with posts from PoopScoop, Android Programming and IOS Programming
 
 ![snap 2015-09-25 at 21 49 20](https://cloud.githubusercontent.com/assets/5139030/10105978/a8fecfd2-63cf-11e5-986e-f53d29edcd16.png)
 
-The Delete problem
+<h4>The Delete problem</h4>
 
 Fpam as of September 26 8:30 am has a drawback where if a post is deleted using Fpam, it will be deleted from the underlying database after its successfully deleted from Facebook Graph API. However if a person deletes a post from Facebook directly, the deleted post is still present in the Fpam database. An upper limit of 100 posts per group also needs to be enforced on Fpam so that it deletes the oldest post and stores the newest one when it crosses the limit. 
 
@@ -75,22 +75,22 @@ This example post below is made by a person who doesn't exist on Facebook anymor
 ![snap 2015-09-18 at 22 32 38](https://cloud.githubusercontent.com/assets/5139030/9966022/e13ecb40-5e57-11e5-9c21-49724fcdd84a.png)
 
 
-UPDATE 1 [September 20, 2015 9+ pm writing after a nice BR ice cream and chat]
+<h4>UPDATE 1 [September 20, 2015 9+ pm writing after a nice BR ice cream and chat]</h4>
 
 The next question is to determine how to load the feeds optimally. There are N groups that a person may own. Lets say we wanna load the feed for Android Programming , we have a database table called cachestack that knows the ID of a group for which it is loading the feed, if we have never loaded the feed before, then either the database is empty or does not return a result with the group ID for which we are loading currently, in such a case, load the group ID, load N items , store a row in the table that indicates the group ID, the last loaded time, the number of times the group was loaded so far, if we are loading the feed for that group the subsequent time, first get the last loaded time, use this paramter to fetch all the posts from that group that were updated since the last loaded time, if the request was successful, update the last loaded time in the database and the number of times the group was loaded so far. For every group, maintain a row in the table that indicates when its feed was last loaded.
 
-UPDATE 2 [September 20, 2015 9+ pm]
+<h4>UPDATE 2 [September 20, 2015 9+ pm]</h4>
 Currently, only the list of groups on 1 page are being stored, gotta find a way to use the paging cursors and fetch all groups in one stroke or cache the paging cursors, the most important question here is how to store paging cursors, since Facebook doc says they are unstable and should not be stored permanently.
 
-UPDATE 3 [September 20, 2015 9+ pm]
+<h4>UPDATE 3 [September 20, 2015 9+ pm]</h4>
 
 The current model for Feed processing takes separate model classes, one for GSON that implements a parcelable and one for Realm that doesn't . Need to keep one single class that directly stores stuff from JSON to Realm, and eliminates the need for any intermediate GSON, the idea is also to remember the fact that only a max of 500 posts should be stored per group and when a post is deleted, all its attachments and comments also be deleted.
 
-UPDATE 4 [September 26, 2015, 10+ pm]
+<h4>UPDATE 4 [September 26, 2015, 10+ pm]</h4>
 
 As of now, admin, groups, posts and feed details are stored with manual JSON parsing. Each time the same group is loaded, it simply overrides or replaces what was already present.
 
-UPDATE 5 [September 29, 2015, 10 am]
+<h4>UPDATE 5 [September 29, 2015, 10 am]</h4>
 
 <ol>
 
@@ -118,12 +118,12 @@ UPDATE 5 [September 29, 2015, 10 am]
 
 </ol>
 
-UPDATE 6, Oct 1 , 2015 [9:30 am - 1:30 pm]
+<h4>UPDATE 6, Oct 1 , 2015 [9:30 am - 1:30 pm]</h4>
 Hired Neel Raj by paying him 5000 bucks upfront for Fpam App design. 
 
-UPDATE 7, Oct 2, 2015 [8:20pm]
+<h4>UPDATE 7, Oct 2, 2015 [8:20pm]</h4>
 
-What would complete Fpam?
+<h5>What would complete Fpam?</h5>
 <ol>
 <li>Create the IntentService for API<21 and JobScheduler Service for API>21 [HIGH]</li>
 <li>Make a viable approach to detect duplicate posts [MODERATE]</li>
@@ -142,11 +142,11 @@ What would complete Fpam?
 <li>Figure out scrap post deletion [post deleted from facebook but present in fpam database] [HIGH]</li>
 </ol>
 
-UPDATE 8, Oct 5, 2015 [4:30pm]
+<h4>UPDATE 8, Oct 5, 2015 [4:30pm]</h4>
 
 Make the MVP of fpam capable of only blocking people in v1. This will ensure the app is released aptly, before 17th October 2015. 
 
-<h3>Things needed for the MVP Fpam v1.0</h3>
+<h5>Things needed for the MVP Fpam v1.0</h5>
 <ul>
 	<li>Process only spammers in v1.0</li>
 	<li>let admin decide which groups to scan</li>
@@ -156,9 +156,9 @@ Make the MVP of fpam capable of only blocking people in v1. This will ensure the
 	<li>Send data about spammers to the server fpam.io with the same information, [userid, username, list of group ids where the spammer is a member of and the number of spam posts he or she has made] corresponding to a user id or the person using the app fpam.</li>
 </ul>
 
-UPDATE 9, Oct 6, 2015 [11 pm]
+<h4>UPDATE 9, Oct 6, 2015 [11 pm]</h4>
 
-<h3>What completes v1 Fpam</h3>
+<h5>What completes v1 Fpam</h5>
 
 <ol>
 	<li>Save the choice of groups the admin has opted to monitor in the background</li>
