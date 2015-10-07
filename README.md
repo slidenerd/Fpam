@@ -178,12 +178,12 @@ UPDATE 9, Oct 6, 2015 [11 pm]
 	<li>Complete all UI design process</li>
 </ol>
 
-The Workflow
+<h3>The Workflow</h3>
 
 When the user logs in, get the list of groups and user details and store them in Realm. 
 When the user clicks on a group, load the posts with that group postId and store it in Realm. If there are more than 100 posts that are already stored for that group, delete the oldest N entries and add the new ones, update all existing posts, comments, attachments and any other detail.
 
-The Algorithm
+<h4>The Algorithm</h4>
 
 There are some important considerations about how data is processed with Fpam, links may be from facebook either in the picture section or the link section or the message section. The question is on how to deal with links from Facebook.
 
