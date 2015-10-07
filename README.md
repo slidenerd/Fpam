@@ -223,7 +223,7 @@ Make the MVP of fpam capable of only blocking people in v1. This will ensure the
 				</li>
 			</ol>
 			</li>
-			<li>Does the number of LIST_POSTS loaded equal to the LIMIT set by the admin?
+			<li>Does the number of LIST_POSTS loaded equal to the LIMIT set by the admin? [It is designed to hold only posts till the limit, as such it can be lesser than limit or equal to it but not greater]
 			<ol>
 				<li>If YES, Delete all previous posts for that group in the database and store the new entries</li>
 				<li>If NO, then store all the posts from LIST_POSTS to the database
@@ -231,7 +231,7 @@ Make the MVP of fpam capable of only blocking people in v1. This will ensure the
 					<li>Is the SUM of LIST_POSTS and OLD ENTRIES from the database greater than the LIMIT?
 					<ol>
 						<li>If NO, then do nothing</li>
-						<li>If YES, find the number of entries in the database - LIMIT which gives us the OVERSHOOT number of extra posts stored.</li>
+						<li>If YES, find the total number of entries in the database - LIMIT which gives us the OVERSHOOT number of extra posts stored.</li>
 						<li>Find OVERSHOOT number of oldest entries from the database and delete them.</li>
 					</ol>
 					</li>
