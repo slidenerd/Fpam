@@ -183,6 +183,69 @@ Make the MVP of fpam capable of only blocking people in v1. This will ensure the
 <p>One option as discussed with Neel Raj is to load all posts from yesterday night till today morning and save them to the database, but the issue here lies if the time interval is large. For example, if I loaded the feed last a week ago and today i load them in the morning, the app would load every post for the entire week, this number would be small for a group like Swift Programming which has only 2000 members but for a large group like Android Programming could run into 500 posts. So the setting of letting the admin store posts only for 24 hours  or 1 week or 2 weeks would store more posts for an Active group and less posts for an inactive group.</p>
 <p>Here is the final workaround. Create a setting that lets the admin decide how many posts stored be cached, in the database, whether its last 20 or 50 or 100. If the feed of a group is being loaded for the first time, load the standard 15 results and store the timestamp at that instant. If the feed of a group is being loaded subsequently, then load all posts from the timestamp till now. If the number of posts exceeds the limit set by the admin, then remove all old posts and store the 100 posts. This covers feed consistency</p>
 
+<dl>
+	<dt>
+		LIMIT
+	</dt>
+	<dd>
+		The number of posts that can be stored for a particular feed enforced by the admin under app settings
+	</dd>
+	<dt>
+		LIST_POSTS
+	</dt>
+	<dd>The list of posts that were retrieved from the JSON feed. The number of entries in this list is either less than the LIMIT or equal to it but never GREATER</dd>
+	<dt>
+		OVERSHOOT
+	</dt>
+	<dd>The number of posts in the database beyond the limit enforced by the admin.</dd>
+</dl>
+<ol>
+	<li>Set the LIMIT on the number of posts to be stored at a reasonable value such as 20, 50, 100</li>
+	<li>Let the admin load the feed for a particular group, was this feed loaded before?
+	<ol>
+		<li>If NO, then load the feed, store the timestamp of when this feed was loaded</li>
+		<li>If YES, then 
+		<ol>
+			<li>Find the saved timestamp for this feed</li>
+			<li>Find the LIMIT enforced by the admin</li>
+			<li>Request the facebook graph API to load all posts from the timestamp till now</li>
+			<li>Initialize the number of posts read to 0</li>
+			<li>Initialize the list of posts as empty which is called LIST_POSTS hereafter</li>
+			<li>WHILE number of posts read is less than or equal to the limit enforced by the admin
+			<ol>
+				<li>Store a post in LIST_POSTS</li>
+				<li>Increment the number of posts loaded</li>
+				<li>Do we have a pagination token?
+				<ol>
+					<li>If YES, then load the json for the next page and repeat the steps under WHILE</li>
+					<li>If NO, then STOP</li>
+				</ol>
+				</li>
+			</ol>
+			</li>
+			<li>Does the number of LIST_POSTS loaded equal to the LIMIT set by the admin?
+			<ol>
+				<li>If YES, Delete all previous posts for that group in the database and store the new entries</li>
+				<li>If NO, then store all the posts from LIST_POSTS to the database
+				<ol>
+					<li>Is the SUM of LIST_POSTS and OLD ENTRIES from the database greater than the LIMIT?
+					<ol>
+						<li>If NO, then do nothing</li>
+						<li>If YES, find the number of entries in the database - LIMIT which gives us the OVERSHOOT number of extra posts stored.</li>
+						<li>Find OVERSHOOT number of oldest entries from the database and delete them.</li>
+					</ol>
+					</li>
+				</ol>
+				</li>
+			</ol>
+			</li>
+			
+		</ol>
+		</li>
+	</ol>
+	</li>
+</ol>
+
 <h3>The Workflow</h3>
 
 When the user logs in, get the list of groups and user details and store them in Realm. 
