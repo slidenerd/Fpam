@@ -11,4 +11,9 @@
         android:orderInCategory="200"
         android:title="@string/title_export_database"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_cache"
+        android:orderInCategory="300"
+        android:title="@string/title_activity_cache"
+        app:showAsAction="never" />
 </menu>

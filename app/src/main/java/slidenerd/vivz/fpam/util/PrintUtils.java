@@ -3,6 +3,7 @@ package slidenerd.vivz.fpam.util;
 import java.util.List;
 
 import slidenerd.vivz.fpam.model.json.feed.Post;
+import slidenerd.vivz.fpam.model.realm.Spammer;
 
 public class PrintUtils {
 
@@ -23,6 +24,13 @@ public class PrintUtils {
             stringBuilder.append("\n").append(toString(post)).append("\n");
         }
         return stringBuilder.toString();
+    }
+
+    public static String toString(Spammer spammer) {
+        return "\n" + spammer.getUserGroupCompositeId()
+                + "\n" + spammer.getUserName()
+                + "\n" + spammer.getSpamCount()
+                + "\n" + spammer.getTimestamp();
     }
 
 }

@@ -95,7 +95,7 @@ public abstract class ActivityBase extends AppCompatActivity
         if (savedInstanceState != null) {
             mSelectedGroup = Parcels.unwrap(savedInstanceState.getParcelable(STATE_SELECTED_GROUP));
             if (mSelectedGroup != null) {
-                NavUtils.triggerLoadFeed(this, mSelectedGroup);
+                NavUtils.broadcastSelectedGroup(this, mSelectedGroup);
             }
         }
     }
@@ -131,6 +131,12 @@ public abstract class ActivityBase extends AppCompatActivity
     @OptionsItem(R.id.action_export)
     boolean onExportDatabaseSelected() {
         DatabaseUtils.exportDatabase(this);
+        return true;
+    }
+
+    @OptionsItem(R.id.action_cache)
+    boolean onCacheSelected() {
+        NavUtils.startActivityCache(this);
         return true;
     }
 
@@ -172,7 +178,7 @@ public abstract class ActivityBase extends AppCompatActivity
         mProgress.dismiss();
         Snackbar.make(mFab, message + " " + group.getName(), Snackbar.LENGTH_LONG)
                 .setAction("Yay!", null).show();
-        NavUtils.triggerLoadFeed(this, group);
+        NavUtils.broadcastSelectedGroup(this, group);
     }
 
 

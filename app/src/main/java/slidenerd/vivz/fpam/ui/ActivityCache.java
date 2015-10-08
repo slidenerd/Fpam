@@ -9,12 +9,10 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
-import java.util.ArrayList;
-
 import io.realm.Realm;
+import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.database.DataStore;
-import slidenerd.vivz.fpam.model.json.feed.Post;
+import slidenerd.vivz.fpam.model.realm.Spammer;
 import slidenerd.vivz.fpam.util.PrintUtils;
 
 @EActivity(R.layout.activity_cache)
@@ -33,8 +31,11 @@ public class ActivityCache extends AppCompatActivity {
 
     @AfterViews
     void initUI() {
-        ArrayList<Post> listPosts = DataStore.loadFeed(mRealm);
-        String text = PrintUtils.toString(listPosts);
+        RealmResults<Spammer> listSpammers = mRealm.where(Spammer.class).findAll();
+        StringBuffer text = new StringBuffer();
+        for (Spammer spammer : listSpammers) {
+            text.append(PrintUtils.toString(spammer));
+        }
         mTextCache.setText(text);
     }
 

@@ -2,9 +2,11 @@ package slidenerd.vivz.fpam.util;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Pair;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
+import com.facebook.GraphRequestBatch;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
 import com.google.gson.Gson;
@@ -15,6 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
@@ -160,5 +163,24 @@ public class FBUtils {
         GraphResponse response = graphRequest.executeAndWait();
         JSONObject jsonObject = response.getJSONObject();
         return jsonObject != null && jsonObject.has("success") && !jsonObject.isNull("success") && jsonObject.getBoolean("success");
+    }
+
+    public static ArrayList<Pair<String, Boolean>> requestDeletePosts(AccessToken accessToken, ArrayList<String> listPostIds) throws JSONException {
+        ArrayList<Pair<String, Boolean>> listStatus = new ArrayList<>();
+        GraphRequestBatch requests = new GraphRequestBatch();
+        for (String postId : listPostIds) {
+            GraphRequest graphRequest = new GraphRequest(accessToken, postId, null, HttpMethod.DELETE);
+            requests.add(graphRequest);
+        }
+        List<GraphResponse> responses = requests.executeAndWait();
+        for (int i = 0; i < responses.size(); i++) {
+            GraphResponse response = responses.get(i);
+            JSONObject jsonObject = response.getJSONObject();
+            String postId = listPostIds.get(i);
+            boolean success = (jsonObject != null && jsonObject.has("success") && !jsonObject.isNull("success") && jsonObject.getBoolean("success"));
+            Pair<String, Boolean> pair = new Pair<>(postId, success);
+            listStatus.add(pair);
+        }
+        return listStatus;
     }
 }

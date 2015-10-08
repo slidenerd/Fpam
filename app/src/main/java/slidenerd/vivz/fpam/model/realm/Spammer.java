@@ -1,13 +1,10 @@
 package slidenerd.vivz.fpam.model.realm;
 
 import org.parceler.Parcel;
-import org.parceler.ParcelPropertyConverter;
 
-import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.SpammerRealmProxy;
 import io.realm.annotations.PrimaryKey;
-import slidenerd.vivz.fpam.model.parcel.SpammerEntryParcelConverter;
 
 /**
  * Created by vivz on 07/10/15.
@@ -17,26 +14,20 @@ import slidenerd.vivz.fpam.model.parcel.SpammerEntryParcelConverter;
         analyze = {Spammer.class})
 public class Spammer extends RealmObject {
     @PrimaryKey
-    private String userId;
+    private String userGroupCompositeId;
     private String userName;
-    private RealmList<SpammerEntry> entries = new RealmList<>();
+    private int spamCount;
+    private long timestamp;
 
     public Spammer() {
 
     }
 
-    public Spammer(String userId, String userName, RealmList<SpammerEntry> entries) {
-        this.userId = userId;
+    public Spammer(String userGroupCompositeId, String userName, int spamCount, long timestamp) {
+        this.userGroupCompositeId = userGroupCompositeId;
         this.userName = userName;
-        this.entries = entries;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
+        this.spamCount = spamCount;
+        this.timestamp = timestamp;
     }
 
     public String getUserName() {
@@ -47,12 +38,27 @@ public class Spammer extends RealmObject {
         this.userName = userName;
     }
 
-    public RealmList<SpammerEntry> getEntries() {
-        return entries;
+    public String getUserGroupCompositeId() {
+        return userGroupCompositeId;
     }
 
-    @ParcelPropertyConverter(SpammerEntryParcelConverter.class)
-    public void setEntries(RealmList<SpammerEntry> entries) {
-        this.entries = entries;
+    public void setUserGroupCompositeId(String userGroupCompositeId) {
+        this.userGroupCompositeId = userGroupCompositeId;
+    }
+
+    public int getSpamCount() {
+        return spamCount;
+    }
+
+    public void setSpamCount(int spamCount) {
+        this.spamCount = spamCount;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }

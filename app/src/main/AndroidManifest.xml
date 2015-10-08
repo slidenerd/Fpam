@@ -26,7 +26,6 @@
         <activity
             android:name=".ui.ActivityLogin_"
             android:label="@string/title_activity_login" />
-
         <activity
             android:name=".ui.ActivityCache_"
             android:label="@string/title_activity_cache" />
@@ -48,6 +47,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".background.FilterPostService_"
+            android:exported="false"></service>
     </application>
 
 </manifest>

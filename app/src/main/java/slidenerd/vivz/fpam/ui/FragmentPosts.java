@@ -34,18 +34,17 @@ import org.parceler.Parcels;
 import java.util.Arrays;
 
 import io.realm.Realm;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.PostAdapter;
 import slidenerd.vivz.fpam.adapter.TouchHelper;
+import slidenerd.vivz.fpam.background.FilterPostService_;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.model.realm.Spammer;
-import slidenerd.vivz.fpam.model.realm.SpammerEntry;
 import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 import slidenerd.vivz.fpam.widget.RecyclerViewEmptySupport;
@@ -174,11 +173,11 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         mProgressDialog.setMessage("Post was made by " + post.getUserName());
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.show();
-        onDelete(mApplication.getToken(), position, post);
+        onDelete(mApplication.getToken(), position, mSelectedGroup, post);
     }
 
     @Background
-    void onDelete(AccessToken accessToken, int position, Post post) {
+    void onDelete(AccessToken accessToken, int position, Group group, Post post) {
         Realm realm = null;
         try {
             realm = Realm.getDefaultInstance();
@@ -188,7 +187,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
                 realm.beginTransaction();
                 realm.where(Post.class).equalTo("postId", post.getPostId()).findFirst().removeFromRealm();
                 realm.commitTransaction();
-                updateSpammerData(realm, post);
+                updateSpammerData(realm, group, post);
             }
             afterDelete(position, success);
         } catch (JSONException e) {
@@ -200,47 +199,21 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         }
     }
 
-    private void updateSpammerData(Realm realm, Post post) {
-//Find a spammer with the user id and user name of the post to check if one exists in the database already.
-        Spammer spammer = realm.where(Spammer.class)
-                .equalTo("userId", post.getUserId())
-                .findFirst();
+    private void updateSpammerData(Realm realm, Group group, Post post) {
 
-        //If we found the spammer in the database
-        if (spammer != null) {
-            boolean foundEntry = false;
-            //Get the list of entries made by that spammer.
-            RealmList<SpammerEntry> entries = spammer.getEntries();
-            //Check if there is an entry from the list of entries corresponding to this group
-            for (SpammerEntry current : entries) {
-                if (current.getGroupId().equals(mSelectedGroup.getId())) {
-                    int spamCount = current.getSpamCount();
-                    realm.beginTransaction();
-                    current.setSpamCount(spamCount + 1);
-                    realm.commitTransaction();
-                    foundEntry = true;
-                    break;
-                }
-            }
-
-            if (!foundEntry) {
-                SpammerEntry entry = new SpammerEntry(mSelectedGroup.getId(), mSelectedGroup.getName(), 1);
-                realm.beginTransaction();
-                realm.copyToRealm(entry);
-                realm.commitTransaction();
-            }
-
-        }
-        //If we did not find the spammer in the database
-        else {
-            SpammerEntry entry = new SpammerEntry(mSelectedGroup.getId(), mSelectedGroup.getName(), 1);
-            RealmList<SpammerEntry> entries = new RealmList<>();
-            entries.add(entry);
-            spammer = new Spammer(post.getUserId(), post.getUserName(), entries);
+        Spammer spammer = realm.where(Spammer.class).beginsWith("userGroupCompositeId", post.getUserId()).endsWith("userGroupCompositeId", group.getId()).findFirst();
+        if (spammer == null) {
+            spammer = new Spammer(post.getUserId() + ":" + group.getId(), post.getUserName(), 1, System.currentTimeMillis());
             realm.beginTransaction();
-            realm.copyToRealmOrUpdate(spammer);
+            realm.copyToRealm(spammer);
+            realm.commitTransaction();
+        } else {
+            realm.beginTransaction();
+            spammer.setSpamCount(spammer.getSpamCount() + 1);
+            spammer.setTimestamp(System.currentTimeMillis());
             realm.commitTransaction();
         }
+
     }
 
     @UiThread
@@ -258,12 +231,19 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
 //        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mGroupSelectedReceiver);
     }
 
-    @Receiver(actions = "load_feed", registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
-    public void onGroupSelected(Intent intent) {
+    @Receiver(actions = NavUtils.ACTION_LOAD_FEED, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
+    public void onBroadcastSelectedGroup(Context context, Intent intent) {
         mSelectedGroup = Parcels.unwrap(intent.getExtras().getParcelable(NavUtils.EXTRA_SELECTED_GROUP));
+        FilterPostService_.intent(context).onFilterPosts(Parcels.wrap(Group.class, mSelectedGroup)).start();
         RealmResults<Post> realmResults = mRealm.where(Post.class).beginsWith("postId", mSelectedGroup.getId()).findAllSorted("updatedTime", false);
         mAdapter.setData(realmResults);
         if (!realmResults.isEmpty())
             mRecyclerPosts.smoothScrollToPosition(0);
+    }
+
+    @Receiver(actions = NavUtils.ACTION_FILTER_POSTS, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
+    public void onBroadcastPostsFiltered() {
+        L.m("posts filtered");
+
     }
 }

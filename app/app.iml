@@ -146,7 +146,7 @@
     <orderEntry type="library" exported="" name="play-services-analytics-8.1.0" level="project" />
     <orderEntry type="library" exported="" name="cardview-v7-23.0.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-8.1.0" level="project" />
-    <orderEntry type="library" exported="" name="realm-android-0.82.2" level="project" />
+    <orderEntry type="library" exported="" name="realm-android-0.83.0" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-23.0.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-measurement-8.1.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-ads-8.1.0" level="project" />

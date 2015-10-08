@@ -16,8 +16,9 @@ import slidenerd.vivz.fpam.ui.ActivityMain_;
  * Created by vivz on 28/07/15.
  */
 public class NavUtils {
-    private static final String ACTION_LOAD_FEED = "load_feed";
+    public static final String ACTION_LOAD_FEED = "load_feed";
     public static final String EXTRA_SELECTED_GROUP = "selected_group";
+    public static final String ACTION_FILTER_POSTS = "filter_posts";
 
     public static void startActivityLogin(Context context) {
         ActivityLogin_.intent(context).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP).start();
@@ -35,9 +36,14 @@ public class NavUtils {
         ActivityMain_.intent(context).start();
     }
 
-    public static void triggerLoadFeed(Context context, Group group) {
+    public static void broadcastSelectedGroup(Context context, Group group) {
         Intent intent = new Intent(ACTION_LOAD_FEED);
         intent.putExtra(EXTRA_SELECTED_GROUP, Parcels.wrap(Group.class, group));
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    public static void broadcastPostsFiltered(Context context) {
+        Intent intent = new Intent(ACTION_FILTER_POSTS);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 }
