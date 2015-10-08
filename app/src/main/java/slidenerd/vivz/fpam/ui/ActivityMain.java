@@ -16,7 +16,7 @@ import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.log.L;
 
 @EActivity
-public class Child extends Main {
+public class ActivityMain extends ActivityBase {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +26,7 @@ public class Child extends Main {
 
     @Override
     public int getContentView() {
-        return R.layout.content_child;
+        return R.layout.activity_main;
     }
 
     @Override

@@ -34,8 +34,8 @@ import slidenerd.vivz.fpam.widget.RoundedImageView;
 /**
  * A simple {@link Fragment} subclass.
  */
-@EFragment(R.layout.drawer)
-public class Drawer extends Fragment {
+@EFragment(R.layout.nav_drawer)
+public class FragmentDrawer extends Fragment {
 
     @ViewById(R.id.nav_view)
     NavigationView mDrawer;
@@ -45,10 +45,10 @@ public class Drawer extends Fragment {
     private ArrayList<Group> mGroups = new ArrayList<>();
     private Admin mAdmin;
     private Context mContext;
-    private Main mActivity;
+    private ActivityBase mActivity;
     private Realm mRealm;
 
-    public Drawer() {
+    public FragmentDrawer() {
         // Required empty public constructor
     }
 
@@ -56,14 +56,14 @@ public class Drawer extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         this.mContext = context;
-        this.mActivity = (Main) context;
+        this.mActivity = (ActivityBase) context;
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         this.mContext = activity;
-        this.mActivity = (Main) activity;
+        this.mActivity = (ActivityBase) activity;
     }
 
     @Override
@@ -111,11 +111,11 @@ public class Drawer extends Fragment {
         RoundedImageView imageProfile = (RoundedImageView) headerView.findViewById(R.id.image_profile);
         textUserName.setText(admin.getFirstName() + " " + admin.getLastName());
         textEmail.setText(admin.getEmail());
-        Picasso.with(getActivity()).load(admin.getUrl()).into(imageProfile);
+        Picasso.with(mContext).load(admin.getUrl()).into(imageProfile);
     }
 
     /**
-     * If the access token is null or expired, this Activity will finish executing but this method is still called inside the onCreate as per the debugger and hence, check whether we have a valid list before adding any items to the drawer to prevent a crash.
+     * If the access token is null or expired, this Activity will finish executing but this method is still called inside the onCreate as per the debugger and hence, check whether we have a valid list before adding any items to the nav_drawer to prevent a crash.
      *
      * @param list the list of groups that the logged in user controls
      */
@@ -139,7 +139,7 @@ public class Drawer extends Fragment {
     }
 
     /**
-     * The dynamic ID assigned to each group while adding it to the Navigation Drawer. If we have a non zero number of groups, we need to find the position of a group within the List. The dynamic ID starts from a number like 101 and hence if there are 4 groups currently present, their IDS would be 101, 102, 103, 104. If the third group is selected by the user currently from the Navigation Drawer, we get the selected ID as 103.The position of the group with ID 103 is simply calculated as the difference between the selected ID 103 and start ID 101 which turns out to be 2. We check whether the position obtained in the above step is truly within the range of the List before extracting it as an additional measure of precaution.
+     * The dynamic ID assigned to each group while adding it to the Navigation FragmentDrawer. If we have a non zero number of groups, we need to find the position of a group within the List. The dynamic ID starts from a number like 101 and hence if there are 4 groups currently present, their IDS would be 101, 102, 103, 104. If the third group is selected by the user currently from the Navigation FragmentDrawer, we get the selected ID as 103.The position of the group with ID 103 is simply calculated as the difference between the selected ID 103 and start ID 101 which turns out to be 2. We check whether the position obtained in the above step is truly within the range of the List before extracting it as an additional measure of precaution.
      *
      * @return the group object corresponding to the id selected by the user.
      */

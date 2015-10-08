@@ -30,4 +30,21 @@ public class CopyUtils {
 //        }
         return listPosts;
     }
+
+    public static Post duplicatePost(Post realmPost) {
+        Post post = new Post();
+        post.setPostId(realmPost.getPostId());
+        post.setUserId(realmPost.getUserId());
+        post.setUserName(realmPost.getUserName());
+        post.setMessage(realmPost.getMessage());
+        post.setType(realmPost.getType());
+        post.setCreatedTime(realmPost.getCreatedTime());
+        post.setUpdatedTime(realmPost.getUpdatedTime());
+        post.setName(realmPost.getName());
+        post.setCaption(realmPost.getCaption());
+        post.setDescription(realmPost.getDescription());
+        post.setPicture(realmPost.getPicture());
+        post.setLink(realmPost.getLink());
+        return post;
+    }
 }

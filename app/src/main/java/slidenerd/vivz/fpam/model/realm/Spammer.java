@@ -21,6 +21,16 @@ public class Spammer extends RealmObject {
     private String userName;
     private RealmList<SpammerEntry> entries = new RealmList<>();
 
+    public Spammer() {
+
+    }
+
+    public Spammer(String userId, String userName, RealmList<SpammerEntry> entries) {
+        this.userId = userId;
+        this.userName = userName;
+        this.entries = entries;
+    }
+
     public String getUserId() {
         return userId;
     }

@@ -13,10 +13,19 @@ import io.realm.annotations.PrimaryKey;
         value = Parcel.Serialization.BEAN,
         analyze = {SpammerEntry.class})
 public class SpammerEntry extends RealmObject {
-    @PrimaryKey
     private String groupId;
     private String groupName;
     private int spamCount;
+
+    public SpammerEntry() {
+
+    }
+
+    public SpammerEntry(String groupId, String groupName, int spamCount) {
+        this.groupId = groupId;
+        this.groupName = groupName;
+        this.spamCount = spamCount;
+    }
 
     public String getGroupId() {
         return groupId;

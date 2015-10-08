@@ -16,7 +16,6 @@ import org.json.JSONException;
 import java.util.ArrayList;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
@@ -51,7 +50,7 @@ public class TaskFragmentLogin extends Fragment {
     }
 
     @Background
-    void loadUserAndGroupsAsync(AccessToken accessToken) {
+    void loadAdminAndGroupsInBackground(AccessToken accessToken) {
         Realm realm = null;
         try {
             Gson gson = Fpam.getGson();
@@ -71,7 +70,7 @@ public class TaskFragmentLogin extends Fragment {
             if (realm != null) {
                 realm.close();
             }
-            onUserAndGroupsLoaded();
+            onAdminAndGroupsLoaded();
         }
 
     }
@@ -83,13 +82,13 @@ public class TaskFragmentLogin extends Fragment {
     }
 
     @UiThread
-    void onUserAndGroupsLoaded() {
+    void onAdminAndGroupsLoaded() {
         if (mCallback != null) {
-            mCallback.onUserAndGroupsLoaded();
+            mCallback.afterAdminAndGroupsLoaded();
         }
     }
 
     interface TaskCallback {
-        void onUserAndGroupsLoaded();
+        void afterAdminAndGroupsLoaded();
     }
 }

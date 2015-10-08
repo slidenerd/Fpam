@@ -17,7 +17,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewStub;
-import android.widget.ImageView;
 
 import com.facebook.login.LoginManager;
 
@@ -34,22 +33,23 @@ import slidenerd.vivz.fpam.util.DatabaseUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
 @EActivity
-@OptionsMenu(R.menu.main)
+@OptionsMenu(R.menu.menu_base)
 
-public abstract class Main extends AppCompatActivity
+public abstract class ActivityBase extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, TaskFragmentFeed.TaskCallback {
 
     @App
     Fpam mApplication;
     private ProgressDialog mProgress;
     private TaskFragmentFeed_ mTask;
-    private Drawer_ mDrawer;
+    private FragmentDrawer_ mDrawer;
     private FloatingActionButton mFab;
+    private Group mSelectedGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_base);
         if (mApplication.shouldRedirectToLogin()) {
             moveToLogin();
             return;
@@ -66,10 +66,10 @@ public abstract class Main extends AppCompatActivity
             }
         });
 
-        mDrawer = (Drawer_) getSupportFragmentManager().findFragmentByTag("drawer");
+        mDrawer = (FragmentDrawer_) getSupportFragmentManager().findFragmentByTag("nav_drawer");
         if (mDrawer == null) {
-            mDrawer = new Drawer_();
-            getSupportFragmentManager().beginTransaction().add(R.id.drawer_container, mDrawer, "drawer").commit();
+            mDrawer = new FragmentDrawer_();
+            getSupportFragmentManager().beginTransaction().add(R.id.drawer_container, mDrawer, "nav_drawer").commit();
         }
         mTask = (TaskFragmentFeed_) getSupportFragmentManager().findFragmentByTag("task");
         if (mTask == null) {
@@ -135,12 +135,12 @@ public abstract class Main extends AppCompatActivity
                 logout();
                 break;
             default:
-                Group group = mDrawer.getSelectedGroup(id);
-                if (group == null) {
+                mSelectedGroup = mDrawer.getSelectedGroup(id);
+                if (mSelectedGroup == null) {
                     return false;
                 }
-                setTitle(group.getName());
-                mTask.beforeLoadFeed(group, mApplication.getToken());
+                setTitle(mSelectedGroup.getName());
+                mTask.triggerLoadFeed(mSelectedGroup, mApplication.getToken());
                 break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

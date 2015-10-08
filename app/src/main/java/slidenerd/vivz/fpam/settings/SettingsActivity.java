@@ -29,7 +29,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     /*
-    Note: We have not added the main fragment to the back stack, which means on pressing back both the Main Fragment and SettingsActivity Activity will exit together
+    Note: We have not added the menu_base fragment to the back stack, which means on pressing back both the ActivityBase Fragment and SettingsActivity Activity will exit together
      */
 
     /**

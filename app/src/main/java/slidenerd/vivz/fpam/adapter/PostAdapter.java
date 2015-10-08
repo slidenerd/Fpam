@@ -18,6 +18,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.model.json.feed.Post;
+import slidenerd.vivz.fpam.util.CopyUtils;
 import slidenerd.vivz.fpam.util.DisplayUtils;
 
 /**
@@ -84,7 +85,7 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
     @Override
     public void onSwipe(int position) {
         Post post = mResults.get(position);
-        mListener.triggerDelete(position, post);
+        mListener.triggerDelete(position, CopyUtils.duplicatePost(post));
     }
 
     public interface DeleteListener {

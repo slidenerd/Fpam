@@ -63,7 +63,7 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
         } else {
             if (FBUtils.isValidToken(accessToken)) {
                 mProgress.setVisibility(View.VISIBLE);
-                mTaskFragment.loadUserAndGroupsAsync(accessToken);
+                mTaskFragment.loadAdminAndGroupsInBackground(accessToken);
             } else {
                 L.m("access token is null or expired");
             }
@@ -119,7 +119,7 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
     }
 
     @Override
-    public void onUserAndGroupsLoaded() {
+    public void afterAdminAndGroupsLoaded() {
         mProgress.setVisibility(View.GONE);
         NavUtils.startActivityChild(ActivityLogin.this);
         finish();

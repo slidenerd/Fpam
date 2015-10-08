@@ -6,7 +6,7 @@ import android.content.Intent;
 import slidenerd.vivz.fpam.settings.SettingsActivity_;
 import slidenerd.vivz.fpam.ui.ActivityCache_;
 import slidenerd.vivz.fpam.ui.ActivityLogin_;
-import slidenerd.vivz.fpam.ui.Child_;
+import slidenerd.vivz.fpam.ui.ActivityMain_;
 
 /**
  * Created by vivz on 28/07/15.
@@ -26,6 +26,6 @@ public class NavUtils {
     }
 
     public static void startActivityChild(Context context) {
-        Child_.intent(context).start();
+        ActivityMain_.intent(context).start();
     }
 }

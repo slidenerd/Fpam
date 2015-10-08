@@ -53,15 +53,15 @@ public class TaskFragmentFeed extends Fragment {
         setRetainInstance(true);
     }
 
-    void beforeLoadFeed(@NonNull Group group, AccessToken accessToken) {
+    void triggerLoadFeed(@NonNull Group group, AccessToken accessToken) {
         if (mCallback != null) {
             mCallback.beforeFeedLoaded("Loading posts for the group " + group.getName());
         }
-        onLoadFeed(group, accessToken);
+        loadFeedInBackground(group, accessToken);
     }
 
     @Background
-    void onLoadFeed(@NonNull Group group, AccessToken accessToken) {
+    void loadFeedInBackground(@NonNull Group group, AccessToken accessToken) {
         if (mApplication.hasToken()) {
             Realm realm = null;
             try {
@@ -71,7 +71,7 @@ public class TaskFragmentFeed extends Fragment {
                 PostUtils.sortByCreatedTime(listPosts);
                 ArrayList<Post> listPostsLast24Hours = PostUtils.getPostsLast24Hours(listPosts);
                 String postingFrequency = PostUtils.calculatePostingFrequency(listPostsLast24Hours);
-                afterFeedLoaded("FeedFields Loaded With Frequency " + postingFrequency + " for", group);
+                onFeedLoaded("FeedFields Loaded With Frequency " + postingFrequency + " for", group);
             } catch (JSONException e) {
                 L.m("" + e);
             } finally {
@@ -80,12 +80,12 @@ public class TaskFragmentFeed extends Fragment {
                 }
             }
         } else {
-            afterFeedLoaded("Did not find a valid access token while loading", group);
+            onFeedLoaded("Did not find a valid access token while loading", group);
         }
     }
 
     @UiThread
-    void afterFeedLoaded(String message, Group group) {
+    void onFeedLoaded(String message, Group group) {
         if (mCallback != null) {
             mCallback.afterFeedLoaded(message, group);
         } else {

@@ -39,7 +39,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".ui.Child_"
+            android:name=".ui.ActivityMain_"
             android:label="@string/title_activity_child"
             android:theme="@style/AppTheme">
             <intent-filter>
