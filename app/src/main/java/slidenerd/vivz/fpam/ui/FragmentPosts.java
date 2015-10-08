@@ -48,6 +48,7 @@ import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.widget.RecyclerViewEmptySupport;
 
+
 /**
  * TODO handle error conditions, handle the loginmanager properly, how the items are shown while deleting and after deleting
  * A simple {@link Fragment} subclass.
@@ -85,10 +86,12 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRealm = Realm.getDefaultInstance();
+        //Initialize facebook stuff for login
         mCallbackManager = CallbackManager.Factory.create();
         mLoginManager = LoginManager.getInstance();
         mLoginManager.registerCallback(mCallbackManager, this);
 
+        //Check if our app has publish_actions permissions, its needed to perform deletes
         if (!mApplication.hasPermissionsPublishActions()) {
             mLoginManager.logInWithPublishPermissions(FragmentPosts.this, Arrays.asList("publish_actions"));
         }
@@ -108,12 +111,11 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         super.onViewCreated(view, savedInstanceState);
         RealmResults<Post> results = mRealm.where(Post.class).beginsWith("postId", "NONE").findAll();
         mAdapter = new PostAdapter(getActivity(), mRealm, results);
-        mAdapter.setOnDeleteListener(this);
+        mAdapter.setDeleteListener(this);
         mTextEmpty = (TextView) view.findViewById(R.id.text_empty_posts);
         mRecyclerPosts = (RecyclerViewEmptySupport) view.findViewById(R.id.recycler_posts);
         mRecyclerPosts.setEmptyView(mTextEmpty);
         mRecyclerPosts.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerPosts.addItemDecoration(new Divider(getActivity(), LinearLayoutManager.VERTICAL));
         mRecyclerPosts.setAdapter(mAdapter);
         ItemTouchHelper.Callback callback = new TouchHelper(mAdapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
@@ -122,16 +124,27 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     }
 
 
+    /**
+     * TODO handle login success and check for permission publish_actions in the result, if its not found, show a prompt displaying why its needed
+     * @param loginResult
+     */
     @Override
     public void onSuccess(LoginResult loginResult) {
 
     }
 
+    /**
+     * TODO handle the case where the user cancels while requesting publish_actions permission
+     */
     @Override
     public void onCancel() {
 
     }
 
+    /**
+     * TODO handle any errors that may arise while login
+     * @param e
+     */
     @Override
     public void onError(FacebookException e) {
 
@@ -144,7 +157,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     }
 
     @Override
-    public void beforeDelete(int position, Post post) {
+    public void triggerDelete(int position, Post post) {
         mProgressDialog.setTitle("Deleting post");
         mProgressDialog.setMessage("Post was made by " + post.getUserName());
         mProgressDialog.setIndeterminate(true);

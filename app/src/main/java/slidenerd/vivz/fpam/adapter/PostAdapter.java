@@ -47,7 +47,7 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
     }
 
 
-    public void setOnDeleteListener(DeleteListener listener) {
+    public void setDeleteListener(DeleteListener listener) {
         this.mListener = listener;
     }
 
@@ -84,11 +84,11 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
     @Override
     public void onSwipe(int position) {
         Post post = mResults.get(position);
-        mListener.beforeDelete(position, post);
+        mListener.triggerDelete(position, post);
     }
 
     public interface DeleteListener {
-        void beforeDelete(int position, Post post);
+        void triggerDelete(int position, Post post);
     }
 
     public class ItemHolder extends RecyclerView.ViewHolder {
