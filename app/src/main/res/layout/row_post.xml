@@ -9,10 +9,8 @@
         android:id="@+id/user_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="4dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:paddingTop="4dp"
         android:text="@string/user_name"
         android:textColor="@color/colorPrimaryDark"
         android:textStyle="bold" />
@@ -22,10 +20,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/user_name"
-        android:paddingBottom="4dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:paddingTop="4dp"
         android:text="@string/updated_time"
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
         android:textColor="@color/colorTextSecondary" />

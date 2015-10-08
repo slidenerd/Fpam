@@ -53,7 +53,7 @@ import slidenerd.vivz.fpam.widget.RecyclerViewEmptySupport;
  * A simple {@link Fragment} subclass.
  */
 @EFragment
-public class FragmentPosts extends Fragment implements FacebookCallback<LoginResult>, PostAdapter.OnDeleteListener {
+public class FragmentPosts extends Fragment implements FacebookCallback<LoginResult>, PostAdapter.DeleteListener {
 
     @App
     Fpam mApplication;

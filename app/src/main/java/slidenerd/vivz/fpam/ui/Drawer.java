@@ -13,6 +13,8 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
@@ -27,6 +29,7 @@ import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.widget.RoundedImageView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -105,8 +108,10 @@ public class Drawer extends Fragment {
         View headerView = mDrawer.inflateHeaderView(R.layout.nav_header_main);
         TextView textUserName = (TextView) headerView.findViewById(R.id.text_username);
         TextView textEmail = (TextView) headerView.findViewById(R.id.text_email);
+        RoundedImageView imageProfile = (RoundedImageView) headerView.findViewById(R.id.image_profile);
         textUserName.setText(admin.getFirstName() + " " + admin.getLastName());
         textEmail.setText(admin.getEmail());
+        Picasso.with(getActivity()).load(admin.getUrl()).into(imageProfile);
     }
 
     /**
@@ -123,8 +128,8 @@ public class Drawer extends Fragment {
         } else {
             int i = Constants.MENU_START_ID;
             for (Group group : list) {
-                MenuItem item = subMenu.add(100, i, i, group.getName());
-                item.setIcon(android.R.drawable.ic_menu_week);
+                final MenuItem item = subMenu.add(100, i, i, group.getName());
+                item.setIcon(android.R.drawable.ic_menu_my_calendar);
                 i++;
             }
         }

@@ -28,7 +28,7 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
     private Context mContext;
     private LayoutInflater mLayoutInflater;
 
-    private OnDeleteListener mListener;
+    private DeleteListener mListener;
 
     private int screenWidth;
 
@@ -47,7 +47,7 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
     }
 
 
-    public void setOnDeleteListener(OnDeleteListener listener) {
+    public void setOnDeleteListener(DeleteListener listener) {
         this.mListener = listener;
     }
 
@@ -87,8 +87,8 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
         mListener.beforeDelete(position, post);
     }
 
-    public interface OnDeleteListener {
-        public void beforeDelete(int position, Post post);
+    public interface DeleteListener {
+        void beforeDelete(int position, Post post);
     }
 
     public class ItemHolder extends RecyclerView.ViewHolder {

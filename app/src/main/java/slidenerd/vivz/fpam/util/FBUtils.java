@@ -132,7 +132,7 @@ public class FBUtils {
         TypeToken<ArrayList<Post>> typeToken = new TypeToken<ArrayList<Post>>() {
         };
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "from,message,caption,comments{from,message},description,name,full_picture,type,updated_time,attachments{type},link,created_time");
+        parameters.putString("fields", "from{name,id,picture},message,caption,comments{from,message},description,name,full_picture,type,updated_time,attachments{type},link,created_time");
         parameters.putString("limit", "15");
 //        parameters.putLong("since", 1442552400);
         GraphRequest request = new GraphRequest(token, "/" + group.getId() + "/feed");
