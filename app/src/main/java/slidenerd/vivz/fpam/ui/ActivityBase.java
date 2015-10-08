@@ -1,14 +1,12 @@
 package slidenerd.vivz.fpam.ui;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -38,6 +36,7 @@ import slidenerd.vivz.fpam.util.NavUtils;
 public abstract class ActivityBase extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, TaskFragmentFeed.TaskCallback {
 
+    private static final String STATE_SELECTED_GROUP = "state_selected_group";
     @App
     Fpam mApplication;
     private ProgressDialog mProgress;
@@ -92,6 +91,20 @@ public abstract class ActivityBase extends AppCompatActivity
 
         mProgress = new ProgressDialog(this);
         onCreateUserInterface(tabLayout, mainContentView);
+
+        if (savedInstanceState != null) {
+            mSelectedGroup = Parcels.unwrap(savedInstanceState.getParcelable(STATE_SELECTED_GROUP));
+            if (mSelectedGroup != null) {
+                NavUtils.triggerLoadFeed(this, mSelectedGroup);
+            }
+        }
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(STATE_SELECTED_GROUP, Parcels.wrap(Group.class, mSelectedGroup));
     }
 
     private void moveToLogin() {
@@ -136,11 +149,10 @@ public abstract class ActivityBase extends AppCompatActivity
                 break;
             default:
                 mSelectedGroup = mDrawer.getSelectedGroup(id);
-                if (mSelectedGroup == null) {
-                    return false;
+                if (mSelectedGroup != null) {
+                    setTitle(mSelectedGroup.getName());
+                    mTask.triggerLoadFeed(mSelectedGroup, mApplication.getToken());
                 }
-                setTitle(mSelectedGroup.getName());
-                mTask.triggerLoadFeed(mSelectedGroup, mApplication.getToken());
                 break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -160,14 +172,9 @@ public abstract class ActivityBase extends AppCompatActivity
         mProgress.dismiss();
         Snackbar.make(mFab, message + " " + group.getName(), Snackbar.LENGTH_LONG)
                 .setAction("Yay!", null).show();
-        notifyFeedLoaded(group);
+        NavUtils.triggerLoadFeed(this, group);
     }
 
-    private void notifyFeedLoaded(Group group) {
-        Intent intent = new Intent("group_selected");
-        intent.putExtra("selectedGroup", Parcels.wrap(Group.class, group));
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
 
     private void logout() {
         LoginManager loginManager = LoginManager.getInstance();

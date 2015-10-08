@@ -5,11 +5,9 @@ import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -28,6 +26,7 @@ import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
+import org.androidannotations.annotations.Receiver;
 import org.androidannotations.annotations.UiThread;
 import org.json.JSONException;
 import org.parceler.Parcels;
@@ -48,6 +47,7 @@ import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.model.realm.Spammer;
 import slidenerd.vivz.fpam.model.realm.SpammerEntry;
 import slidenerd.vivz.fpam.util.FBUtils;
+import slidenerd.vivz.fpam.util.NavUtils;
 import slidenerd.vivz.fpam.widget.RecyclerViewEmptySupport;
 
 
@@ -74,11 +74,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     private BroadcastReceiver mGroupSelectedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            mSelectedGroup = Parcels.unwrap(intent.getExtras().getParcelable("selectedGroup"));
-            RealmResults<Post> realmResults = mRealm.where(Post.class).beginsWith("postId", mSelectedGroup.getId()).findAllSorted("updatedTime", false);
-            mAdapter.setData(realmResults);
-            if (!realmResults.isEmpty())
-                mRecyclerPosts.smoothScrollToPosition(0);
+
         }
     };
 
@@ -89,6 +85,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGroupSelectedReceiver, new IntentFilter("group_selected"));
         mRealm = Realm.getDefaultInstance();
         //Initialize facebook stuff for login
         mCallbackManager = CallbackManager.Factory.create();
@@ -133,7 +130,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         ItemTouchHelper.Callback callback = new TouchHelper(mAdapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(mRecyclerPosts);
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGroupSelectedReceiver, new IntentFilter("group_selected"));
+
     }
 
 
@@ -258,6 +255,15 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     public void onDestroy() {
         super.onDestroy();
         mRealm.close();
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mGroupSelectedReceiver);
+//        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mGroupSelectedReceiver);
+    }
+
+    @Receiver(actions = "load_feed", registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
+    public void onGroupSelected(Intent intent) {
+        mSelectedGroup = Parcels.unwrap(intent.getExtras().getParcelable(NavUtils.EXTRA_SELECTED_GROUP));
+        RealmResults<Post> realmResults = mRealm.where(Post.class).beginsWith("postId", mSelectedGroup.getId()).findAllSorted("updatedTime", false);
+        mAdapter.setData(realmResults);
+        if (!realmResults.isEmpty())
+            mRecyclerPosts.smoothScrollToPosition(0);
     }
 }

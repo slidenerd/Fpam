@@ -2,7 +2,6 @@ package slidenerd.vivz.fpam.ui;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -13,16 +12,10 @@ import android.view.View;
 import org.androidannotations.annotations.EActivity;
 
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.log.L;
 
 @EActivity
 public class ActivityMain extends ActivityBase {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        L.m("this got called");
-    }
+    private ViewPager mPager;
 
     @Override
     public int getContentView() {
@@ -36,14 +29,13 @@ public class ActivityMain extends ActivityBase {
 
     @Override
     public void onCreateUserInterface(TabLayout tabLayout, View mainContentView) {
-        ViewPager viewPager = (ViewPager) mainContentView;
-        viewPager.setAdapter(new MainPagerAdapter(this, getSupportFragmentManager()));
-        tabLayout.setupWithViewPager(viewPager);
+        mPager = (ViewPager) mainContentView;
+        mPager.setAdapter(new MainPagerAdapter(this, getSupportFragmentManager()));
+        tabLayout.setupWithViewPager(mPager);
     }
 
     public static class MainPagerAdapter extends FragmentStatePagerAdapter {
         public static final int POSITION_POSTS = 0;
-        public static final int POSITION_STATS = 1;
         public static final int TAB_COUNT = 2;
         private Resources mResources;
 
