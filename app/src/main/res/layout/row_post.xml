@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:text="@string/user_name"
+        android:text="@string/placeholder_user_name"
         android:textColor="@color/colorPrimaryDark"
         android:textStyle="bold" />
 
@@ -22,7 +22,7 @@
         android:layout_below="@+id/user_name"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:text="@string/updated_time"
+        android:text="@string/placeholder_updated_time"
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
         android:textColor="@color/colorTextSecondary" />
 
@@ -37,7 +37,7 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingTop="4dp"
-        android:text="@string/message"
+        android:text="@string/placeholder_message"
         android:textColor="@color/colorTextPrimary" />
 
     <ImageView

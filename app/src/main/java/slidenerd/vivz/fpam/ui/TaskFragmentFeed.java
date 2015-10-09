@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 
 import com.facebook.AccessToken;
+import com.facebook.FacebookException;
 
 import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Background;
@@ -66,13 +67,15 @@ public class TaskFragmentFeed extends Fragment {
             Realm realm = null;
             try {
                 realm = Realm.getDefaultInstance();
-                ArrayList<Post> listPosts = FBUtils.requestFeedSync(accessToken, Fpam.getGson(), group);
+                ArrayList<Post> listPosts = FBUtils.requestFeedSince(accessToken, Fpam.getGson(), group, 10, 1444372298);
                 DataStore.storeFeed(realm, listPosts);
                 PostUtils.sortByCreatedTime(listPosts);
                 ArrayList<Post> listPostsLast24Hours = PostUtils.getPostsLast24Hours(listPosts);
                 String postingFrequency = PostUtils.calculatePostingFrequency(listPostsLast24Hours);
                 onFeedLoaded("FeedFields Loaded With Frequency " + postingFrequency + " for", group);
             } catch (JSONException e) {
+                L.m("" + e);
+            } catch (FacebookException e) {
                 L.m("" + e);
             } finally {
                 if (realm != null) {

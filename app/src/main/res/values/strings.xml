@@ -1,40 +1,30 @@
 <resources>
     <string name="app_name">Fpam</string>
-    <string name="title_activity_login">Login</string>
     <string name="title_activity_main">Fpam</string>
+    <string name="title_activity_login">Login</string>
     <string name="title_activity_cache">Cache</string>
-
-    <string name="drawer_open">Open Drawer</string>
-    <string name="drawer_close">Close Drawer</string>
     <string name="navigation_settings">Settings</string>
+    <string name="title_export_database">Export Database</string>
     <string name="navigation_drawer">Logout</string>
     <string name="action_settings">Settings</string>
-    <string name="action_cache">Feed</string>
-    <string name="key_spam_content">key_spam_content</string>
-    <string name="key_spammers">key_spammers</string>
-    <string name="key_links_blacklist">key_links_blacklist</string>
-    <string name="key_links_whitelist">key_links_whitelist</string>
-    <string name="text_empty_phrases">You have not added any spam words or phrases yet. What do you say we add some stuff to kick the spammers out?</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="already_added_item">You already added this item %s</string>
+
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="fragment_drawer_tag">fragment_drawer</string>
-    <string name="title_export_database">Export Database</string>
+    <string name="key_spammers">key_spammers</string>
+
     <string name="tab_posts">Posts</string>
     <string name="tab_stats">Stats</string>
-    <string name="user_name">User Name</string>
-    <string name="updated_time">Updated Time</string>
-    <string name="message">Message</string>
+
     <string name="text_empty_posts">No Posts To Display</string>
+    <string name="text_no_spammers">No spammers added yet</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="title_activity_child">Fpam</string>
-    <string name="text_placeholder_name">Vladimir Makarov</string>
-    <string name="text_placeholder_email">vivek.officialr@gmail.com</string>
-    <string name="text_no_spammers">No spammers added yet</string>
-    <string name="text_scan_groups">Which Groups Do You Want To Monitor?</string>
-    <string name="text_placeholder_group_name">Placeholder Group Name</string>
+
+    <string name="placeholder_group_name">Placeholder Group Name</string>
+    <string name="placeholder_user_name">User Name</string>
+    <string name="placeholder_updated_time">Updated Time</string>
+    <string name="placeholder_message">Message</string>
+    <string name="placeholder_name">Vladimir Makarov</string>
+    <string name="placeholder_email">vivek.officialr@gmail.com</string>
 </resources>

@@ -2,11 +2,18 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <slidenerd.vivz.fpam.widget.ListPreferenceWithSummary
+        android:defaultValue="25"
+        android:dialogTitle="@string/dialog_title_post_cache_size"
+        android:entries="@array/post_cache_entries"
+        android:entryValues="@array/post_cache_entry_values"
+        android:key="@string/key_post_cache_size"
+        android:title="@string/title_post_cache_size" />
+    <slidenerd.vivz.fpam.widget.ListPreferenceWithSummary
         android:defaultValue="120"
         android:dialogTitle="@string/pref_dialog_title_frequency"
-        android:entries="@array/pref_scan_frequency_titles"
-        android:entryValues="@array/pref_scan_frequency_values"
-        android:key="@string/key_scan_frequency"
+        android:entries="@array/pref_monitor_frequency_titles"
+        android:entryValues="@array/pref_monitor_frequency_values"
+        android:key="@string/key_monitor_frequency"
         android:title="@string/pref_monitor" />
     <Preference
         android:key="@string/key_groups"
@@ -16,4 +23,5 @@
         android:key="@string/key_spammers"
         android:summary="@string/pref_summary_spammers_blacklist"
         android:title="Spammers" />
+
 </PreferenceScreen>

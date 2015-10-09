@@ -39,7 +39,6 @@ import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.PostAdapter;
 import slidenerd.vivz.fpam.adapter.TouchHelper;
-import slidenerd.vivz.fpam.background.FilterPostService_;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Post;
@@ -234,7 +233,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     @Receiver(actions = NavUtils.ACTION_LOAD_FEED, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
     public void onBroadcastSelectedGroup(Context context, Intent intent) {
         mSelectedGroup = Parcels.unwrap(intent.getExtras().getParcelable(NavUtils.EXTRA_SELECTED_GROUP));
-        FilterPostService_.intent(context).onFilterPosts(Parcels.wrap(Group.class, mSelectedGroup)).start();
+//        FilterPostService_.intent(context).onFilterPosts(Parcels.wrap(Group.class, mSelectedGroup)).start();
         RealmResults<Post> realmResults = mRealm.where(Post.class).beginsWith("postId", mSelectedGroup.getId()).findAllSorted("updatedTime", false);
         mAdapter.setData(realmResults);
         if (!realmResults.isEmpty())

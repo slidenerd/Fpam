@@ -36,7 +36,7 @@ public class NavUtils {
         ActivityMain_.intent(context).start();
     }
 
-    public static void broadcastSelectedGroup(Context context, Group group) {
+    public static void broadcastSelectedGroup(Context context, Group group, boolean filterPosts) {
         Intent intent = new Intent(ACTION_LOAD_FEED);
         intent.putExtra(EXTRA_SELECTED_GROUP, Parcels.wrap(Group.class, group));
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);

@@ -95,7 +95,7 @@ public abstract class ActivityBase extends AppCompatActivity
         if (savedInstanceState != null) {
             mSelectedGroup = Parcels.unwrap(savedInstanceState.getParcelable(STATE_SELECTED_GROUP));
             if (mSelectedGroup != null) {
-                NavUtils.broadcastSelectedGroup(this, mSelectedGroup);
+                NavUtils.broadcastSelectedGroup(this, mSelectedGroup, false);
             }
         }
     }
@@ -178,7 +178,7 @@ public abstract class ActivityBase extends AppCompatActivity
         mProgress.dismiss();
         Snackbar.make(mFab, message + " " + group.getName(), Snackbar.LENGTH_LONG)
                 .setAction("Yay!", null).show();
-        NavUtils.broadcastSelectedGroup(this, group);
+        NavUtils.broadcastSelectedGroup(this, group, true);
     }
 
 

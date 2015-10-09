@@ -39,7 +39,7 @@
 
         <activity
             android:name=".ui.ActivityMain_"
-            android:label="@string/title_activity_child"
+            android:label="@string/title_activity_main"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

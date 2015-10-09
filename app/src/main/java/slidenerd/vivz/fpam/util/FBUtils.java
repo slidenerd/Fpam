@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.util.Pair;
 
 import com.facebook.AccessToken;
+import com.facebook.FacebookException;
 import com.facebook.GraphRequest;
 import com.facebook.GraphRequestBatch;
 import com.facebook.GraphResponse;
@@ -26,6 +27,8 @@ import slidenerd.vivz.fpam.util.JSONUtils.FeedFields;
 import slidenerd.vivz.fpam.util.JSONUtils.GroupFields;
 
 public class FBUtils {
+    private static final int NUMBER_OF_ITEMS_RETREIEVED_ON_FIRST_PAGE = 25;
+
     //TODO handle errors that may arise if JSONObject is null while retrieving admin, Paginate Feed Pages
     public static boolean isValidToken(AccessToken accessToken) {
         return accessToken != null && !accessToken.isExpired();
@@ -54,7 +57,7 @@ public class FBUtils {
      */
     @Nullable
     public static ArrayList<Group> requestGroupsSync(AccessToken accessToken, Gson gson) throws JSONException {
-        ArrayList<Group> listGroups = new ArrayList<>();
+        ArrayList<Group> listGroups = new ArrayList<>(NUMBER_OF_ITEMS_RETREIEVED_ON_FIRST_PAGE);
         Bundle parameters = new Bundle();
         TypeToken<ArrayList<Group>> typeToken = new TypeToken<ArrayList<Group>>() {
         };
@@ -131,20 +134,17 @@ public class FBUtils {
      */
 
     public static ArrayList<Post> requestFeedSync(AccessToken token, Gson gson, Group group) throws JSONException {
-        ArrayList<Post> listPosts = new ArrayList<>();
+        ArrayList<Post> listPosts = new ArrayList<>(NUMBER_OF_ITEMS_RETREIEVED_ON_FIRST_PAGE);
         TypeToken<ArrayList<Post>> typeToken = new TypeToken<ArrayList<Post>>() {
         };
         Bundle parameters = new Bundle();
         parameters.putString("fields", "from{name,id,picture},message,caption,comments{from,message},description,name,full_picture,type,updated_time,attachments{type},link,created_time");
-        parameters.putString("limit", "15");
-//        parameters.putLong("since", 1442552400);
         GraphRequest request = new GraphRequest(token, "/" + group.getId() + "/feed");
         request.setParameters(parameters);
         GraphResponse response = request.executeAndWait();
         JSONObject root = response.getJSONObject();
         if (root != null) {
-//Check if our root contains a json array called 'data' that has all the group objects inside it
-
+            //Check if our root contains a json array called 'data' that has all the group objects inside it
             if (root.has(FeedFields.DATA) && !root.isNull(FeedFields.DATA)) {
 
                 //retrieve our json array with group objects
@@ -158,18 +158,68 @@ public class FBUtils {
         return listPosts;
     }
 
-    public static boolean requestDeletePost(AccessToken accessToken, String postId) throws JSONException {
-        GraphRequest graphRequest = new GraphRequest(accessToken, postId, null, HttpMethod.DELETE);
+    public static ArrayList<Post> requestFeedSince(AccessToken token, Gson gson, Group group, int maximumNumberOfPostsToRetrieve, long sinceUnixEpoch) throws JSONException, FacebookException {
+        ArrayList<Post> listPosts = new ArrayList<>(maximumNumberOfPostsToRetrieve);
+        TypeToken<ArrayList<Post>> typeToken = new TypeToken<ArrayList<Post>>() {
+        };
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "from{name,id,picture},message,caption,comments{from,message},description,name,full_picture,type,updated_time,attachments{type},link,created_time");
+        parameters.putString("since", sinceUnixEpoch + "");
+        boolean hasMoreData = false;
+        GraphRequest request = new GraphRequest(token, "/" + group.getId() + "/feed");
+        request.setParameters(parameters);
+        GraphResponse response = request.executeAndWait();
+        int numberOfPostsRetrieved = 0;
+        JSONObject root = null;
+        JSONArray dataArray = null;
+        do {
+            root = response.getJSONObject();
+            if (root != null) {
+
+                //Check if our root contains a json array called 'data' that has all the group objects inside it
+
+                if (root.has(FeedFields.DATA) && !root.isNull(FeedFields.DATA)) {
+
+                    //retrieve our json array with group objects
+
+                    dataArray = root.getJSONArray(GroupFields.DATA);
+
+                    //For each iteration, we fetch the list of groups and append all of them to what we have so far
+
+                    ArrayList<Post> posts = gson.fromJson(dataArray.toString(), typeToken.getType());
+                    for (Post post : posts) {
+                        if (numberOfPostsRetrieved < maximumNumberOfPostsToRetrieve) {
+                            listPosts.add(post);
+                            numberOfPostsRetrieved++;
+                        }
+                    }
+                    request = response.getRequestForPagedResults(GraphResponse.PagingDirection.NEXT);
+
+                    //We have more data if posts retrieved in the current iteration are not empty and we have a valid pagination request for the next round and we have not reached the limit or maximum number of posts to retrieve yet
+
+                    hasMoreData = !posts.isEmpty() && request != null && numberOfPostsRetrieved != maximumNumberOfPostsToRetrieve;
+                    if (hasMoreData) {
+                        response = request.executeAndWait();
+                    }
+                }
+            }
+        }
+        while (hasMoreData);
+        return listPosts;
+    }
+
+    public static boolean requestDeletePost(AccessToken token, String postId) throws JSONException {
+        GraphRequest graphRequest = new GraphRequest(token, postId, null, HttpMethod.DELETE);
         GraphResponse response = graphRequest.executeAndWait();
         JSONObject jsonObject = response.getJSONObject();
         return jsonObject != null && jsonObject.has("success") && !jsonObject.isNull("success") && jsonObject.getBoolean("success");
     }
 
-    public static ArrayList<Pair<String, Boolean>> requestDeletePosts(AccessToken accessToken, ArrayList<String> listPostIds) throws JSONException {
+    public static ArrayList<Pair<String, Boolean>> requestDeletePosts(AccessToken token, ArrayList<String> listPostIds) throws JSONException {
         ArrayList<Pair<String, Boolean>> listStatus = new ArrayList<>();
         GraphRequestBatch requests = new GraphRequestBatch();
         for (String postId : listPostIds) {
-            GraphRequest graphRequest = new GraphRequest(accessToken, postId, null, HttpMethod.DELETE);
+            GraphRequest graphRequest = new GraphRequest(token, postId, null, HttpMethod.DELETE);
             requests.add(graphRequest);
         }
         List<GraphResponse> responses = requests.executeAndWait();
