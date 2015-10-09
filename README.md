@@ -246,6 +246,30 @@ Make the MVP of fpam capable of only blocking people in v1. This will ensure the
 	</li>
 </ol>
 
+<h4>UPDATE 11, Oct 9,2015 9:30 am</h4>
+<dl>
+<dt>Auto Cleanup</dt>
+<dd>A process to check if posts are made by an existing spammer, remove the unwanted posts and then present the results to the admin</dd>
+</dl>
+<h5>Auto Cleanup Algorithm</h5>
+<ol>
+	<li>Load N new posts.</li>
+	<li>Is the spammer database empty? 
+	<ol>
+		<li>If YES, present the posts to the admin without alteration</li>
+		<li>If NO, compare the source of the N posts against the M spammers in the database, did we find matches?
+		<ol>
+			<li>If MATCH found, add the post to the list of posts to be deleted</li>
+			<li>Increment the number of spam posts made by that spammer for that particular group id</li>
+		</ol>
+		<ol>
+			<li>If NO MATCH found, present the posts to the admin without alteration</li>
+		</ol>
+		</li>
+	</ol>
+	</li>
+</ol>
+
 <h3>The Workflow</h3>
 
 When the user logs in, get the list of groups and user details and store them in Realm. 
