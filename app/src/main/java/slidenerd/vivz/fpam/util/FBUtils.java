@@ -27,12 +27,11 @@ import slidenerd.vivz.fpam.util.JSONUtils.FeedFields;
 import slidenerd.vivz.fpam.util.JSONUtils.GroupFields;
 
 public class FBUtils {
-    private static final int NUMBER_OF_ITEMS_RETREIEVED_ON_FIRST_PAGE = 25;
+    private static final int RESULTS_PER_PAGE = 25;
 
-    //TODO handle errors that may arise if JSONObject is null while retrieving admin, Paginate Feed Pages
-    public static boolean isValidToken(AccessToken accessToken) {
-        return accessToken != null && !accessToken.isExpired();
-    }
+    //TODO handle errors that may arise if JSONObject is null while retrieving admin, Paginate GroupMeta Pages
+    //TODO write a requestGroups method that uses pagination technique similar to requestFeedSince if possible
+    //TODO optimize the requestDeletePosts method
 
     /**
      * Specify the fields of the logged in user that you are interested to retrieve. Fire a Graph Request synchronously and get its JSON object.
@@ -57,7 +56,7 @@ public class FBUtils {
      */
     @Nullable
     public static ArrayList<Group> requestGroupsSync(AccessToken accessToken, Gson gson) throws JSONException {
-        ArrayList<Group> listGroups = new ArrayList<>(NUMBER_OF_ITEMS_RETREIEVED_ON_FIRST_PAGE);
+        ArrayList<Group> listGroups = new ArrayList<>(RESULTS_PER_PAGE);
         Bundle parameters = new Bundle();
         TypeToken<ArrayList<Group>> typeToken = new TypeToken<ArrayList<Group>>() {
         };
@@ -134,7 +133,7 @@ public class FBUtils {
      */
 
     public static ArrayList<Post> requestFeedSync(AccessToken token, Gson gson, Group group) throws JSONException {
-        ArrayList<Post> listPosts = new ArrayList<>(NUMBER_OF_ITEMS_RETREIEVED_ON_FIRST_PAGE);
+        ArrayList<Post> listPosts = new ArrayList<>(RESULTS_PER_PAGE);
         TypeToken<ArrayList<Post>> typeToken = new TypeToken<ArrayList<Post>>() {
         };
         Bundle parameters = new Bundle();

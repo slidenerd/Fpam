@@ -15,6 +15,7 @@ import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 
+import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsMenu;
@@ -23,15 +24,20 @@ import org.androidannotations.annotations.ViewById;
 import java.util.Arrays;
 import java.util.Set;
 
+import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
+/**
+ * TODO make a better dialog to ask permissions and handle onCancel and onError in a better manner
+ */
 @EActivity(R.layout.activity_login)
 @OptionsMenu(R.menu.menu_activity_login)
 public class ActivityLogin extends AppCompatActivity implements FacebookCallback<LoginResult>, TaskFragmentLogin.TaskCallback {
     private static final String TAG_TASK_FRAGMENT = "task_fragment";
+    @App
+    Fpam mApplication;
     @ViewById(R.id.progress)
     ProgressBar mProgress;
     private TaskFragmentLogin_ mTaskFragment;
@@ -61,7 +67,7 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
                 mDialog.show();
             }
         } else {
-            if (FBUtils.isValidToken(accessToken)) {
+            if (mApplication.isValidToken(accessToken)) {
                 mProgress.setVisibility(View.VISIBLE);
                 mTaskFragment.loadAdminAndGroupsInBackground(accessToken);
             } else {

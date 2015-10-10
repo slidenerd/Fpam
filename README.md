@@ -51,13 +51,13 @@ The Delete problem
 
 Fpam as of September 26 8:30 am has a drawback where if a post is deleted using Fpam, it will be deleted from the underlying database after its successfully deleted from Facebook Graph API. However if a person deletes a post from Facebook directly, the deleted post is still present in the Fpam database. An upper limit of 100 posts per group also needs to be enforced on Fpam so that it deletes the oldest post and stores the newest one when it crosses the limit. 
 
-Is the database empty, is the feed for this group being loaded the first time?
-    If yes, store the JSON feed directly
-    If no, find the list of common posts between the JSON feed and posts stored in the database.
+Is the database empty, is the groupMeta for this group being loaded the first time?
+    If yes, store the JSON groupMeta directly
+    If no, find the list of common posts between the JSON groupMeta and posts stored in the database.
     There is nothing common
       Dont process any further
     There is something common
-      Find the list of all posts that are contained in both the JSON feed and the database. Lets call it List<C>
+      Find the list of all posts that are contained in both the JSON groupMeta and the database. Lets call it List<C>
       Sort these posts in order of their updated time
       Find the updated time of the oldest common post and the newest common post
       Find all the posts stored in the database between this time range. Lets call it List<U>
@@ -77,7 +77,7 @@ This example post below is made by a person who doesn't exist on Facebook anymor
 
 UPDATE 1 [September 20, 2015 9+ pm writing after a nice BR ice cream and chat]
 
-The next question is to determine how to load the feeds optimally. There are N groups that a person may own. Lets say we wanna load the feed for Android Programming , we have a database table called cachestack that knows the ID of a group for which it is loading the feed, if we have never loaded the feed before, then either the database is empty or does not return a result with the group ID for which we are loading currently, in such a case, load the group ID, load N items , store a row in the table that indicates the group ID, the last loaded time, the number of times the group was loaded so far, if we are loading the feed for that group the subsequent time, first get the last loaded time, use this paramter to fetch all the posts from that group that were updated since the last loaded time, if the request was successful, update the last loaded time in the database and the number of times the group was loaded so far. For every group, maintain a row in the table that indicates when its feed was last loaded.
+The next question is to determine how to load the feeds optimally. There are N groups that a person may own. Lets say we wanna load the groupMeta for Android Programming , we have a database table called cachestack that knows the ID of a group for which it is loading the groupMeta, if we have never loaded the groupMeta before, then either the database is empty or does not return a result with the group ID for which we are loading currently, in such a case, load the group ID, load N items , store a row in the table that indicates the group ID, the last loaded time, the number of times the group was loaded so far, if we are loading the groupMeta for that group the subsequent time, first get the last loaded time, use this paramter to fetch all the posts from that group that were updated since the last loaded time, if the request was successful, update the last loaded time in the database and the number of times the group was loaded so far. For every group, maintain a row in the table that indicates when its groupMeta was last loaded.
 
 UPDATE 2 [September 20, 2015 9+ pm]
 Currently, only the list of groups on 1 page are being stored, gotta find a way to use the paging cursors and fetch all groups in one stroke or cache the paging cursors, the most important question here is how to store paging cursors, since Facebook doc says they are unstable and should not be stored permanently.
@@ -88,7 +88,7 @@ The current model for Feed processing takes separate model classes, one for GSON
 
 UPDATE 4 [September 26, 2015, 10+ pm]
 
-As of now, admin, groups, posts and feed details are stored with manual JSON parsing. Each time the same group is loaded, it simply overrides or replaces what was already present.
+As of now, admin, groups, posts and groupMeta details are stored with manual JSON parsing. Each time the same group is loaded, it simply overrides or replaces what was already present.
 
 UPDATE 5 [September 29, 2015, 10 am]
 
@@ -107,7 +107,7 @@ UPDATE 5 [September 29, 2015, 10 am]
 
 <ol>
 
-<li>Load feed by using since and until or a combination of them</li>
+<li>Load groupMeta by using since and until or a combination of them</li>
 <li>Support pagination for feeds</li>
 <li>Store comments and attachments</li>
 <li>use a sliding panel to display posts and comments</li>
@@ -166,7 +166,7 @@ The Algorithm
 
 There are some important considerations about how data is processed with Fpam, links may be from facebook either in the picture section or the link section or the message section. The question is on how to deal with links from Facebook.
 
-A link/links found within the description or caption or message will be hence forth called LINK_CONTENT and a link found within the link tag in the json feed if it is non null will be hence forth called LINK_TAG.
+A link/links found within the description or caption or message will be hence forth called LINK_CONTENT and a link found within the link tag in the json groupMeta if it is non null will be hence forth called LINK_TAG.
 
 The 4 pieces of information that we need to analyze are : the person who posted, the message that was posted if any, the LINK_TAG if any and the picture if any. The message that was posted may be of 4 types 1) no message or no text 2) only text 3) message with only LINK_CONTENT inside its contents 4)message with text and one or more LINK_CONTENT in its contents.
 
@@ -202,7 +202,7 @@ Analytics [Overall for each post]
 		<dt>LINK_CONTENT</dt>
 		<dd>A post may has 0 to many links inside the message json tag which will be referred to henceforth as LINK_CONTENT </dd>
 		<dt>LINK_TAG</dt>
-		<dd>A post may have 0 or 1 link tag in its json feed which will be referred to henceforth as LINK_TAG</dd>
+		<dd>A post may have 0 or 1 link tag in its json groupMeta which will be referred to henceforth as LINK_TAG</dd>
 		<dt>LINK_SET</dt>
 		<dd>A post may contain 0 to many LINK_CONTENT or LINK_TAG items which will be combined referred to henceforth as LINK_SET</dd>
 		<dt>NON EXISTING USER</dt>

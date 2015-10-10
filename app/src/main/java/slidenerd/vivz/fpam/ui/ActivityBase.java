@@ -34,13 +34,15 @@ import slidenerd.vivz.fpam.util.NavUtils;
 @OptionsMenu(R.menu.menu_base)
 
 public abstract class ActivityBase extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, TaskFragmentFeed.TaskCallback {
+        implements NavigationView.OnNavigationItemSelectedListener, TaskFragmentPosts.TaskCallback {
 
     private static final String STATE_SELECTED_GROUP = "state_selected_group";
+    private static final String TAG_FRAGMENT_DRAWER = "nav_drawer";
+    private static final String TAG_FRAGMENT_TASK_POSTS = "task_fragment";
     @App
     Fpam mApplication;
     private ProgressDialog mProgress;
-    private TaskFragmentFeed_ mTask;
+    private TaskFragmentPosts_ mTask;
     private FragmentDrawer_ mDrawer;
     private FloatingActionButton mFab;
     private Group mSelectedGroup;
@@ -49,38 +51,37 @@ public abstract class ActivityBase extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
+
+        //If the access token has expired or null, take the user back to the login screen, and call return in addition to finish() of the activity to halt processing any remaining code inside onCreate
+
         if (mApplication.shouldRedirectToLogin()) {
             moveToLogin();
             return;
         }
+
+        //Initialize the Toolbar
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mFab = (FloatingActionButton) findViewById(R.id.fab);
-        mFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        //Initialize the Floating Action Button
 
-        mDrawer = (FragmentDrawer_) getSupportFragmentManager().findFragmentByTag("nav_drawer");
-        if (mDrawer == null) {
-            mDrawer = new FragmentDrawer_();
-            getSupportFragmentManager().beginTransaction().add(R.id.drawer_container, mDrawer, "nav_drawer").commit();
-        }
-        mTask = (TaskFragmentFeed_) getSupportFragmentManager().findFragmentByTag("task");
-        if (mTask == null) {
-            mTask = new TaskFragmentFeed_();
-            getSupportFragmentManager().beginTransaction().add(mTask, "task").commit();
-        }
+        initFab();
+
+        //Initialize our Drawer Fragment that contains the navigation view and adds admin information and groups information
+
+        initNavigationDrawer();
+
+        //Initialize our retained fragment that performs the task of loading posts in the background
+
+        initTaskFragment();
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
 
+        //Inflate the child class root View which is represented by a ViewStub in this layout
 
         ViewStub viewStub = (ViewStub) findViewById(R.id.content_main);
         viewStub.setInflatedId(getContentViewRoot());
@@ -90,6 +91,9 @@ public abstract class ActivityBase extends AppCompatActivity
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
         mProgress = new ProgressDialog(this);
+
+        //Give the subclasses an opportunity to create their views by indicating the parent tablayout and their main content view is ready.
+
         onCreateUserInterface(tabLayout, mainContentView);
 
         if (savedInstanceState != null) {
@@ -100,6 +104,37 @@ public abstract class ActivityBase extends AppCompatActivity
         }
     }
 
+    private void moveToLogin() {
+        NavUtils.startActivityLogin(this);
+        finish();
+    }
+
+    private void initFab() {
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+    }
+
+    private void initNavigationDrawer() {
+        mDrawer = (FragmentDrawer_) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_DRAWER);
+        if (mDrawer == null) {
+            mDrawer = new FragmentDrawer_();
+            getSupportFragmentManager().beginTransaction().add(R.id.drawer_container, mDrawer, TAG_FRAGMENT_DRAWER).commit();
+        }
+    }
+
+    private void initTaskFragment() {
+        mTask = (TaskFragmentPosts_) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_TASK_POSTS);
+        if (mTask == null) {
+            mTask = new TaskFragmentPosts_();
+            getSupportFragmentManager().beginTransaction().add(mTask, TAG_FRAGMENT_TASK_POSTS).commit();
+        }
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -107,11 +142,10 @@ public abstract class ActivityBase extends AppCompatActivity
         outState.putParcelable(STATE_SELECTED_GROUP, Parcels.wrap(Group.class, mSelectedGroup));
     }
 
-    private void moveToLogin() {
-        NavUtils.startActivityLogin(this);
-        finish();
-    }
 
+    /**
+     * If the drawer is open, close the drawer, else let the default behavior take place for back press
+     */
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -140,7 +174,6 @@ public abstract class ActivityBase extends AppCompatActivity
         return true;
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -157,7 +190,7 @@ public abstract class ActivityBase extends AppCompatActivity
                 mSelectedGroup = mDrawer.getSelectedGroup(id);
                 if (mSelectedGroup != null) {
                     setTitle(mSelectedGroup.getName());
-                    mTask.triggerLoadFeed(mSelectedGroup, mApplication.getToken());
+                    mTask.triggerLoadPosts(mSelectedGroup, mApplication.getToken());
                 }
                 break;
         }
@@ -167,14 +200,14 @@ public abstract class ActivityBase extends AppCompatActivity
     }
 
     @Override
-    public void beforeFeedLoaded(String message) {
+    public void beforePostsLoaded(String message) {
         mProgress.setTitle("Loading...");
         mProgress.setMessage(message);
         mProgress.show();
     }
 
     @Override
-    public void afterFeedLoaded(String message, Group group) {
+    public void afterPostsLoaded(String message, Group group) {
         mProgress.dismiss();
         Snackbar.make(mFab, message + " " + group.getName(), Snackbar.LENGTH_LONG)
                 .setAction("Yay!", null).show();
@@ -188,10 +221,21 @@ public abstract class ActivityBase extends AppCompatActivity
     }
 
 
+    /**
+     * @return the layout id of the child activity
+     */
     public abstract int getContentView();
 
+    /**
+     * @return the id of the root View of the layout of the child
+     */
     @IdRes
     public abstract int getContentViewRoot();
+
+    /**
+     * @param tabLayout       the tab layout of the parent which can be used to link with the ViewPager in the child if it uses ViewPager as its root
+     * @param mainContentView the View object corresponding to the root View of the child
+     */
 
     public abstract void onCreateUserInterface(TabLayout tabLayout, View mainContentView);
 }

@@ -51,6 +51,7 @@ public class SettingsFragmentMain extends PreferenceFragment implements SharedPr
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        //Disable the option to choose which groups to monitor if the user has selected a frequency of never in the frequency settings.
         if (key.equals(getString(R.string.key_monitor_frequency))) {
             int value = Integer.parseInt(sharedPreferences.getString(key, "-1"));
             if (value == -1) {

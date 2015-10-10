@@ -51,8 +51,12 @@ public class Fpam extends Application {
         return gson;
     }
 
-    public boolean hasToken() {
+    public boolean isValidToken() {
         AccessToken token = getToken();
+        return token != null && !token.isExpired();
+    }
+
+    public boolean isValidToken(AccessToken token) {
         return token != null && !token.isExpired();
     }
 
@@ -61,7 +65,7 @@ public class Fpam extends Application {
     }
 
     public boolean hasPermissionsPublishActions() {
-        if (hasToken()) {
+        if (isValidToken()) {
             AccessToken token = getToken();
             Set<String> permissions = token.getPermissions();
             return !permissions.isEmpty() && permissions.contains(PUBLISH_ACTIONS);
@@ -70,7 +74,7 @@ public class Fpam extends Application {
     }
 
     public boolean shouldRedirectToLogin() {
-        return !hasToken();
+        return !isValidToken();
     }
 
     @Override

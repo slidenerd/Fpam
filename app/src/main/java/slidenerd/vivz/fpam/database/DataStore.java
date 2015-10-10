@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
+import slidenerd.vivz.fpam.model.json.feed.GroupMeta;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.CopyUtils;
@@ -58,15 +59,15 @@ public class DataStore {
         return src != null ? CopyUtils.duplicateAdmin(src) : null;
     }
 
-    public static void storeFeed(Realm realm, ArrayList<Post> listPosts) {
+    public static void storePosts(Realm realm, ArrayList<Post> listPosts) {
         realm.beginTransaction();
         realm.copyToRealmOrUpdate(listPosts);
         realm.commitTransaction();
     }
 
-    public static ArrayList<Post> loadFeed(Realm realm) {
-        RealmResults<Post> realmPosts = realm.where(Post.class).findAll();
-        return CopyUtils.duplicatePosts(realmPosts);
+    public static void storeGroupMeta(Realm realm, GroupMeta groupMeta) {
+        realm.beginTransaction();
+        realm.copyToRealmOrUpdate(groupMeta);
+        realm.commitTransaction();
     }
-
 }
