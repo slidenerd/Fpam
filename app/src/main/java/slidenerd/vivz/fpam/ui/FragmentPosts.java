@@ -38,7 +38,8 @@ import io.realm.RealmResults;
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.PostAdapter;
-import slidenerd.vivz.fpam.adapter.TouchHelper;
+import slidenerd.vivz.fpam.adapter.SwipeHelper;
+import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Post;
@@ -83,7 +84,6 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGroupSelectedReceiver, new IntentFilter("group_selected"));
         mRealm = Realm.getDefaultInstance();
         //Initialize facebook stuff for login
         mCallbackManager = CallbackManager.Factory.create();
@@ -125,10 +125,9 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         mRecyclerPosts.setEmptyView(mTextEmpty);
         mRecyclerPosts.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerPosts.setAdapter(mAdapter);
-        ItemTouchHelper.Callback callback = new TouchHelper(mAdapter);
+        ItemTouchHelper.Callback callback = new SwipeHelper(mAdapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(mRecyclerPosts);
-
     }
 
 
@@ -200,13 +199,22 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
 
     private void updateSpammerData(Realm realm, Group group, Post post) {
 
+        //The spammer exists in the database if we find a composite id such that it starts with the user id the person who made the post and ends with the group id where the person posted
+
         Spammer spammer = realm.where(Spammer.class).beginsWith("userGroupCompositeId", post.getUserId()).endsWith("userGroupCompositeId", group.getId()).findFirst();
+
+        //If we did NOT find a spammer for the given user id and group id, add the person to the spammer's database and mark the number of spam posts as 1 for this entry.
+
         if (spammer == null) {
             spammer = new Spammer(post.getUserId() + ":" + group.getId(), post.getUserName(), 1, System.currentTimeMillis());
             realm.beginTransaction();
             realm.copyToRealm(spammer);
             realm.commitTransaction();
-        } else {
+        }
+
+        //If we found the id of the person making this post in the spammer's database, increment the number of spam posts made by this person.
+
+        else {
             realm.beginTransaction();
             spammer.setSpamCount(spammer.getSpamCount() + 1);
             spammer.setTimestamp(System.currentTimeMillis());
@@ -227,16 +235,15 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     public void onDestroy() {
         super.onDestroy();
         mRealm.close();
-//        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mGroupSelectedReceiver);
     }
 
     @Receiver(actions = NavUtils.ACTION_LOAD_FEED, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
     public void onBroadcastSelectedGroup(Context context, Intent intent) {
         mSelectedGroup = Parcels.unwrap(intent.getExtras().getParcelable(NavUtils.EXTRA_SELECTED_GROUP));
 //        FilterPostService_.intent(context).onFilterPosts(Parcels.wrap(Group.class, mSelectedGroup)).start();
-        RealmResults<Post> realmResults = mRealm.where(Post.class).beginsWith("postId", mSelectedGroup.getId()).findAllSorted("updatedTime", false);
-        mAdapter.setData(realmResults);
-        if (!realmResults.isEmpty())
+        RealmResults<Post> results = DataStore.getSortedPostsFrom(mRealm, mSelectedGroup);
+        mAdapter.setData(results);
+        if (!results.isEmpty())
             mRecyclerPosts.smoothScrollToPosition(0);
     }
 

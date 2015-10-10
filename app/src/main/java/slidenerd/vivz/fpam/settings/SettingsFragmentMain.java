@@ -1,64 +1,55 @@
 package slidenerd.vivz.fpam.settings;
 
 import android.annotation.TargetApi;
-import android.content.SharedPreferences;
 import android.os.Build;
-import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
+
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.PreferenceByKey;
+import org.androidannotations.annotations.PreferenceChange;
+import org.androidannotations.annotations.PreferenceClick;
+import org.androidannotations.annotations.PreferenceScreen;
 
 import slidenerd.vivz.fpam.R;
+import slidenerd.vivz.fpam.extras.Constants;
+
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-public class SettingsFragmentMain extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private SharedPreferences mPreferences;
+@EFragment
+@PreferenceScreen(R.xml.pref_main)
+public class SettingsFragmentMain extends PreferenceFragment {
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.pref_main);
-        mPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        mPreferences.registerOnSharedPreferenceChangeListener(this);
+    @PreferenceByKey(R.string.key_groups)
+    Preference mPrefGroups;
+
+    @PreferenceClick(R.string.key_groups)
+    public void onClickGroups() {
+        getFragmentManager()
+                .beginTransaction()
+                .replace(R.id.main_content, new SettingsFragmentGroups_())
+                .addToBackStack(getString(R.string.key_groups))
+                .commit();
     }
 
-    @Override
-    public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
-        if (preference.getKey().equals(getString(R.string.key_groups))) {
-            getFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.main_content, new SettingsFragmentGroups_())
-                    .addToBackStack(getString(R.string.key_groups))
-                    .commit();
-        }
-        if (preference.getKey().equals(getString(R.string.key_spammers))) {
-            getFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.main_content, new SettingsFragmentSpammers_())
-                    .addToBackStack(getString(R.string.key_groups))
-                    .commit();
-        }
-        return false;
+    @PreferenceClick(R.string.key_spammers)
+    public void onClickSpammers() {
+        getFragmentManager()
+                .beginTransaction()
+                .replace(R.id.main_content, new SettingsFragmentSpammers_())
+                .addToBackStack(getString(R.string.key_groups))
+                .commit();
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mPreferences.unregisterOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+    @PreferenceChange(R.string.key_monitor_frequency)
+    public void onPreferenceMonitorFrequencyChanged(Preference preference, String newValue) {
         //Disable the option to choose which groups to monitor if the user has selected a frequency of never in the frequency settings.
-        if (key.equals(getString(R.string.key_monitor_frequency))) {
-            int value = Integer.parseInt(sharedPreferences.getString(key, "-1"));
-            if (value == -1) {
-                getPreferenceScreen().findPreference(getString(R.string.key_groups)).setEnabled(false);
-            } else {
-                getPreferenceScreen().findPreference(getString(R.string.key_groups)).setEnabled(true);
-            }
+        int value = Integer.parseInt(newValue);
+        if (value == Constants.NA) {
+            mPrefGroups.setEnabled(false);
+        } else {
+            mPrefGroups.setEnabled(true);
         }
     }
 }

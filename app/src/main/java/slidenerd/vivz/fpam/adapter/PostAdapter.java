@@ -24,7 +24,7 @@ import slidenerd.vivz.fpam.util.DisplayUtils;
 /**
  * Created by vivz on 29/08/15.
  */
-public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHolder> implements OnSwipeListener {
+public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHolder> implements SwipeHelper.OnSwipeListener {
 
     private Context mContext;
     private LayoutInflater mLayoutInflater;

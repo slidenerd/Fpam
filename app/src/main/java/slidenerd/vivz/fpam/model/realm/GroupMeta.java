@@ -1,4 +1,4 @@
-package slidenerd.vivz.fpam.model.json.feed;
+package slidenerd.vivz.fpam.model.realm;
 
 import org.parceler.Parcel;
 

@@ -3,11 +3,11 @@ package slidenerd.vivz.fpam.adapter;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
-public class TouchHelper extends ItemTouchHelper.Callback {
+public class SwipeHelper extends ItemTouchHelper.Callback {
 
     private final OnSwipeListener mOnSwipeListener;
 
-    public TouchHelper(OnSwipeListener adapter) {
+    public SwipeHelper(OnSwipeListener adapter) {
         mOnSwipeListener = adapter;
     }
 
@@ -43,5 +43,9 @@ public class TouchHelper extends ItemTouchHelper.Callback {
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
         mOnSwipeListener.onSwipe(viewHolder.getAdapterPosition());
+    }
+    public interface OnSwipeListener {
+        //Called when the user swipes an item from the RecyclerView at the given position
+        void onSwipe(int position);
     }
 }

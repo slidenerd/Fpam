@@ -8,19 +8,19 @@ import io.realm.RealmObject;
 import io.realm.RealmResults;
 
 public abstract class AbstractMutableRealmAdapter<T extends RealmObject, VH extends RecyclerView.ViewHolder>
-        extends AbstractRealmAdapter<T, VH> implements OnSwipeListener {
+        extends AbstractRealmAdapter<T, VH> implements SwipeHelper.OnSwipeListener {
 
-    private Realm realm;
+    private Realm mRealm;
 
     public AbstractMutableRealmAdapter(Context context, Realm realm, RealmResults<T> results) {
         super(context, realm, results);
-        this.realm = realm;
+        this.mRealm = realm;
     }
 
     public void add(T item, boolean update) {
-        realm.beginTransaction();
-        T phraseToWrite = update == true ? realm.copyToRealmOrUpdate(item) : realm.copyToRealm(item);
-        realm.commitTransaction();
+        mRealm.beginTransaction();
+        T phraseToWrite = (update == true) ? mRealm.copyToRealmOrUpdate(item) : mRealm.copyToRealm(item);
+        mRealm.commitTransaction();
         notifyItemRangeChanged(0, getItemCount());
     }
 
@@ -29,10 +29,10 @@ public abstract class AbstractMutableRealmAdapter<T extends RealmObject, VH exte
         if (!isHeader(position) && !isFooter(position)) {
             int itemPosition = position - getHeaderCount();
             if (!mResults.isEmpty()) {
-                realm.beginTransaction();
+                mRealm.beginTransaction();
                 T item = mResults.get(itemPosition);
                 item.removeFromRealm();
-                realm.commitTransaction();
+                mRealm.commitTransaction();
                 notifyItemRemoved(position);
             }
         }

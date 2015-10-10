@@ -6,10 +6,11 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
-import slidenerd.vivz.fpam.model.json.feed.GroupMeta;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.realm.GroupMeta;
 import slidenerd.vivz.fpam.util.CopyUtils;
 
 public class DataStore {
@@ -69,5 +70,23 @@ public class DataStore {
         realm.beginTransaction();
         realm.copyToRealmOrUpdate(groupMeta);
         realm.commitTransaction();
+    }
+
+    public static ArrayList<GroupMeta> loadGroupMeta(Realm realm) {
+        RealmResults<GroupMeta> results = realm.where(GroupMeta.class).findAll();
+        return CopyUtils.duplicateGroupMetas(results);
+    }
+
+    public static RealmResults<Post> getSortedPostsFrom(Realm realm, Group group) {
+        return realm.where(Post.class).beginsWith("postId", group.getId()).findAllSorted("updatedTime", false);
+    }
+
+    public static RealmResults<Group> getSortedGroups(Realm realm) {
+        return realm.where(Group.class).findAllSorted("name");
+    }
+
+    public static long getTimestamp(Realm realm, Group group) {
+        GroupMeta groupMeta = realm.where(GroupMeta.class).equalTo("groupId", group.getId()).findFirst();
+        return groupMeta != null ? groupMeta.getTimestamp() : Constants.NA;
     }
 }

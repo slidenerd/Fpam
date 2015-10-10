@@ -32,6 +32,7 @@ import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.widget.RoundedImageView;
 
 /**
+ * TODO show the drawer if its the first time else hide it
  * A simple {@link Fragment} subclass.
  */
 @EFragment(R.layout.nav_drawer)

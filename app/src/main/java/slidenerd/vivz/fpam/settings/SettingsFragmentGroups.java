@@ -14,6 +14,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.SettingsGroupsAdapter;
+import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.model.json.group.Group;
 
 /**
@@ -38,7 +39,7 @@ public class SettingsFragmentGroups extends Fragment {
     void onViewCreated() {
         mRecyclerGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerGroups.setHasFixedSize(true);
-        RealmResults<Group> results = mRealm.where(Group.class).findAllSorted("name");
+        RealmResults<Group> results = DataStore.getSortedGroups(mRealm);
         mRecyclerGroups.setAdapter(new SettingsGroupsAdapter(getActivity(), mRealm, results));
     }
 

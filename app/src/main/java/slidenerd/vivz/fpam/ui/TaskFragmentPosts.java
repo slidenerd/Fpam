@@ -20,11 +20,14 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.database.DataStore;
+import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.feed.GroupMeta;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.realm.GroupMeta;
+import slidenerd.vivz.fpam.util.DateUtils;
 import slidenerd.vivz.fpam.util.FBUtils;
+import slidenerd.vivz.fpam.util.PostUtils;
 
 /**
  * The retained fragment used to load posts in the background
@@ -69,22 +72,30 @@ public class TaskFragmentPosts extends Fragment {
     /**
      * If the feed is loaded for the first time, then load posts the simple way without considering the timestamp. There is no need to consider the limit enforced by the admin from the settings of the app since the default option for limit corresponds to 25 which also happens to be the maximum number of results returned by facebook graph api if loading data using the simple way. If the loading process returned non empty results, then store the timestamp of when this group was loaded. If the feed is loaded for a subsequent time, use the previously stored timestamp from the previous step to fetch all the posts from the timestamp till the current time. Since the number of posts may be literally very large, consider the limits set by the admin for settings to get at max limit number of posts.
      *
-     * @param group       the group selected by the user from the navigation drawer
-     * @param accessToken the access token provided by facebook after login
+     * @param group the group selected by the user from the navigation drawer
+     * @param token the access token provided by facebook after login
      */
     @Background
-    void loadPostsAsync(@NonNull Group group, AccessToken accessToken) {
+    void loadPostsAsync(@NonNull Group group, AccessToken token) {
         if (mApplication.isValidToken()) {
             Realm realm = null;
             try {
                 realm = Realm.getDefaultInstance();
-                ArrayList<Post> listPosts = FBUtils.requestFeedSync(accessToken, Fpam.getGson(), group);
-                DataStore.storePosts(realm, listPosts);
-                if (!listPosts.isEmpty()) {
+                long lastLoadedTimestamp = DataStore.getTimestamp(realm, group);
+                ArrayList<Post> posts;
+                if (lastLoadedTimestamp == Constants.NA) {
+                    posts = FBUtils.requestFeedSync(token, Fpam.getGson(), group);
+                } else {
+                    posts = FBUtils.requestFeedSince(token, Fpam.getGson(), group, 100, lastLoadedTimestamp);
+                }
+                DataStore.storePosts(realm, posts);
+                long averageInterval = PostUtils.calculateAverageInterval(posts);
+                String average = DateUtils.getDurationHHMMSS(averageInterval);
+                if (!posts.isEmpty()) {
                     GroupMeta groupMeta = new GroupMeta(group.getId(), System.currentTimeMillis());
                     DataStore.storeGroupMeta(realm, groupMeta);
                 }
-                onPostsLoaded("Feed loaded for ", group);
+                onPostsLoaded("Feed loaded with an average activity every " + average + " for ", group);
             } catch (JSONException e) {
                 L.m("" + e);
             } catch (FacebookException e) {

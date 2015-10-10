@@ -1,9 +1,12 @@
 package slidenerd.vivz.fpam.util;
 
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
 
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
+import slidenerd.vivz.fpam.model.realm.GroupMeta;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 
@@ -22,15 +25,6 @@ public class CopyUtils {
         return admin;
     }
 
-    public static ArrayList<Post> duplicatePosts(RealmResults<Post> realmPosts) {
-        ArrayList<Post> listPosts = new ArrayList<>();
-//        for (Post realmPost : realmPosts) {
-//            Post post = new Post(realmPost.getPostId(), realmPost.getFrom(), realmPost.getMessage(), realmPost.getName(), realmPost.getCaption(), realmPost.getDescription(), realmPost.getLink(), realmPost.getPicture(), realmPost.getType(), realmPost.getAttachments(), realmPost.getComments(), realmPost.getUpdatedTime());
-//            listPosts.add(post);
-//        }
-        return listPosts;
-    }
-
     public static Post duplicatePost(Post realmPost) {
         Post post = new Post();
         post.setPostId(realmPost.getPostId());
@@ -46,5 +40,21 @@ public class CopyUtils {
         post.setPicture(realmPost.getPicture());
         post.setLink(realmPost.getLink());
         return post;
+    }
+
+    public static ArrayList<GroupMeta> duplicateGroupMetas(RealmResults<GroupMeta> results) {
+        ArrayList<GroupMeta> groupMetas = new ArrayList<>();
+        for (GroupMeta realmGroupMeta : results) {
+            GroupMeta groupMeta = duplicateGroupMeta(realmGroupMeta);
+            groupMetas.add(groupMeta);
+        }
+        return groupMetas;
+    }
+
+    public static GroupMeta duplicateGroupMeta(@NonNull GroupMeta realmGroupMeta) {
+        GroupMeta groupMeta = new GroupMeta();
+        groupMeta.setGroupId(realmGroupMeta.getGroupId());
+        groupMeta.setTimestamp(realmGroupMeta.getTimestamp());
+        return groupMeta;
     }
 }
