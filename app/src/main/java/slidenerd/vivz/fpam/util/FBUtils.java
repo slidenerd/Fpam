@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
@@ -27,7 +28,7 @@ import slidenerd.vivz.fpam.util.JSONUtils.FeedFields;
 import slidenerd.vivz.fpam.util.JSONUtils.GroupFields;
 
 public class FBUtils {
-    private static final int RESULTS_PER_PAGE = 25;
+
 
     //TODO handle errors that may arise if JSONObject is null while retrieving admin, Paginate GroupMeta Pages
     //TODO write a requestGroups method that uses pagination technique similar to requestFeedSince if possible
@@ -56,7 +57,7 @@ public class FBUtils {
      */
     @Nullable
     public static ArrayList<Group> requestGroupsSync(AccessToken accessToken, Gson gson) throws JSONException {
-        ArrayList<Group> listGroups = new ArrayList<>(RESULTS_PER_PAGE);
+        ArrayList<Group> listGroups = new ArrayList<>(Constants.RESULTS_PER_PAGE);
         Bundle parameters = new Bundle();
         TypeToken<ArrayList<Group>> typeToken = new TypeToken<ArrayList<Group>>() {
         };
@@ -133,7 +134,7 @@ public class FBUtils {
      */
 
     public static ArrayList<Post> requestFeedSync(AccessToken token, Gson gson, Group group) throws JSONException {
-        ArrayList<Post> listPosts = new ArrayList<>(RESULTS_PER_PAGE);
+        ArrayList<Post> listPosts = new ArrayList<>(Constants.RESULTS_PER_PAGE);
         TypeToken<ArrayList<Post>> typeToken = new TypeToken<ArrayList<Post>>() {
         };
         Bundle parameters = new Bundle();

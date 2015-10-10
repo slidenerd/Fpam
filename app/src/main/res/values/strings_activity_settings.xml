@@ -3,7 +3,7 @@
     <string name="title_activity_settings">Settings</string>
     <!--The first setting for Active Scan-->
     <string name="pref_monitor">Monitor Spam</string>
-    <string name="key_monitor_frequency">key_scan_frequency</string>
+    <string name="key_monitor_frequency">key_monitor_frequency</string>
     <string-array name="pref_monitor_frequency_titles">
         <item>Never</item>
         <item>Every 15 minutes</item>

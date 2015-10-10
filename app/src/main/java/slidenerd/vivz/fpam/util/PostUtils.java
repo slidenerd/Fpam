@@ -17,7 +17,9 @@ public class PostUtils {
             averageInterval += Math.abs(next.getUpdatedTime() - current.getUpdatedTime());
             L.m("average interval " + averageInterval);
         }
-        averageInterval /= (posts.size() - 1);
+        if (posts.size() - 1 > 0) {
+            averageInterval /= (posts.size() - 1);
+        }
         return averageInterval;
     }
 }

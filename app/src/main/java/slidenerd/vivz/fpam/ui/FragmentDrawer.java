@@ -18,6 +18,7 @@ import com.squareup.picasso.Picasso;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.prefs.MyPrefs_;
 import slidenerd.vivz.fpam.widget.RoundedImageView;
 
 /**
@@ -40,6 +42,8 @@ public class FragmentDrawer extends Fragment {
 
     @ViewById(R.id.nav_view)
     NavigationView mDrawer;
+    @Pref
+    MyPrefs_ mPref;
     /*
         The list of groups that the logged in user is an admin of.
      */

@@ -35,6 +35,9 @@ public class DataStore {
         return CopyUtils.duplicateGroups(realmGroups);
     }
 
+    public static RealmResults<Group> getGroups(Realm realm) {
+        return realm.where(Group.class).findAllSorted("name");
+    }
 
     /**
      * In the first step, check if we have a valid user to store. If we have a valid user, use shared preferences to store each aspect of their profile. Convert the 'Picture' object of the user into a JSON String and store that.
@@ -66,23 +69,23 @@ public class DataStore {
         realm.commitTransaction();
     }
 
+    public static RealmResults<Post> getPosts(Realm realm, Group group) {
+        return realm.where(Post.class).beginsWith("postId", group.getId()).findAllSorted("updatedTime", false);
+    }
+
+    public static int getPostCountForGroup(Realm realm, Group group) {
+        return realm.where(Post.class).beginsWith("postId", group.getId()).findAllSorted("updatedTime", false).size();
+    }
+
     public static void storeGroupMeta(Realm realm, GroupMeta groupMeta) {
         realm.beginTransaction();
         realm.copyToRealmOrUpdate(groupMeta);
         realm.commitTransaction();
     }
 
-    public static ArrayList<GroupMeta> loadGroupMeta(Realm realm) {
+    public static ArrayList<GroupMeta> loadGroupMetas(Realm realm) {
         RealmResults<GroupMeta> results = realm.where(GroupMeta.class).findAll();
         return CopyUtils.duplicateGroupMetas(results);
-    }
-
-    public static RealmResults<Post> getSortedPostsFrom(Realm realm, Group group) {
-        return realm.where(Post.class).beginsWith("postId", group.getId()).findAllSorted("updatedTime", false);
-    }
-
-    public static RealmResults<Group> getSortedGroups(Realm realm) {
-        return realm.where(Group.class).findAllSorted("name");
     }
 
     public static long getTimestamp(Realm realm, Group group) {

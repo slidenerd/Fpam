@@ -2,6 +2,7 @@ package slidenerd.vivz.fpam.settings;
 
 import android.annotation.TargetApi;
 import android.os.Build;
+import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
@@ -21,8 +22,15 @@ import slidenerd.vivz.fpam.extras.Constants;
 @PreferenceScreen(R.xml.pref_main)
 public class SettingsFragmentMain extends PreferenceFragment {
 
+    public static String PREF_NAME = "MyPrefs";
     @PreferenceByKey(R.string.key_groups)
     Preference mPrefGroups;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getPreferenceManager().setSharedPreferencesName(PREF_NAME);
+    }
 
     @PreferenceClick(R.string.key_groups)
     public void onClickGroups() {

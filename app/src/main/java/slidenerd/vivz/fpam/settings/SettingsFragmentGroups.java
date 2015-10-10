@@ -39,7 +39,7 @@ public class SettingsFragmentGroups extends Fragment {
     void onViewCreated() {
         mRecyclerGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerGroups.setHasFixedSize(true);
-        RealmResults<Group> results = DataStore.getSortedGroups(mRealm);
+        RealmResults<Group> results = DataStore.getGroups(mRealm);
         mRecyclerGroups.setAdapter(new SettingsGroupsAdapter(getActivity(), mRealm, results));
     }
 
