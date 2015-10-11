@@ -4,9 +4,9 @@ import java.util.Date;
 import java.util.List;
 
 import slidenerd.vivz.fpam.model.json.admin.Admin;
-import slidenerd.vivz.fpam.model.realm.GroupMeta;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.realm.GroupMeta;
 import slidenerd.vivz.fpam.model.realm.Spammer;
 
 public class PrintUtils {
@@ -25,7 +25,8 @@ public class PrintUtils {
                 + "\n" + post.getLink()
                 + "\n" + post.getCreatedTime()
                 + "\n" + post.getUpdatedTime()
-                + "\n" + post.getType();
+                + "\n" + post.getType()
+                + "\n";
     }
 
     public static String toString(List<Post> listPosts) {

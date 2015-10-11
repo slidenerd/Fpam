@@ -27,11 +27,10 @@ import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.model.realm.GroupMeta;
 import slidenerd.vivz.fpam.prefs.MyPrefs_;
-import slidenerd.vivz.fpam.util.DateUtils;
 import slidenerd.vivz.fpam.util.FBUtils;
-import slidenerd.vivz.fpam.util.PostUtils;
 
 /**
+ * TODO implement database limiting by removing posts beyond the limit
  * The retained fragment used to load posts in the background
  */
 @EFragment
@@ -89,35 +88,37 @@ public class TaskFragmentPosts extends Fragment {
 
                 //Get the maximum number of posts to retrieve or cache size from app settings
 
-                int maximumNumberOfPostsToRetrieve = mPref.cacheSize().getOr(Constants.DEFAULT_NUMBER_OF_ITEMS_TO_FETCH);
+                int maximumPostsStored = mPref.cacheSize().getOr(Constants.DEFAULT_NUMBER_OF_ITEMS_TO_FETCH);
 
                 //Get the time stamp of when this group was last loaded and convert that timestamp to UTC format
 
                 long lastLoadedTimestamp = DataStore.getTimestamp(realm, group) / 1000;
                 ArrayList<Post> posts;
 
-                //If the group was never loaded before, load it for the first time
-
-                if (lastLoadedTimestamp == Constants.NA) {
-                    posts = FBUtils.requestFeedSync(token, Fpam.getGson(), group);
-                }
-
                 //If the group was loaded before as indicated by a valid timestamp, then fetch all posts made since that timestamp or maximum number of posts as per the cache size from the app settings whichever is greater
 
+                if (lastLoadedTimestamp > 0) {
+                    posts = FBUtils.requestFeedSince(token, Fpam.getGson(), group, maximumPostsStored, lastLoadedTimestamp);
+                    L.m("loading " + posts.size() + " posts for SUBSEQUENT time for group " + group.getName());
+                }
+
+                //If the group was never loaded before, load it for the first time
+
                 else {
-                    posts = FBUtils.requestFeedSince(token, Fpam.getGson(), group, maximumNumberOfPostsToRetrieve, lastLoadedTimestamp);
+                    posts = FBUtils.requestFeedSync(token, Fpam.getGson(), group);
+                    L.m("loading " + posts.size() + " posts for the first time for group " + group.getName());
                 }
                 DataStore.storePosts(realm, posts);
-                long averageInterval = PostUtils.calculateAverageInterval(posts);
-                String average = averageInterval == 0 ? "not available" : DateUtils.getDurationHHMMSS(averageInterval);
 
                 //If we did retrieve posts, update the timestamp of when the group was loaded
 
                 if (!posts.isEmpty()) {
                     GroupMeta groupMeta = new GroupMeta(group.getId(), System.currentTimeMillis());
                     DataStore.storeGroupMeta(realm, groupMeta);
+                    L.m("updated group meta for " + group.getName());
+                    DataStore.limitStoredPosts(realm, group, maximumPostsStored);
                 }
-                onPostsLoaded(posts.size() + " posts loaded with an interval " + average + " for ", group);
+                onPostsLoaded(posts.size() + " posts loaded for ", group);
             } catch (JSONException e) {
                 L.m("" + e);
             } catch (FacebookException e) {

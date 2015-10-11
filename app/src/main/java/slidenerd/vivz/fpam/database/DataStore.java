@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import slidenerd.vivz.fpam.extras.Constants;
+import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
@@ -73,8 +73,17 @@ public class DataStore {
         return realm.where(Post.class).beginsWith("postId", group.getId()).findAllSorted("updatedTime", false);
     }
 
-    public static int getPostCountForGroup(Realm realm, Group group) {
-        return realm.where(Post.class).beginsWith("postId", group.getId()).findAllSorted("updatedTime", false).size();
+    public static void limitStoredPosts(Realm realm, Group group, int maximumPostsStored) {
+        RealmResults<Post> results = realm.where(Post.class).beginsWith("postId", group.getId()).findAllSorted("updatedTime", false);
+        int numberOfPostsRemoved = 0;
+        realm.beginTransaction();
+        while (results.size() > maximumPostsStored) {
+            Post post = results.get(results.size() - 1);
+            post.removeFromRealm();
+            numberOfPostsRemoved++;
+        }
+        realm.commitTransaction();
+        L.m(numberOfPostsRemoved > 0 ? "Removed " + numberOfPostsRemoved : "Nothing to remove");
     }
 
     public static void storeGroupMeta(Realm realm, GroupMeta groupMeta) {
@@ -90,6 +99,7 @@ public class DataStore {
 
     public static long getTimestamp(Realm realm, Group group) {
         GroupMeta groupMeta = realm.where(GroupMeta.class).equalTo("groupId", group.getId()).findFirst();
-        return groupMeta != null ? groupMeta.getTimestamp() : Constants.NA;
+        L.m((groupMeta == null) + "");
+        return groupMeta != null ? groupMeta.getTimestamp() : 0;
     }
 }
