@@ -21,11 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import slidenerd.vivz.fpam.extras.Constants;
+import slidenerd.vivz.fpam.extras.FeedFields;
+import slidenerd.vivz.fpam.extras.GroupFields;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.util.JSONUtils.FeedFields;
-import slidenerd.vivz.fpam.util.JSONUtils.GroupFields;
 
 public class FBUtils {
 

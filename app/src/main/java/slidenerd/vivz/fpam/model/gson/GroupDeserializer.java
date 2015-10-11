@@ -8,8 +8,8 @@ import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
 
+import slidenerd.vivz.fpam.extras.GroupFields;
 import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.util.JSONUtils;
 
 /**
  * Created by vivz on 29/09/15.
@@ -24,19 +24,19 @@ public class GroupDeserializer implements JsonDeserializer<Group> {
 
         //Get the 'name'
 
-        final String name = root.get(JSONUtils.GroupFields.NAME).getAsString();
+        final String name = root.get(GroupFields.NAME).getAsString();
 
         //Get the 'id'
 
-        final String id = root.get(JSONUtils.GroupFields.ID).getAsString();
+        final String id = root.get(GroupFields.ID).getAsString();
 
         //Get the 'icon'
 
-        final String icon = root.get(JSONUtils.GroupFields.ICON).getAsString();
+        final String icon = root.get(GroupFields.ICON).getAsString();
 
         //Get the 'unread'
 
-        final int unread = root.getAsJsonPrimitive(JSONUtils.GroupFields.UNREAD).getAsInt();
+        final int unread = root.getAsJsonPrimitive(GroupFields.UNREAD).getAsInt();
         final Group group = new Group();
         group.setId(id);
         group.setName(name);

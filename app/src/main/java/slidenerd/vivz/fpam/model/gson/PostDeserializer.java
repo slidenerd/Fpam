@@ -8,9 +8,9 @@ import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
 
+import slidenerd.vivz.fpam.extras.FeedFields;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.util.DateUtils;
-import slidenerd.vivz.fpam.util.JSONUtils.FeedFields;
 
 /**
  * TODO Add appropriate comments

@@ -27,6 +27,7 @@ import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.model.realm.GroupMeta;
 import slidenerd.vivz.fpam.prefs.MyPrefs_;
+import slidenerd.vivz.fpam.util.DateUtils;
 import slidenerd.vivz.fpam.util.FBUtils;
 
 /**
@@ -92,7 +93,7 @@ public class TaskFragmentPosts extends Fragment {
 
                 //Get the time stamp of when this group was last loaded and convert that timestamp to UTC format
 
-                long lastLoadedTimestamp = DataStore.getTimestamp(realm, group) / 1000;
+                long lastLoadedTimestamp = DateUtils.getUTCTimestamp(DataStore.getTimestamp(realm, group));
                 ArrayList<Post> posts;
 
                 //If the group was loaded before as indicated by a valid timestamp, then fetch all posts made since that timestamp or maximum number of posts as per the cache size from the app settings whichever is greater
@@ -113,11 +114,15 @@ public class TaskFragmentPosts extends Fragment {
                 //If we did retrieve posts, update the timestamp of when the group was loaded
 
                 if (!posts.isEmpty()) {
+
+                    //update the timestamp of the group that was just loaded
+
                     GroupMeta groupMeta = new GroupMeta(group.getId(), System.currentTimeMillis());
                     DataStore.storeGroupMeta(realm, groupMeta);
                     L.m("updated group meta for " + group.getName());
                     DataStore.limitStoredPosts(realm, group, maximumPostsStored);
                 }
+
                 onPostsLoaded(posts.size() + " posts loaded for ", group);
             } catch (JSONException e) {
                 L.m("" + e);

@@ -13,8 +13,11 @@ public class DateUtils {
     private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
     public static final long getUTCTimestamp() {
-        long unixTime = System.currentTimeMillis() / 1000L;
-        return unixTime;
+        return System.currentTimeMillis() / 1000L;
+    }
+
+    public static final long getUTCTimestamp(long milliseconds) {
+        return milliseconds / 1000L;
     }
 
     public static final long getFBFormattedTime(String timeString) {

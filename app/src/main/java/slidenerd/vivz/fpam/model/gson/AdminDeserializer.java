@@ -8,8 +8,8 @@ import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
 
+import slidenerd.vivz.fpam.extras.AdminFields;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
-import slidenerd.vivz.fpam.util.JSONUtils;
 
 /**
  * Created by vivz on 29/09/15.
@@ -25,43 +25,43 @@ public class AdminDeserializer implements JsonDeserializer<Admin> {
 
         //Retrieve 'id'
 
-        final String id = root.get(JSONUtils.AdminFields.ID).getAsString();
+        final String id = root.get(AdminFields.ID).getAsString();
 
         //Retrieve 'email'
 
-        final String email = root.get(JSONUtils.AdminFields.EMAIL).getAsString();
+        final String email = root.get(AdminFields.EMAIL).getAsString();
 
         //Retrieve 'first_name'
 
-        final String firstName = root.get(JSONUtils.AdminFields.FIRST_NAME).getAsString();
+        final String firstName = root.get(AdminFields.FIRST_NAME).getAsString();
 
         //Retrieve 'last_name'
 
-        final String lastName = root.get(JSONUtils.AdminFields.LAST_NAME).getAsString();
+        final String lastName = root.get(AdminFields.LAST_NAME).getAsString();
 
         //Retrieve Json object 'picture' inside root json object
 
-        final JsonObject pictureObject = root.getAsJsonObject(JSONUtils.AdminFields.PICTURE);
+        final JsonObject pictureObject = root.getAsJsonObject(AdminFields.PICTURE);
 
         //Retrieve Json object 'data' inside 'picture' json object
 
-        final JsonObject dataObject = pictureObject.getAsJsonObject(JSONUtils.AdminFields.DATA);
+        final JsonObject dataObject = pictureObject.getAsJsonObject(AdminFields.DATA);
 
         //Retrieve 'width' inside 'data'
 
-        final int width = dataObject.getAsJsonPrimitive(JSONUtils.AdminFields.WIDTH).getAsInt();
+        final int width = dataObject.getAsJsonPrimitive(AdminFields.WIDTH).getAsInt();
 
         //Retrieve 'height' inside 'data'
 
-        final int height = dataObject.getAsJsonPrimitive(JSONUtils.AdminFields.HEIGHT).getAsInt();
+        final int height = dataObject.getAsJsonPrimitive(AdminFields.HEIGHT).getAsInt();
 
         //Retrieve 'is_silhouette' inside 'data'
 
-        final boolean isSilhouette = dataObject.getAsJsonPrimitive(JSONUtils.AdminFields.IS_SILHOUETTE).getAsBoolean();
+        final boolean isSilhouette = dataObject.getAsJsonPrimitive(AdminFields.IS_SILHOUETTE).getAsBoolean();
 
         //Retrieve 'url' inside 'data'
 
-        final String url = dataObject.getAsJsonPrimitive(JSONUtils.AdminFields.URL).getAsString();
+        final String url = dataObject.getAsJsonPrimitive(AdminFields.URL).getAsString();
 
         //Set appropriate fields
 
