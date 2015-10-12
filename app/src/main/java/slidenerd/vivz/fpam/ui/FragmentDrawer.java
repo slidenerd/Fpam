@@ -9,7 +9,6 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.widget.TextView;
 
@@ -112,10 +111,8 @@ public class FragmentDrawer extends Fragment {
     public void addHeaderToDrawer(@NonNull Admin admin) {
         View headerView = mDrawer.inflateHeaderView(R.layout.nav_header_main);
         TextView textUserName = (TextView) headerView.findViewById(R.id.text_username);
-        TextView textEmail = (TextView) headerView.findViewById(R.id.text_email);
         RoundedImageView imageProfile = (RoundedImageView) headerView.findViewById(R.id.image_profile);
         textUserName.setText(admin.getFirstName() + " " + admin.getLastName());
-        textEmail.setText(admin.getEmail());
         Picasso.with(mContext).load(admin.getUrl()).into(imageProfile);
     }
 
@@ -126,15 +123,14 @@ public class FragmentDrawer extends Fragment {
      */
     public void addGroupsToDrawer(ArrayList<Group> list) {
         Menu menu = mDrawer.getMenu();
-        SubMenu subMenu = menu.addSubMenu(100, 100, 100, R.string.text_my_groups).setIcon(android.R.drawable.ic_menu_info_details);
         if (mGroups.isEmpty()) {
-            MenuItem item = subMenu.add(100, 100, 100, R.string.text_no_groups);
+            MenuItem item = menu.add(100, 100, 100, R.string.text_no_groups);
             item.setIcon(android.R.drawable.stat_notify_error);
         } else {
             int i = Constants.MENU_START_ID;
             for (Group group : list) {
-                final MenuItem item = subMenu.add(100, i, i, group.getName());
-                item.setIcon(android.R.drawable.ic_menu_my_calendar);
+                final MenuItem item = menu.add(100, i, i, group.getName());
+                item.setIcon(R.drawable.ic_group_black);
                 i++;
             }
         }

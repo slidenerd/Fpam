@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <!--All the items added without any grouping-->
     <item
         android:id="@+id/menu_settings"
-        android:icon="@android:drawable/ic_menu_preferences"
+        android:icon="@drawable/ic_settings_black"
         android:orderInCategory="49000"
-        android:title="@string/navigation_settings" />
+        android:title="@string/navigation_settings"
+        app:itemBackground="@color/colorPrimary"
+        app:itemIconTint="@color/colorAccent"
+        app:itemTextColor="@android:color/white" />
     <item
         android:id="@+id/menu_logout"
         android:icon="@android:drawable/ic_menu_set_as"
         android:orderInCategory="50000"
-        android:title="@string/navigation_drawer" />
+        android:title="@string/navigation_drawer"
+        app:itemBackground="@color/colorPrimary"
+        app:itemTextColor="@android:color/white" />
 </menu>

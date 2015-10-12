@@ -1,43 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
-    android:background="@drawable/side_nav_bar"
-    android:gravity="bottom"
-    android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <slidenerd.vivz.fpam.widget.RoundedImageView
-        android:id="@+id/image_profile"
-        android:layout_width="@dimen/profile_picture_size"
-        android:layout_height="@dimen/profile_picture_size"
-        android:background="@drawable/image_circle"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:src="@drawable/com_facebook_profile_picture_blank_square" />
-
-    <TextView
-        android:id="@+id/text_username"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="right"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:text="@string/placeholder_name"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="@color/colorTextPrimary" />
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical">
 
-    <TextView
+        <slidenerd.vivz.fpam.widget.RoundedImageView
+            android:id="@+id/image_profile"
+            android:layout_width="@dimen/profile_picture_size"
+            android:layout_height="@dimen/profile_picture_size"
+            android:background="@drawable/image_circle"
+            android:paddingTop="@dimen/nav_header_vertical_spacing"
+            android:src="@drawable/com_facebook_profile_picture_blank_square" />
 
-        android:id="@+id/text_email"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="right"
-        android:paddingTop="@dimen/nav_email_vertical_spacing"
-        android:text="@string/placeholder_email"
-        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-        android:textColor="@color/colorTextSecondary" />
+        <TextView
+            android:id="@+id/text_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/nav_header_vertical_spacing"
+            android:text="@string/placeholder_name"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/colorTextPrimary" />
+    </LinearLayout>
 
-</LinearLayout>
+
+</RelativeLayout>
