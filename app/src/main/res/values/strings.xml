@@ -5,7 +5,7 @@
     <string name="title_activity_cache">Cache</string>
     <string name="navigation_settings">Settings</string>
     <string name="title_export_database">Export Database</string>
-    <string name="navigation_drawer">Logout</string>
+    <string name="action_logout">Logout</string>
     <string name="action_settings">Settings</string>
 
     <string name="key_spammers">key_spammers</string>

@@ -61,8 +61,6 @@ public class Filter {
                 spammers.add(spammer);
                 deletePosts.add(post);
                 size++;
-            } else {
-                L.m("Spammer was null");
             }
         }
 
@@ -96,6 +94,7 @@ public class Filter {
 
                     //Remove the post from the Collection
 
+                    L.m("Spam post successfully removed " + post.getPostId() + " made by " + post.getUserName());
                     posts.remove(post);
 
                     //update the number of spam posts made by this spammer and the timestamp which indicates when this post was deleted
@@ -111,16 +110,16 @@ public class Filter {
                         spammer.setSpamCount(spammer.getSpamCount() + 1);
                         spammer.setTimestamp(System.currentTimeMillis());
 
+                        L.m("updating existing spammer " + spammer.getUserName());
+
                     } else {
 
                         //this spammer hasnt spammed in this group before
 
                         Spammer newSpammer = new Spammer(compositePrimaryKey, spammer.getUserName(), 1, System.currentTimeMillis());
                         realm.copyToRealmOrUpdate(newSpammer);
+                        L.m("adding new spammer " + spammer.getUserName());
                     }
-
-
-                    L.m("Spam successfully removed " + info.getPost().getPostId() + " made by " + info.getPost().getUserName());
 
                 } else {
                     L.m("Delete failed for " + info.getPost().getPostId() + " made by " + info.getPost().getUserName());

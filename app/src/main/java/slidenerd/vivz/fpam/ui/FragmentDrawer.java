@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.sharedpreferences.Pref;
@@ -33,7 +34,7 @@ import slidenerd.vivz.fpam.prefs.MyPrefs_;
 import slidenerd.vivz.fpam.widget.RoundedImageView;
 
 /**
- * TODO show the drawer if its the first time else hide it
+ * TODO show the drawer if its the first time else hide it, make the logout and settings work, align the images inside the drawer
  * A simple {@link Fragment} subclass.
  */
 @EFragment(R.layout.nav_drawer)
@@ -133,10 +134,24 @@ public class FragmentDrawer extends Fragment {
                 item.setIcon(R.drawable.ic_group_black);
                 i++;
             }
+
+            //Add an extra item at the bottom to prevent the navigationview from drawing a divider between the last item and settings
+
+            menu.add(100, i, i, Constants.GROUP_ID_NONE);
         }
         //Bug Fix for the Navigation View not refreshing after items are added dynamically.
         MenuItem mi = menu.getItem(menu.size() - 1);
         mi.setTitle(mi.getTitle());
+    }
+
+    @Click(R.id.action_settings)
+    public void onSettingsClick() {
+        L.t(mContext, "settings clicked");
+    }
+
+    @Click(R.id.action_logout)
+    public void onLogoutClick() {
+        L.t(mContext, "logout clicked");
     }
 
     /**
@@ -147,7 +162,7 @@ public class FragmentDrawer extends Fragment {
     @Nullable
     public Group getSelectedGroup(int selectedMenuId) {
         int sPosition = selectedMenuId - Constants.MENU_START_ID;
-        return !mGroups.isEmpty() && sPosition < mGroups.size() ? mGroups.get(sPosition) : null;
+        return !mGroups.isEmpty() && sPosition > 0 && sPosition < mGroups.size() ? mGroups.get(sPosition) : null;
     }
 
     @Override
@@ -155,4 +170,6 @@ public class FragmentDrawer extends Fragment {
         super.onDestroy();
         mRealm.close();
     }
+
+
 }

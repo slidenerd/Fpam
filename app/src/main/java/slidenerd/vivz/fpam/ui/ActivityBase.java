@@ -181,10 +181,10 @@ public abstract class ActivityBase extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         switch (id) {
-            case R.id.menu_settings:
+            case R.id.action_settings:
                 onSettingsSelected();
                 break;
-            case R.id.menu_logout:
+            case R.id.action_logout:
                 moveToLogin();
                 logout();
                 break;
