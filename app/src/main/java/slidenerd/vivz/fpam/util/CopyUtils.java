@@ -6,9 +6,9 @@ import java.util.ArrayList;
 
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
-import slidenerd.vivz.fpam.model.realm.GroupMeta;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.realm.GroupMeta;
 
 public class CopyUtils {
     public static ArrayList<Group> duplicateGroups(RealmResults<Group> listSourceGroups) {
@@ -25,21 +25,30 @@ public class CopyUtils {
         return admin;
     }
 
-    public static Post duplicatePost(Post realmPost) {
+    public static Post duplicatePost(Post originalPost) {
         Post post = new Post();
-        post.setPostId(realmPost.getPostId());
-        post.setUserId(realmPost.getUserId());
-        post.setUserName(realmPost.getUserName());
-        post.setMessage(realmPost.getMessage());
-        post.setType(realmPost.getType());
-        post.setCreatedTime(realmPost.getCreatedTime());
-        post.setUpdatedTime(realmPost.getUpdatedTime());
-        post.setName(realmPost.getName());
-        post.setCaption(realmPost.getCaption());
-        post.setDescription(realmPost.getDescription());
-        post.setPicture(realmPost.getPicture());
-        post.setLink(realmPost.getLink());
+        post.setPostId(originalPost.getPostId());
+        post.setUserId(originalPost.getUserId());
+        post.setUserName(originalPost.getUserName());
+        post.setMessage(originalPost.getMessage());
+        post.setType(originalPost.getType());
+        post.setCreatedTime(originalPost.getCreatedTime());
+        post.setUpdatedTime(originalPost.getUpdatedTime());
+        post.setName(originalPost.getName());
+        post.setCaption(originalPost.getCaption());
+        post.setDescription(originalPost.getDescription());
+        post.setPicture(originalPost.getPicture());
+        post.setLink(originalPost.getLink());
         return post;
+    }
+
+    public static ArrayList<Post> clonePosts(ArrayList<Post> posts) {
+        ArrayList<Post> clones = new ArrayList<>(posts.size());
+        for (Post post : posts) {
+            Post clone = CopyUtils.duplicatePost(post);
+            clones.add(clone);
+        }
+        return clones;
     }
 
     public static ArrayList<GroupMeta> duplicateGroupMetas(RealmResults<GroupMeta> results) {

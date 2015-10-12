@@ -8,7 +8,7 @@ import slidenerd.vivz.fpam.model.json.feed.Post;
 /**
  * Created by vivz on 06/10/15.
  */
-public class PostUtils {
+public class ModelUtils {
     public static long calculateAverageInterval(ArrayList<Post> posts) {
         long averageInterval = 0;
         for (int i = 0; i < posts.size() - 1; i++) {
@@ -21,5 +21,9 @@ public class PostUtils {
             averageInterval /= (posts.size() - 1);
         }
         return averageInterval;
+    }
+
+    public static String getUserGroupCompositePrimaryKey(String userId, String groupId) {
+        return userId + ":" + groupId;
     }
 }

@@ -127,7 +127,7 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
     @Override
     public void afterAdminAndGroupsLoaded() {
         mProgress.setVisibility(View.GONE);
-        NavUtils.startActivityChild(ActivityLogin.this);
+        NavUtils.startActivityMain(this);
         finish();
     }
 }

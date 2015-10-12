@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import slidenerd.vivz.fpam.Fpam;
+import slidenerd.vivz.fpam.core.Filter;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
@@ -115,12 +116,13 @@ public class TaskFragmentPosts extends Fragment {
 
                 if (!posts.isEmpty()) {
 
-                    //update the timestamp of the group that was just loaded
+                    //update the timestamp and the metadata of the group that was just loaded
 
                     GroupMeta groupMeta = new GroupMeta(group.getId(), System.currentTimeMillis());
                     DataStore.storeGroupMeta(realm, groupMeta);
                     L.m("updated group meta for " + group.getName());
                     DataStore.limitStoredPosts(realm, group, maximumPostsStored);
+                    Filter.filterPostsOnLoad(token, realm, group, posts);
                 }
 
                 onPostsLoaded(posts.size() + " posts loaded for ", group);

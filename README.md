@@ -49,7 +49,7 @@ The Database with posts from PoopScoop, Android Programming and IOS Programming
 
 The Delete problem
 
-Fpam as of September 26 8:30 am has a drawback where if a post is deleted using Fpam, it will be deleted from the underlying database after its successfully deleted from Facebook Graph API. However if a person deletes a post from Facebook directly, the deleted post is still present in the Fpam database. An upper limit of 100 posts per group also needs to be enforced on Fpam so that it deletes the oldest post and stores the newest one when it crosses the limit. 
+Fpam as of September 26 8:30 am has a drawback where if a postId is deleted using Fpam, it will be deleted from the underlying database after its successfully deleted from Facebook Graph API. However if a person deletes a postId from Facebook directly, the deleted postId is still present in the Fpam database. An upper limit of 100 posts per group also needs to be enforced on Fpam so that it deletes the oldest postId and stores the newest one when it crosses the limit.
 
 Is the database empty, is the groupMeta for this group being loaded the first time?
     If yes, store the JSON groupMeta directly
@@ -59,11 +59,11 @@ Is the database empty, is the groupMeta for this group being loaded the first ti
     There is something common
       Find the list of all posts that are contained in both the JSON groupMeta and the database. Lets call it List<C>
       Sort these posts in order of their updated time
-      Find the updated time of the oldest common post and the newest common post
+      Find the updated time of the oldest common postId and the newest common postId
       Find all the posts stored in the database between this time range. Lets call it List<U>
       Compare the posts between List<C> and List<U>
-        If a post is present in List<U> but not in List<C> delete the post
-        If a post is present in List<U> and List<C> update the post
+        If a postId is present in List<U> but not in List<C> delete the postId
+        If a postId is present in List<U> and List<C> update the postId
       
 
 # Fpam
@@ -71,7 +71,7 @@ You know what it does, don't you?
 There can be posts made by people who don't exist
 ![people without names posting stuff](https://cloud.githubusercontent.com/assets/5139030/9966000/c7686352-5e57-11e5-89d4-47725ba6f76d.png)
 
-This example post below is made by a person who doesn't exist on Facebook anymore or was banned
+This example postId below is made by a person who doesn't exist on Facebook anymore or was banned
 ![snap 2015-09-18 at 22 32 38](https://cloud.githubusercontent.com/assets/5139030/9966022/e13ecb40-5e57-11e5-9c21-49724fcdd84a.png)
 
 
@@ -84,7 +84,7 @@ Currently, only the list of groups on 1 page are being stored, gotta find a way 
 
 UPDATE 3 [September 20, 2015 9+ pm]
 
-The current model for Feed processing takes separate model classes, one for GSON that implements a parcelable and one for Realm that doesn't . Need to keep one single class that directly stores stuff from JSON to Realm, and eliminates the need for any intermediate GSON, the idea is also to remember the fact that only a max of 500 posts should be stored per group and when a post is deleted, all its attachments and comments also be deleted.
+The current model for Feed processing takes separate model classes, one for GSON that implements a parcelable and one for Realm that doesn't . Need to keep one single class that directly stores stuff from JSON to Realm, and eliminates the need for any intermediate GSON, the idea is also to remember the fact that only a max of 500 posts should be stored per group and when a postId is deleted, all its attachments and comments also be deleted.
 
 UPDATE 4 [September 26, 2015, 10+ pm]
 
@@ -113,7 +113,7 @@ UPDATE 5 [September 29, 2015, 10 am]
 <li>use a sliding panel to display posts and comments</li>
 <li><b>Swipe to delete posts from facebook first and then from realm on success</b></li>
 <li>Swipe to delete comments from facebook first and then from realm on success</li>
-<li>Cascade deletion of comments for a related post<li>
+<li>Cascade deletion of comments for a related postId<li>
 <li>Commence analytics and spam processing work</li>
 
 </ol>
@@ -128,7 +128,7 @@ What would complete Fpam?
 <li>Create the IntentService for API<21 and JobScheduler Service for API>21 [HIGH]</li>
 <li>Make a viable approach to detect duplicate posts [MODERATE]</li>
 <li>Determine if a spammer must be blocked instantly or after 3 tries in a viable way [MODERATE]</li>
-<li>Show images of the post along with caption, links, description [HIGH]</li>
+<li>Show images of the postId along with caption, links, description [HIGH]</li>
 <li>Show comments in a sliding panel and let people swipe to delete comments [HIGH]</li>
 <li>Add morphing animation to turn the facebook login button into something with a progress bar [LOW]</li>
 <li>Show a tutorial for how to use the app at the login screen [LOW]</li>
@@ -139,7 +139,7 @@ What would complete Fpam?
 <li>Collect analytics data [HIGH]</li>
 <li>Sync analytics data from app to server [HIGH]</li>
 <li>Enforce database limits for posts stored [HIGH]</li>
-<li>Figure out scrap post deletion [post deleted from facebook but present in fpam database] [HIGH]</li>
+<li>Figure out scrap postId deletion [postId deleted from facebook but present in fpam database] [HIGH]</li>
 </ol>
 
 UPDATE 8, Oct 5, 2015 [4:30pm]
@@ -150,9 +150,9 @@ Make the MVP of fpam capable of only blocking people in v1. This will ensure the
 <ul>
 	<li>Process only spammers in v1.0</li>
 	<li>let admin decide which groups to scan</li>
-	<li>If a post is deleted, mark the person as a spammer and block all further posts from that person for all groups.</li>
+	<li>If a postId is deleted, mark the person as a spammer and block all further posts from that person for all groups.</li>
 	<li>A spammer is a member of usually more than one group and as such, keep a track of the user id, user name of the spammer, list of group ids where he is a member of and the number of times he or she has spammed.</li>
-	<li>Enable spam filtering for both posts and comments {show the dual pane with posts and comments} and delete the post or comment on swipe and add the person to the blacklist if he/she is not already a member</li>
+	<li>Enable spam filtering for both posts and comments {show the dual pane with posts and comments} and delete the postId or comment on swipe and add the person to the blacklist if he/she is not already a member</li>
 	<li>Send data about spammers to the server fpam.io with the same information, [userid, username, list of group ids where the spammer is a member of and the number of spam posts he or she has made] corresponding to a user id or the person using the app fpam.</li>
 </ul>
 
@@ -170,14 +170,14 @@ A link/links found within the description or caption or message will be hence fo
 
 The 4 pieces of information that we need to analyze are : the person who posted, the message that was posted if any, the LINK_TAG if any and the picture if any. The message that was posted may be of 4 types 1) no message or no text 2) only text 3) message with only LINK_CONTENT inside its contents 4)message with text and one or more LINK_CONTENT in its contents.
 
-Analytics [Overall for each post]
+Analytics [Overall for each postId]
 
 <ul>
-    <li>Which group is this post read from? Track the group id</li>
+    <li>Which group is this postId read from? Track the group id</li>
     <li>How many posts have been read so far? Increment the number of posts read so far.</li>
-    <li>What are the properties of this post?
+    <li>What are the properties of this postId?
         <ul>
-            <li>Language in which this post is written [Implement if possible now]</li>
+            <li>Language in which this postId is written [Implement if possible now]</li>
             <li>Does it have a link tag?</li>
             <li>Does it have a picture tag?</li>
             <li>Does it have a message tag?
@@ -186,7 +186,7 @@ Analytics [Overall for each post]
                     <li>Number of characters</li>
                     <li>Percentage of capslock or capital to small letters [spam posts often have capital letters in them]</li>
                     <li>Number of emoticons detected [spam posts often use many emoticons]</li>
-                    <li>Percentage of emoticons to actual content in the post</li>
+                    <li>Percentage of emoticons to actual content in the postId</li>
                 </ul>
             </li>
         </ul>
@@ -196,27 +196,27 @@ Analytics [Overall for each post]
 <ul>
 	<dl>
 		<dt>CONTENT</dt>
-		<dd>A post contains several optional fields such as name, message, caption, description, link and the person who posted it (person is optional as well) which will be referred to henceforth as CONTENT</dd>
+		<dd>A postId contains several optional fields such as name, message, caption, description, link and the person who posted it (person is optional as well) which will be referred to henceforth as CONTENT</dd>
 		<dt>MESSAGE</dt>
-		<dd>A post may or may not contain data for the json tag message which will be referred to henceforth as MESSAGE</dd>
+		<dd>A postId may or may not contain data for the json tag message which will be referred to henceforth as MESSAGE</dd>
 		<dt>LINK_CONTENT</dt>
-		<dd>A post may has 0 to many links inside the message json tag which will be referred to henceforth as LINK_CONTENT </dd>
+		<dd>A postId may has 0 to many links inside the message json tag which will be referred to henceforth as LINK_CONTENT </dd>
 		<dt>LINK_TAG</dt>
-		<dd>A post may have 0 or 1 link tag in its json groupMeta which will be referred to henceforth as LINK_TAG</dd>
+		<dd>A postId may have 0 or 1 link tag in its json groupMeta which will be referred to henceforth as LINK_TAG</dd>
 		<dt>LINK_SET</dt>
-		<dd>A post may contain 0 to many LINK_CONTENT or LINK_TAG items which will be combined referred to henceforth as LINK_SET</dd>
+		<dd>A postId may contain 0 to many LINK_CONTENT or LINK_TAG items which will be combined referred to henceforth as LINK_SET</dd>
 		<dt>NON EXISTING USER</dt>
-		<dd>The data of a person making a post may or may not be available depending on whether the person's facebook profile is intact on Facebook. If there is no data regarding the person who made a post, that post is considered rogue and attributed to a fictional user called NON EXISTING USER</dd>
+		<dd>The data of a person making a postId may or may not be available depending on whether the person's facebook profile is intact on Facebook. If there is no data regarding the person who made a postId, that postId is considered rogue and attributed to a fictional user called NON EXISTING USER</dd>
 	</dl>
-	<li>Extract the set of all links from a post which consitute the LINK_SET. The goal of the algorithm is to decide if a post is spam as fast as possible.
+	<li>Extract the set of all links from a postId which consitute the LINK_SET. The goal of the algorithm is to decide if a postId is spam as fast as possible.
 	<ol>
-		<li>Read a post</li>
-		<li>Is there a person available for this post? {A person may be null if he/she was banned or doesnt exist on Facebook anymore}
+		<li>Read a postId</li>
+		<li>Is there a person available for this postId? {A person may be null if he/she was banned or doesnt exist on Facebook anymore}
 		<ul>
 			<li>If PERSON not available,
 			<ol>
-				<li>Delete the post</li>
-				<li>Find the group id where this post was made.</li>
+				<li>Delete the postId</li>
+				<li>Find the group id where this postId was made.</li>
 				<li>Increment the number of posts made by NON EXISTING USER for that group id</li>
 				<li>Skip FURTHER PROCESSING</li>
 			</ol>
@@ -228,36 +228,36 @@ Analytics [Overall for each post]
 		<ul>
 			<li>Is the person in the SPAMMERS database?
 			<ol>
-				<li>Delete the post</li>
-				<li>Note the group id where this post was made</li>
+				<li>Delete the postId</li>
+				<li>Note the group id where this postId was made</li>
 				<li>Increment the number of spam posts made by this person under that group id</li>
-				<li>Note the created time of this post [analytics]</li>
-				<li>Note the updated time of this post [analytics]</li>
+				<li>Note the created time of this postId [analytics]</li>
+				<li>Note the updated time of this postId [analytics]</li>
 				<li>Note whether created time and updated time are same or different? [analytics]</li>
 				<li>Skip FURTHER PROCESSING</li>
 			</ol>
 			</li>
-			<li>If the person is NOT present in the SPAMMERS database, process that element first on the basis of which we can instantly classify this as a SPAM post or GOOD post. The post can be eliminated very quickly as SPAM if PICTURES are not allowed by the admin or LINK_SET is not allowed by the admin. The post will require significant amount of processing to check for spam words and even more processing if has to check LINK_SET since it requires admin approval. Jump to CHECK FOR PICTURE</li>
+			<li>If the person is NOT present in the SPAMMERS database, process that element first on the basis of which we can instantly classify this as a SPAM postId or GOOD postId. The postId can be eliminated very quickly as SPAM if PICTURES are not allowed by the admin or LINK_SET is not allowed by the admin. The postId will require significant amount of processing to check for spam words and even more processing if has to check LINK_SET since it requires admin approval. Jump to CHECK FOR PICTURE</li>
 		</ul>
 		</li>
-		<li>CHECK FOR PICTURE, does the post contain a picture?
+		<li>CHECK FOR PICTURE, does the postId contain a picture?
 			<ul>
 				<li>If NO PICTURE is found, jump to PROCESS THE CONTENT</li>
 				<li>If PICTURE is found, has the admin allowed posts to be made that contain a PICTURE?
 				<ul>
 					<li>If NOT ALLOWED,
 					<ol>
-						<li>Delete the post</li>
-						<li>Note the group id where this post was made</li>
+						<li>Delete the postId</li>
+						<li>Note the group id where this postId was made</li>
 						<li>Add this person to the SPAMMERS database</li>
 						<li>Increment the number of spam posts made by this person under that group id</li>
-						<li>Note the created time of this post [analytics]</li>
-						<li>Note the updated time of this post [analytics]</li>
+						<li>Note the created time of this postId [analytics]</li>
+						<li>Note the updated time of this postId [analytics]</li>
 						<li>Note whether created time and updated time are same or different [analytics]</li>
 						<li>Skip FURTHER PROCESSING</li>
 					</ol>
 					</li>
-					<li>If ALLOWED, it means our post at this post contains a PICTURE for certain and may include other optional entities which would be CONTENT or LINK_SET Jump to PROCESS THE CONTENT</li>
+					<li>If ALLOWED, it means our postId at this postId contains a PICTURE for certain and may include other optional entities which would be CONTENT or LINK_SET Jump to PROCESS THE CONTENT</li>
 				</ul>
 				</li>
 			</ul>
@@ -265,97 +265,97 @@ Analytics [Overall for each post]
 		<li>PROCESS THE CONTENT, What type of content is it? There are 4 types of posts 
 		<dl>
 			<dt>MESSAGE_EMPTY</dt>
-			<dd>A post with no message tag data but may contain data in the other fields such as name, caption, description which will referred to henceforth as MESSAGE_EMPTY</dd>
+			<dd>A postId with no message tag data but may contain data in the other fields such as name, caption, description which will referred to henceforth as MESSAGE_EMPTY</dd>
 			<dl>MESSAGE_ONLY_LINK</dl>
-			<dd>A post with message tag that has only a link in it also known as LINK_CONTENT and may contain data in the other fields such as name, caption, description which will be referred to henceforth as MESSAGE_ONLY_LINK</dd>
+			<dd>A postId with message tag that has only a link in it also known as LINK_CONTENT and may contain data in the other fields such as name, caption, description which will be referred to henceforth as MESSAGE_ONLY_LINK</dd>
 			<dl>MESSAGE_TEXT</dl>
-			<dd>A post with message tag that has only text and may contain data in the other fields such as name, caption, description which will be referred to henceforth as MESSAGE_TEXT</dd>
+			<dd>A postId with message tag that has only text and may contain data in the other fields such as name, caption, description which will be referred to henceforth as MESSAGE_TEXT</dd>
 			<dl>MESSAGE_TEXT_AND_LINK</dl>
-			<dd>A post with message that that has text and LINK_CONTENT and may contain data in the other fields such as name, caption, description which will be referred to henceforth as MESSAGE_TEXT_AND_LINK</dd>
+			<dd>A postId with message that that has text and LINK_CONTENT and may contain data in the other fields such as name, caption, description which will be referred to henceforth as MESSAGE_TEXT_AND_LINK</dd>
 		</dl>
 		<ol>
-			<li>For a post of type MESSAGE_EMPTY
+			<li>For a postId of type MESSAGE_EMPTY
 			<ul>
 				<li>If MESSAGE is NOT found, does the ADMIN allow empty posts? or posts that do not have a MESSAGE in them?
 					<ul>
-						<li>If no which implies that post is empty and the admin doesnt allow it,
+						<li>If no which implies that postId is empty and the admin doesnt allow it,
 						<ol>
-							<li>Delete the post</li>
-							<li>Note the group id where this post was made</li>
+							<li>Delete the postId</li>
+							<li>Note the group id where this postId was made</li>
 							<li>Add this person to the SPAMMERS database</li>
 							<li>Increment the number of spam posts made by this person under that group id</li>
-							<li>Note the created time of this post [analytics]</li>
-							<li>Note the updated time of this post [analytics]</li>
+							<li>Note the created time of this postId [analytics]</li>
+							<li>Note the updated time of this postId [analytics]</li>
 							<li>Note whether created time and updated time are same or different [analytics]</li>
 							<li>Skip FURTHER PROCESSING</li>
 						</ol> 
 						</li>
-						<li>If yes which implies that the post has a message which is empty and the admin allows it, but we need to process the other elements  such as {name, caption, description}, does this post contain OPTIONAL elements? 
+						<li>If yes which implies that the postId has a message which is empty and the admin allows it, but we need to process the other elements  such as {name, caption, description}, does this postId contain OPTIONAL elements?
 						<ul>
-							<li>When the post contains only OPTIONAL elements, PROCESS OPTIONAL ELEMENTS</li>
-							<li>When the post contains only LINK_SET, PROCESS LINK SET</li>
-							<li>When the post has no OPTIONAL elements  and no LINK_SET delete the post since there is nothing meaningful in the post</li>
-							<li>When the post has both OPTIONAL elements and LINK_SET, first PROCESS OPTIONAL ELEMENTS and then based on the outcome {if its a spam or not} PROCESS LINK SET {if it was not spam from the previous step}</li>
+							<li>When the postId contains only OPTIONAL elements, PROCESS OPTIONAL ELEMENTS</li>
+							<li>When the postId contains only LINK_SET, PROCESS LINK SET</li>
+							<li>When the postId has no OPTIONAL elements  and no LINK_SET delete the postId since there is nothing meaningful in the postId</li>
+							<li>When the postId has both OPTIONAL elements and LINK_SET, first PROCESS OPTIONAL ELEMENTS and then based on the outcome {if its a spam or not} PROCESS LINK SET {if it was not spam from the previous step}</li>
 						</ul>
 						</li>
 					</ul>
 				</li>
 			</ul>
 			</li>
-			<li>For a post of type MESSAGE_TEXT, does the post contain words or phrases that match with one or more words or phrases from the spam database?
+			<li>For a postId of type MESSAGE_TEXT, does the postId contain words or phrases that match with one or more words or phrases from the spam database?
 			<ul>
 				<li>If NO MATCH found, 
 				<ul>
-					<li>When the post contains only OPTIONAL elements, PROCESS OPTIONAL ELEMENTS</li>
-					<li>When the post contains only LINK_SET, PROCESS LINK SET</li>
-					<li>When the post has no OPTIONAL_ELEMENTS and no LINK_SET approve the post</li>
-					<li>When the post has both OPTIONAL elements and LINK_SET, first PROCESS OPTIONAL ELEMENTS and then based on the outcome {if its a spam or not} PROCESS LINK SET {if it was not spam from the previous step}</li>
+					<li>When the postId contains only OPTIONAL elements, PROCESS OPTIONAL ELEMENTS</li>
+					<li>When the postId contains only LINK_SET, PROCESS LINK SET</li>
+					<li>When the postId has no OPTIONAL_ELEMENTS and no LINK_SET approve the postId</li>
+					<li>When the postId has both OPTIONAL elements and LINK_SET, first PROCESS OPTIONAL ELEMENTS and then based on the outcome {if its a spam or not} PROCESS LINK SET {if it was not spam from the previous step}</li>
 				</ul>
 				</li>
 				<li>If one or more matches are found, 
 				<ol>
-					<li>Delete the post</li>
-					<li>Note the group id where this post was made</li>
+					<li>Delete the postId</li>
+					<li>Note the group id where this postId was made</li>
 					<li>Add this person to the SPAMMERS database</li>
 					<li>Increment the number of spam posts made by this person under that group id</li>
 					<li>Increment the counter of each spam word that was a match [analytics]</li>
-					<li>Note the created time of this post [analytics]</li>
-					<li>Note the updated time of this post [analytics]</li>
+					<li>Note the created time of this postId [analytics]</li>
+					<li>Note the updated time of this postId [analytics]</li>
 					<li>Note whether created time and updated time are same or different [analytics]</li>
 					<li>Skip FURTHER PROCESSING</li>
 				</ol>
 				</li>
 			</ul>
 			</li>
-			<li>For a post of type MESSAGE_ONLY_LINK, our job is to classify a post as spam as fast as possible with minimal user input. Since the post has only a LINK_CONTENT and optional elements, the LINK_CONTENT will require manual admin approval but the optional elements such as caption, name or description can be used to indicate if a post must be classfied as spam or not
+			<li>For a postId of type MESSAGE_ONLY_LINK, our job is to classify a postId as spam as fast as possible with minimal user input. Since the postId has only a LINK_CONTENT and optional elements, the LINK_CONTENT will require manual admin approval but the optional elements such as caption, name or description can be used to indicate if a postId must be classfied as spam or not
 			<ul>
-				<li>When the post contains only OPTIONAL elements, PROCESS OPTIONAL ELEMENTS</li>
-				<li>When the post contains only LINK_SET, PROCESS LINK SET</li>
-				<li>Since we already have a LINK_CONTENT, we dont encounter a case where the post has neither OPTIONALS nor LINK_SET</li>
-				<li>When the post has both OPTIONAL elements and LINK_SET, first PROCESS OPTIONAL ELEMENTS and then based on the outcome {if its a spam or not} PROCESS LINK SET {if it was not spam from the previous step}</li>
+				<li>When the postId contains only OPTIONAL elements, PROCESS OPTIONAL ELEMENTS</li>
+				<li>When the postId contains only LINK_SET, PROCESS LINK SET</li>
+				<li>Since we already have a LINK_CONTENT, we dont encounter a case where the postId has neither OPTIONALS nor LINK_SET</li>
+				<li>When the postId has both OPTIONAL elements and LINK_SET, first PROCESS OPTIONAL ELEMENTS and then based on the outcome {if its a spam or not} PROCESS LINK SET {if it was not spam from the previous step}</li>
 			</ul>
 			</li>
-			<li>For a post of type MESSAGE_TEXT_AND_LINK, lets first process the message part that may tell us if it is a spam by simply doing spam word comparisons, if the outcome of the spam word comparisons is not conclusive, then PROCESS OPTIONAL ELEMENTS and depending on the outcome there, make a further jump to PROCESS LINK SET 
+			<li>For a postId of type MESSAGE_TEXT_AND_LINK, lets first process the message part that may tell us if it is a spam by simply doing spam word comparisons, if the outcome of the spam word comparisons is not conclusive, then PROCESS OPTIONAL ELEMENTS and depending on the outcome there, make a further jump to PROCESS LINK SET
 			<ul>
-				<li>Does the post contain words or phrases that match with one or more words or phrases from the spam database?
+				<li>Does the postId contain words or phrases that match with one or more words or phrases from the spam database?
 				<ul>
 					<li>If NO MATCH found, 
 					<ul>
-						<li>When the post contains only OPTIONAL elements, PROCESS OPTIONAL ELEMENTS and then based on the outcome {if its a spam or not}, PROCESS LINK SET{if it was not spam from the previous step}</li>
-						<li>When the post contains only LINK_SET, PROCESS LINK SET</li>
-						<li>Since we already have a LINK_CONTENT, we dont encounter a case where the post has neither OPTIONALS nor LINK_SET</li>
-						<li>When the post has both OPTIONAL elements and LINK_SET, PROCESS OPTIONAL ELEMENTS and then based on the outcome {if its a spam or not}, PROCESS LINK SET{if it was not spam from the previous step}</li>
+						<li>When the postId contains only OPTIONAL elements, PROCESS OPTIONAL ELEMENTS and then based on the outcome {if its a spam or not}, PROCESS LINK SET{if it was not spam from the previous step}</li>
+						<li>When the postId contains only LINK_SET, PROCESS LINK SET</li>
+						<li>Since we already have a LINK_CONTENT, we dont encounter a case where the postId has neither OPTIONALS nor LINK_SET</li>
+						<li>When the postId has both OPTIONAL elements and LINK_SET, PROCESS OPTIONAL ELEMENTS and then based on the outcome {if its a spam or not}, PROCESS LINK SET{if it was not spam from the previous step}</li>
 					</ul>
 					</li>
 					<li>If one or more matches are found, 
 					<ol>
-						<li>Delete the post</li>
-						<li>Note the group id where this post was made</li>
+						<li>Delete the postId</li>
+						<li>Note the group id where this postId was made</li>
 						<li>Add this person to the SPAMMERS database</li>
 						<li>Increment the number of spam posts made by this person under that group id</li>
 						<li>Increment the counter of each spam word that was a match [analytics]</li>
-						<li>Note the created time of this post [analytics]</li>
-						<li>Note the updated time of this post [analytics]</li>
+						<li>Note the created time of this postId [analytics]</li>
+						<li>Note the updated time of this postId [analytics]</li>
 						<li>Note whether created time and updated time are same or different [analytics]</li>
 						<li>Skip FURTHER PROCESSING</li>
 					</ol>
@@ -373,13 +373,13 @@ Analytics [Overall for each post]
 				<li>If NO MATCH found, then jump to PROCESS LINK SET</li>
 				<li>If one or more matches are found, 
 				<ol>
-					<li>Delete the post</li>
-					<li>Note the group id where this post was made</li>
+					<li>Delete the postId</li>
+					<li>Note the group id where this postId was made</li>
 					<li>Add this person to the SPAMMERS database</li>
 					<li>Increment the number of spam posts made by this person under that group id</li>
 					<li>Increment the counter of each spam word that was a match [analytics]</li>
-					<li>Note the created time of this post [analytics]</li>
-					<li>Note the updated time of this post [analytics]</li>
+					<li>Note the created time of this postId [analytics]</li>
+					<li>Note the updated time of this postId [analytics]</li>
 					<li>Note whether created time and updated time are same or different [analytics]</li>
 					<li>Skip FURTHER PROCESSING</li>
 				</ol>
@@ -392,21 +392,21 @@ Analytics [Overall for each post]
 		<ol>
 			<li>Is the link present in the blacklist?
 			<ol>
-				<li>Delete the post</li>
-				<li>Note the group id where this post was made</li>
+				<li>Delete the postId</li>
+				<li>Note the group id where this postId was made</li>
 				<li>Add this person to the SPAMMERS database</li>
 				<li>Increment the number of spam posts made by this person under that group id</li>
 				<li>Increment the number of times this link was found in the blacklist for that group id</li>
-				<li>Note the created time of this post [analytics]</li>
-				<li>Note the updated time of this post [analytics]</li>
+				<li>Note the created time of this postId [analytics]</li>
+				<li>Note the updated time of this postId [analytics]</li>
 				<li>Note whether created time and updated time are same or different [analytics]</li>
 				<li>Skip FURTHER PROCESSING</li>
 			</ol>
 			</li>
 			<li>Is the link present in the whitelist?
 			<ol>
-				<li>Approve the post</li>
-				<li>Note the group id where this post was made</li>
+				<li>Approve the postId</li>
+				<li>Note the group id where this postId was made</li>
 				<li>Increment the number of total posts made</li>
 			</ol>
 			</li>
@@ -414,7 +414,7 @@ Analytics [Overall for each post]
 			<ol>
 				<li>Extract the base url of this link</li>
 				<li>Add this base url to the unique set of urls that need approval</li>
-				<li>Associate this post id along with the set of other post ids that rely on the approval of the admin for this url</li>
+				<li>Associate this postId id along with the set of other postId ids that rely on the approval of the admin for this url</li>
 			</ol>
 			</li>
 		</ol>

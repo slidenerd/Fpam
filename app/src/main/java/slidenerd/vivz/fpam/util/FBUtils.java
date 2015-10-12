@@ -2,7 +2,6 @@ package slidenerd.vivz.fpam.util;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Pair;
 
 import com.facebook.AccessToken;
 import com.facebook.FacebookException;
@@ -26,6 +25,7 @@ import slidenerd.vivz.fpam.extras.GroupFields;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.pojo.DeleteResponseInfo;
 
 public class FBUtils {
 
@@ -215,22 +215,23 @@ public class FBUtils {
         return jsonObject != null && jsonObject.has("success") && !jsonObject.isNull("success") && jsonObject.getBoolean("success");
     }
 
-    public static ArrayList<Pair<String, Boolean>> requestDeletePosts(AccessToken token, ArrayList<String> listPostIds) throws JSONException {
-        ArrayList<Pair<String, Boolean>> listStatus = new ArrayList<>();
+    public static ArrayList<DeleteResponseInfo> requestDeletePosts(AccessToken token, ArrayList<Post> posts) throws JSONException {
+        ArrayList<DeleteResponseInfo> responseInfos = new ArrayList<>();
         GraphRequestBatch requests = new GraphRequestBatch();
-        for (String postId : listPostIds) {
-            GraphRequest graphRequest = new GraphRequest(token, postId, null, HttpMethod.DELETE);
+        for (Post post : posts) {
+            GraphRequest graphRequest = new GraphRequest(token, post.getPostId(), null, HttpMethod.DELETE);
             requests.add(graphRequest);
         }
         List<GraphResponse> responses = requests.executeAndWait();
         for (int i = 0; i < responses.size(); i++) {
             GraphResponse response = responses.get(i);
+            Post post = posts.get(i);
             JSONObject jsonObject = response.getJSONObject();
-            String postId = listPostIds.get(i);
             boolean success = (jsonObject != null && jsonObject.has("success") && !jsonObject.isNull("success") && jsonObject.getBoolean("success"));
-            Pair<String, Boolean> pair = new Pair<>(postId, success);
-            listStatus.add(pair);
+            DeleteResponseInfo responseInfo = new DeleteResponseInfo(success, post);
+            responseInfos.add(responseInfo);
         }
-        return listStatus;
+        return responseInfos;
     }
+
 }
