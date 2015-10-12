@@ -1,6 +1,7 @@
 package slidenerd.vivz.fpam.core;
 
 import com.facebook.AccessToken;
+import com.facebook.FacebookException;
 
 import org.json.JSONException;
 
@@ -135,7 +136,7 @@ public class Filter {
         return message.toString();
     }
 
-    public static int filterPostsOnDelete(AccessToken token, Realm realm, Group group, Post post) throws JSONException {
+    public static int filterPostsOnDelete(AccessToken token, Realm realm, Group group, Post post) throws JSONException, FacebookException {
         int numberOfPostsDeleted = 0;
         RealmResults<Post> results = realm.where(Post.class).equalTo("userId", post.getUserId()).findAll();
         if (!results.isEmpty()) {

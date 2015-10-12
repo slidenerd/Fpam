@@ -32,6 +32,7 @@ import slidenerd.vivz.fpam.util.DateUtils;
 import slidenerd.vivz.fpam.util.FBUtils;
 
 /**
+ * TODO handle the case where the delete fails or the person has deleted the post from Facebook directly instead of this app
  * The retained fragment used to load posts in the background
  */
 @EFragment
@@ -142,7 +143,7 @@ public class TaskFragmentLoadPosts extends Fragment {
 
                 String message = null;
                 if (originalLoadCount > 0) {
-                    message = originalLoadCount + " New Posts Loaded For " + group.getName() + (filteredLoadCount > 0 ? " And " + filteredLoadCount + " spam posts removed" : "");
+                    message = originalLoadCount + " New Posts Loaded For " + group.getName() + (originalLoadCount - filteredLoadCount > 0 ? " And " + (originalLoadCount - filteredLoadCount) + " spam posts removed" : "");
 
                 } else {
                     message = "No New Posts Loaded For " + group.getName();

@@ -226,7 +226,7 @@ public class FBUtils {
         return responseInfos;
     }
 
-    public static ArrayList<DeleteResponseInfo> requestDeletePosts(AccessToken token, RealmResults<Post> posts) throws JSONException {
+    public static ArrayList<DeleteResponseInfo> requestDeletePosts(AccessToken token, RealmResults<Post> posts) throws JSONException, FacebookException {
         ArrayList<DeleteResponseInfo> responseInfos = new ArrayList<>();
         GraphRequestBatch requests = new GraphRequestBatch();
         for (Post post : posts) {
