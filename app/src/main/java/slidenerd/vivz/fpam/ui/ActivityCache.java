@@ -9,7 +9,9 @@ import android.widget.TextView;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.ItemSelect;
+import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
@@ -36,6 +38,8 @@ public class ActivityCache extends AppCompatActivity {
     Spinner mSpinnerGroup;
     @ViewById(R.id.text_cache)
     TextView mTextCache;
+    @InstanceState
+    int groupSelected = -1;
     private Realm mRealm;
 
     @Override
@@ -60,6 +64,7 @@ public class ActivityCache extends AppCompatActivity {
 
     @ItemSelect(R.id.spinner_group)
     public void groupItemSelected(boolean selected, String item) {
+        groupSelected = mSpinnerGroup.getSelectedItemPosition();
         String groupId = item.substring(item.indexOf(":") + 1, item.length());
         Group temp = new Group(groupId, "", "", 0);
         RealmResults<Post> results = DataStore.getPosts(mRealm, temp);
@@ -68,6 +73,21 @@ public class ActivityCache extends AppCompatActivity {
             text.append(PrintUtils.toString(post));
         }
         mTextCache.setText(text);
+    }
+
+    @OptionsItem(R.id.action_clear_group)
+    public void onClearAllPostsInGroupSelected() {
+        if (groupSelected != -1) {
+            String groupIdName = (String) mSpinnerGroup.getAdapter().getItem(groupSelected);
+            String groupId = groupIdName.substring(groupIdName.indexOf(":") + 1, groupIdName.length());
+            mRealm.beginTransaction();
+            mRealm.where(Post.class).beginsWith("postId", groupId).findAllSorted("updatedTime", false).clear();
+            GroupMeta groupMeta = mRealm.where(GroupMeta.class).equalTo("groupId", groupId).findFirst();
+            if (groupMeta != null) {
+                groupMeta.setTimestamp(0);
+            }
+            mRealm.commitTransaction();
+        }
     }
 
     @ItemSelect(R.id.spinner_database)
@@ -92,8 +112,8 @@ public class ActivityCache extends AppCompatActivity {
             mSpinnerGroup.setVisibility(View.GONE);
         } else if (item.equals("Post")) {
             mSpinnerGroup.setVisibility(View.VISIBLE);
-        } else {
-            RealmResults<Spammer> results = mRealm.where(Spammer.class).findAll();
+        } else if (item.equals("Spammer")) {
+            RealmResults<Spammer> results = mRealm.where(Spammer.class).findAllSorted("userName");
             for (Spammer feed : results) {
                 text.append(PrintUtils.toString(feed));
             }

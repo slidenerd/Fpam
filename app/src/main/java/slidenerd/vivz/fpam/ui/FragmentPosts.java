@@ -38,19 +38,18 @@ import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.PostAdapter;
 import slidenerd.vivz.fpam.adapter.SwipeHelper;
+import slidenerd.vivz.fpam.core.Filter;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.util.FBUtils;
-import slidenerd.vivz.fpam.util.ModelUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 import slidenerd.vivz.fpam.widget.RecyclerViewEmptySupport;
 
 
 /**
- * TODO handle error conditions, handle the loginmanager properly, how the items are shown while deleting and after deleting
+ * TODO handle error conditions, handle the loginmanager properly, how the items are shown while deleting and after deleting, move the background activities to a retained fragment
  * A simple {@link Fragment} subclass.
  */
 @EFragment
@@ -168,20 +167,12 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     }
 
     @Background
-    void onDelete(AccessToken accessToken, int position, Group group, Post post) {
+    void onDelete(AccessToken token, int position, Group group, Post post) {
         Realm realm = null;
         try {
             realm = Realm.getDefaultInstance();
-            boolean success = FBUtils.requestDeletePost(accessToken, post.getPostId());
-            if (success) {
-                //Since the post was removed from facebook graph api, remove it from realm as well
-                realm.beginTransaction();
-                realm.where(Post.class).equalTo("postId", post.getPostId()).findFirst().removeFromRealm();
-                realm.commitTransaction();
-                String compositePrimaryKey = ModelUtils.getUserGroupCompositePrimaryKey(post.getUserId(), group.getId());
-                DataStore.storeOrUpdateSpammer(realm, compositePrimaryKey, post.getUserName());
-            }
-            afterDelete(position, success);
+            int numberOfPostsDeleted = Filter.filterPostsOnDelete(token, realm, group, post);
+            afterDelete(position, numberOfPostsDeleted > 0);
         } catch (JSONException e) {
             L.m(e + "");
         } finally {
@@ -194,7 +185,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     @UiThread
     void afterDelete(int position, boolean success) {
         if (success) {
-            mAdapter.notifyItemRemoved(position);
+            mAdapter.notifyDataSetChanged();
         }
         mProgressDialog.dismiss();
     }

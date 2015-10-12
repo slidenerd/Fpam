@@ -25,4 +25,5 @@
     <string name="placeholder_message">Message</string>
     <string name="placeholder_name">Vladimir Makarov</string>
     <string name="placeholder_email">vivek.officialr@gmail.com</string>
+    <string name="action_clear_group">Clear All Posts In Group</string>
 </resources>

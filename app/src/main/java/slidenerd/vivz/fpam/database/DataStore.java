@@ -128,8 +128,28 @@ public class DataStore {
         }
     }
 
-    public static void updateSpammerOutsideTransaction(Realm realm, Spammer spammer) {
-        spammer.setSpamCount(spammer.getSpamCount() + 1);
-        spammer.setTimestamp(System.currentTimeMillis());
+    public static void storeOrUpdateSpammer(Realm realm, String compositePrimaryKey, String spammerName, int initialSpamCount) {
+
+        //The spammer exists in the database if we find a composite id such that it starts with the user id the person who made the post and ends with the group id where the person posted
+
+        Spammer spammer = realm.where(Spammer.class).equalTo("userGroupCompositeId", compositePrimaryKey).findFirst();
+
+        //If we did NOT find a spammer for the given user id and group id, add the person to the spammer's database and mark the number of spam posts as 1 for this entry.
+
+        if (spammer == null) {
+            spammer = new Spammer(compositePrimaryKey, spammerName, initialSpamCount, System.currentTimeMillis());
+            realm.beginTransaction();
+            realm.copyToRealm(spammer);
+            realm.commitTransaction();
+        }
+
+        //If we found the id of the person making this post in the spammer's database, increment the number of spam posts made by this person.
+
+        else {
+            realm.beginTransaction();
+            spammer.setSpamCount(spammer.getSpamCount() + 1);
+            spammer.setTimestamp(System.currentTimeMillis());
+            realm.commitTransaction();
+        }
     }
 }

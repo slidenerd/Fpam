@@ -7,6 +7,7 @@ import org.json.JSONException;
 import java.util.ArrayList;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Post;
@@ -49,17 +50,15 @@ public class Filter {
 
             String userId = post.getUserId();
 
-            //the composite primary key of the Spammer table is the combination of user id and group id, so construct the primary key
-
-            String compositePrimaryKey = ModelUtils.getUserGroupCompositePrimaryKey(userId, groupId);
-
             //if the post was made by a spammer, add the post to the list of posts to be deleted
 
-            Spammer spammer = getSpammerInfo(realm, compositePrimaryKey, post);
+            Spammer spammer = realm.where(Spammer.class).beginsWith("userGroupCompositeId", userId).findFirst();
             if (spammer != null) {
                 spammers.add(spammer);
                 deletePosts.add(post);
                 size++;
+            } else {
+                L.m("Spammer was null");
             }
         }
 
@@ -84,9 +83,12 @@ public class Filter {
 
                 if (info.getSuccess()) {
 
+
                     //Find the post object whose deletion was successful from Facebook Graph API
 
                     Post post = info.getPost();
+
+                    String userId = post.getUserId();
 
                     //Remove the post from Realm
 
@@ -94,7 +96,22 @@ public class Filter {
 
                     //update the number of spam posts made by this spammer and the timestamp which indicates when this post was deleted
 
-                    DataStore.updateSpammerOutsideTransaction(realm, spammer);
+                    String compositePrimaryKey = ModelUtils.getUserGroupCompositePrimaryKey(userId, groupId);
+                    if (compositePrimaryKey.contains(groupId)) {
+
+                        //this spammer has spammed in this group before
+
+                        spammer.setSpamCount(spammer.getSpamCount() + 1);
+                        spammer.setTimestamp(System.currentTimeMillis());
+
+                    } else {
+
+                        //this spammer hasnt spammed in this group before
+
+                        Spammer newSpammer = new Spammer(compositePrimaryKey, spammer.getUserName(), 1, System.currentTimeMillis());
+                        realm.copyToRealmOrUpdate(newSpammer);
+                    }
+
 
                     L.m("Spam successfully removed " + info.getPost().getPostId() + " made by " + info.getPost().getUserName());
 
@@ -106,15 +123,48 @@ public class Filter {
             //Commit the transaction outside the loop to avoid consuming resources while iterating
 
             realm.commitTransaction();
+        } else {
+            L.m("to delete list was empty");
         }
         return message.toString();
     }
 
-    public static void filterPostsOnDelete() {
+    public static int filterPostsOnDelete(AccessToken token, Realm realm, Group group, Post post) throws JSONException {
+        int numberOfPostsDeleted = 0;
+        RealmResults<Post> results = realm.where(Post.class).equalTo("userId", post.getUserId()).findAll();
+        if (!results.isEmpty()) {
+            ArrayList<DeleteResponseInfo> infos = FBUtils.requestDeletePosts(token, results);
 
-    }
+            String compositePrimaryKey = ModelUtils.getUserGroupCompositePrimaryKey(post.getUserId(), group.getId());
 
-    public static Spammer getSpammerInfo(Realm realm, String compositePrimaryKey, Post post) {
-        return realm.where(Spammer.class).equalTo("userGroupCompositeId", compositePrimaryKey).findFirst();
+            realm.beginTransaction();
+            for (DeleteResponseInfo info : infos) {
+
+                //If the post was removed successfully from the Facebook Graph API, remove the corresponding post from realm as well
+
+                if (info.getSuccess()) {
+
+                    //Remove the post from Realm
+
+                    realm.where(Post.class).equalTo("postId", info.getPost().getPostId()).findFirst().removeFromRealm();
+
+                    numberOfPostsDeleted++;
+
+                } else {
+                    L.m("Delete failed for " + info.getPost().getPostId() + " made by " + info.getPost().getUserName());
+                }
+            }
+
+            //update the number of spam posts made by this spammer and the timestamp which indicates when this post was deleted
+
+            realm.commitTransaction();
+
+            //update the number of spam posts made by this spammer and the timestamp which indicates when this post was deleted
+
+            if (numberOfPostsDeleted > 0) {
+                DataStore.storeOrUpdateSpammer(realm, compositePrimaryKey, post.getUserName(), numberOfPostsDeleted);
+            }
+        }
+        return numberOfPostsDeleted;
     }
 }

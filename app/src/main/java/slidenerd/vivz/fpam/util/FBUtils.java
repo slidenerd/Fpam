@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.RealmResults;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.extras.FeedFields;
 import slidenerd.vivz.fpam.extras.GroupFields;
@@ -225,4 +226,22 @@ public class FBUtils {
         return responseInfos;
     }
 
+    public static ArrayList<DeleteResponseInfo> requestDeletePosts(AccessToken token, RealmResults<Post> posts) throws JSONException {
+        ArrayList<DeleteResponseInfo> responseInfos = new ArrayList<>();
+        GraphRequestBatch requests = new GraphRequestBatch();
+        for (Post post : posts) {
+            GraphRequest graphRequest = new GraphRequest(token, post.getPostId(), null, HttpMethod.DELETE);
+            requests.add(graphRequest);
+        }
+        List<GraphResponse> responses = requests.executeAndWait();
+        for (int i = 0; i < responses.size(); i++) {
+            GraphResponse response = responses.get(i);
+            Post post = posts.get(i);
+            JSONObject jsonObject = response.getJSONObject();
+            boolean success = (jsonObject != null && jsonObject.has("success") && !jsonObject.isNull("success") && jsonObject.getBoolean("success"));
+            DeleteResponseInfo responseInfo = new DeleteResponseInfo(success, post);
+            responseInfos.add(responseInfo);
+        }
+        return responseInfos;
+    }
 }
