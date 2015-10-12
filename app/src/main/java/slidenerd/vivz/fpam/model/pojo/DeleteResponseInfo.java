@@ -6,20 +6,20 @@ import slidenerd.vivz.fpam.model.json.feed.Post;
  * Created by vivz on 11/10/15.
  */
 public class DeleteResponseInfo {
-    private boolean status;
+    private boolean success;
     private Post post;
 
-    public DeleteResponseInfo(boolean status, Post post) {
-        this.status = status;
+    public DeleteResponseInfo(boolean success, Post post) {
+        this.success = success;
         this.post = post;
     }
 
-    public boolean getStatus() {
-        return status;
+    public boolean getSuccess() {
+        return success;
     }
 
-    public void setStatus(boolean status) {
-        this.status = status;
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 
     public Post getPost() {

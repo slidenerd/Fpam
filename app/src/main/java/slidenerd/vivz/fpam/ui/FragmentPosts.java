@@ -186,7 +186,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
                 realm.where(Post.class).equalTo("postId", post.getPostId()).findFirst().removeFromRealm();
                 realm.commitTransaction();
                 String compositePrimaryKey = ModelUtils.getUserGroupCompositePrimaryKey(post.getUserId(), group.getId());
-                DataStore.storeOrUpdateSpammerInTransaction(realm, compositePrimaryKey, post.getUserName());
+                DataStore.storeOrUpdateSpammer(realm, compositePrimaryKey, post.getUserName());
             }
             afterDelete(position, success);
         } catch (JSONException e) {

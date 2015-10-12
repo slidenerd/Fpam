@@ -25,7 +25,7 @@ public class Filter {
      * Get the person id of the guy and group id of the post
      * Check if there exists a spammer with that person id and group id
      * If yes, add the post to the list of posts to be deleted
-     * Request delete from facebook API to remove all these posts
+     * Request delete from facebook API to remove all these posts if we have a non zero list of posts to delete
      * If the outcome is true, delete the posts from facebook and remove them from database
      * Update the spammer data for the deletes that were executed successfully
      *
@@ -34,36 +34,75 @@ public class Filter {
      * @param group
      */
     public static void filterPostsOnLoad(AccessToken token, Realm realm, Group group, ArrayList<Post> posts) throws JSONException {
+
+        //find the group id to which this post belongs
+
         String groupId = group.getId();
         ArrayList<Post> deletePosts = new ArrayList<>(posts.size());
+        ArrayList<Spammer> spammers = new ArrayList<>(posts.size());
+        int size = 0;
         for (Post post : posts) {
+
+            //find the user id of the person who made this post
+
             String userId = post.getUserId();
+
+            //the composite primary key of the Spammer table is the combination of user id and group id, so construct the primary key
+
             String compositePrimaryKey = ModelUtils.getUserGroupCompositePrimaryKey(userId, groupId);
-            if (isPostedBySpammer(realm, compositePrimaryKey, post)) {
+
+            //if the post was made by a spammer, add the post to the list of posts to be deleted
+
+            Spammer spammer = getSpammerInfo(realm, compositePrimaryKey, post);
+            if (spammer != null) {
+                spammers.add(spammer);
                 deletePosts.add(post);
+                size++;
             }
         }
 
         //Check if we have posts to delete before requesting deletion to avoid crash
 
         if (!deletePosts.isEmpty()) {
+
+            //Execute the deletes on all the posts
+
             ArrayList<DeleteResponseInfo> infos = FBUtils.requestDeletePosts(token, deletePosts);
+
+            //Begin a transaction outside the loop to avoid consuming resources while iterating
+
             realm.beginTransaction();
-            for (DeleteResponseInfo info : infos) {
-                if (info.getStatus()) {
+            for (int i = 0; i < size; i++) {
+
+                DeleteResponseInfo info = infos.get(i);
+                Spammer spammer = spammers.get(i);
+
+                //If the post was removed successfully from the Facebook Graph API, remove the corresponding post from realm as well
+
+                if (info.getSuccess()) {
+
+                    //Find the post object whose deletion was successful from Facebook Graph API
+
                     Post post = info.getPost();
+
+                    //Remove the post from Realm
+
                     realm.where(Post.class).equalTo("postId", post.getPostId()).findFirst().removeFromRealm();
-                    String compositePrimaryKey = ModelUtils.getUserGroupCompositePrimaryKey(post.getUserId(), groupId);
-                    DataStore.storeOrUpdateSpammerOutsideTransaction(realm, compositePrimaryKey, post.getUserName());
+
+                    //update the number of spam posts made by this spammer and the timestamp which indicates when this post was deleted
+
+                    DataStore.updateSpammerOutsideTransaction(realm, spammer);
                 }
             }
+
+            //Commit the transaction outside the loop to avoid consuming resources while iterating
+
             realm.commitTransaction();
         }
 
     }
 
-    public static boolean isPostedBySpammer(Realm realm, String compositePrimaryKey, Post post) {
-        Spammer spammer = realm.where(Spammer.class).equalTo("userGroupCompositeId", compositePrimaryKey).findFirst();
-        return spammer != null;
+    public static Spammer getSpammerInfo(Realm realm, String compositePrimaryKey, Post post) {
+        return realm.where(Spammer.class).equalTo("userGroupCompositeId", compositePrimaryKey).findFirst();
     }
 }
