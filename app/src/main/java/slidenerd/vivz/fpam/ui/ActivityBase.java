@@ -34,7 +34,7 @@ import slidenerd.vivz.fpam.util.NavUtils;
 @OptionsMenu(R.menu.menu_base)
 
 public abstract class ActivityBase extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, TaskFragmentPosts.TaskCallback {
+        implements NavigationView.OnNavigationItemSelectedListener, TaskFragmentLoadPosts.TaskCallback {
 
     private static final String STATE_SELECTED_GROUP = "state_selected_group";
     private static final String TAG_FRAGMENT_DRAWER = "nav_drawer";
@@ -42,7 +42,7 @@ public abstract class ActivityBase extends AppCompatActivity
     @App
     Fpam mApplication;
     private ProgressDialog mProgress;
-    private TaskFragmentPosts_ mTask;
+    private TaskFragmentLoadPosts_ mTask;
     private FragmentDrawer_ mDrawer;
     private FloatingActionButton mFab;
     private Group mSelectedGroup;
@@ -129,9 +129,9 @@ public abstract class ActivityBase extends AppCompatActivity
     }
 
     private void initTaskFragment() {
-        mTask = (TaskFragmentPosts_) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_TASK_POSTS);
+        mTask = (TaskFragmentLoadPosts_) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_TASK_POSTS);
         if (mTask == null) {
-            mTask = new TaskFragmentPosts_();
+            mTask = new TaskFragmentLoadPosts_();
             getSupportFragmentManager().beginTransaction().add(mTask, TAG_FRAGMENT_TASK_POSTS).commit();
         }
     }
@@ -204,6 +204,12 @@ public abstract class ActivityBase extends AppCompatActivity
         mProgress.setTitle("Loading...");
         mProgress.setMessage(message);
         mProgress.show();
+    }
+
+    @Override
+    public void onProgressUpdate(String title, String message) {
+        mProgress.setTitle(title);
+        mProgress.setMessage(message);
     }
 
     @Override

@@ -13,7 +13,6 @@ import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.util.DateUtils;
 
 /**
- * TODO Add appropriate comments
  * Created by vivz on 01/10/15.
  */
 public class PostDeserializer implements JsonDeserializer<Post> {

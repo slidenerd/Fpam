@@ -8,8 +8,6 @@
     <string name="navigation_drawer">Logout</string>
     <string name="action_settings">Settings</string>
 
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="key_spammers">key_spammers</string>
 
     <string name="tab_posts">Posts</string>

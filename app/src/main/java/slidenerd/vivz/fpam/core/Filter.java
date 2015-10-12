@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import slidenerd.vivz.fpam.database.DataStore;
+import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.model.pojo.DeleteResponseInfo;
@@ -16,7 +17,6 @@ import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.ModelUtils;
 
 /**
- * TODO write the delete module
  * Created by vivz on 11/10/15.
  */
 public class Filter {
@@ -33,7 +33,9 @@ public class Filter {
      * @param realm
      * @param group
      */
-    public static void filterPostsOnLoad(AccessToken token, Realm realm, Group group, ArrayList<Post> posts) throws JSONException {
+    public static String filterPostsOnLoad(AccessToken token, Realm realm, Group group, ArrayList<Post> posts) throws JSONException {
+
+        StringBuffer message = new StringBuffer();
 
         //find the group id to which this post belongs
 
@@ -65,6 +67,7 @@ public class Filter {
 
         if (!deletePosts.isEmpty()) {
 
+
             //Execute the deletes on all the posts
 
             ArrayList<DeleteResponseInfo> infos = FBUtils.requestDeletePosts(token, deletePosts);
@@ -92,6 +95,11 @@ public class Filter {
                     //update the number of spam posts made by this spammer and the timestamp which indicates when this post was deleted
 
                     DataStore.updateSpammerOutsideTransaction(realm, spammer);
+
+                    L.m("Spam successfully removed " + info.getPost().getPostId() + " made by " + info.getPost().getUserName());
+
+                } else {
+                    L.m("Delete failed for " + info.getPost().getPostId() + " made by " + info.getPost().getUserName());
                 }
             }
 
@@ -99,6 +107,10 @@ public class Filter {
 
             realm.commitTransaction();
         }
+        return message.toString();
+    }
+
+    public static void filterPostsOnDelete() {
 
     }
 

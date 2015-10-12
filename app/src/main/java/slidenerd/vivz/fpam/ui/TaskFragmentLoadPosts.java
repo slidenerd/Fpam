@@ -32,11 +32,10 @@ import slidenerd.vivz.fpam.util.DateUtils;
 import slidenerd.vivz.fpam.util.FBUtils;
 
 /**
- * TODO implement database limiting by removing posts beyond the limit
  * The retained fragment used to load posts in the background
  */
 @EFragment
-public class TaskFragmentPosts extends Fragment {
+public class TaskFragmentLoadPosts extends Fragment {
     @App
     Fpam mApplication;
     TaskCallback mCallback;
@@ -44,7 +43,7 @@ public class TaskFragmentPosts extends Fragment {
     @Pref
     MyPrefs_ mPref;
 
-    public TaskFragmentPosts() {
+    public TaskFragmentLoadPosts() {
 
     }
 
@@ -101,14 +100,14 @@ public class TaskFragmentPosts extends Fragment {
 
                 if (lastLoadedTimestamp > 0) {
                     posts = FBUtils.requestFeedSince(token, Fpam.getGson(), group, maximumPostsStored, lastLoadedTimestamp);
-                    L.m("loading " + posts.size() + " posts for SUBSEQUENT time for group " + group.getName());
+                    onProgressUpdate("Loaded", posts.size() + " posts from " + group.getName());
                 }
 
                 //If the group was never loaded before, load it for the first time
 
                 else {
-                    posts = FBUtils.requestFeedSync(token, Fpam.getGson(), group);
-                    L.m("loading " + posts.size() + " posts for the first time for group " + group.getName());
+                    posts = FBUtils.requestFeedFirstTime(token, Fpam.getGson(), group);
+                    onProgressUpdate("Loaded", posts.size() + " posts from " + group.getName());
                 }
                 DataStore.storePosts(realm, posts);
 
@@ -120,8 +119,12 @@ public class TaskFragmentPosts extends Fragment {
 
                     GroupMeta groupMeta = new GroupMeta(group.getId(), System.currentTimeMillis());
                     DataStore.storeGroupMeta(realm, groupMeta);
-                    L.m("updated group meta for " + group.getName());
+
+                    //Limit the number of entries stored in the database, based on the cache settings of the app, if the admin has set the cache to 25, if the number of posts loaded were 25 but the number of posts already present in the database were 15, then get rid of the oldest 15 posts and store the new 25 posts in the database.
+
                     DataStore.limitStoredPosts(realm, group, maximumPostsStored);
+
+                    //Filter spam posts made by known spammers or containing certain words
                     Filter.filterPostsOnLoad(token, realm, group, posts);
                 }
 
@@ -137,6 +140,15 @@ public class TaskFragmentPosts extends Fragment {
             }
         } else {
             onPostsLoaded("Did not find a valid access token while loading", group);
+        }
+    }
+
+    @UiThread
+    void onProgressUpdate(String title, String message) {
+        if (mCallback != null) {
+            mCallback.onProgressUpdate(title, message);
+        } else {
+            L.m("Callback was null");
         }
     }
 
@@ -157,6 +169,8 @@ public class TaskFragmentPosts extends Fragment {
 
     interface TaskCallback {
         void beforePostsLoaded(String message);
+
+        void onProgressUpdate(String title, String message);
 
         void afterPostsLoaded(String message, Group group);
     }

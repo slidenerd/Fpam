@@ -29,11 +29,6 @@ import slidenerd.vivz.fpam.model.pojo.DeleteResponseInfo;
 
 public class FBUtils {
 
-
-    //TODO handle errors that may arise if JSONObject is null while retrieving admin, Paginate GroupMeta Pages
-    //TODO write a requestGroups method that uses pagination technique similar to requestFeedSince if possible
-    //TODO optimize the requestDeletePosts method
-
     /**
      * Specify the fields of the logged in user that you are interested to retrieve. Fire a Graph Request synchronously and get its JSON object.
      *
@@ -129,11 +124,7 @@ public class FBUtils {
         return listGroups;
     }
 
-    /*
-    TODO implement the since parameter for requesting feeds from Facebook Graph API
-     */
-
-    public static ArrayList<Post> requestFeedSync(AccessToken token, Gson gson, Group group) throws JSONException {
+    public static ArrayList<Post> requestFeedFirstTime(AccessToken token, Gson gson, Group group) throws JSONException {
         ArrayList<Post> listPosts = new ArrayList<>(Constants.RESULTS_PER_PAGE);
         TypeToken<ArrayList<Post>> typeToken = new TypeToken<ArrayList<Post>>() {
         };

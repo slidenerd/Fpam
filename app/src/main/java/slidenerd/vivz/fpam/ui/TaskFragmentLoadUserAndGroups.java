@@ -24,10 +24,10 @@ import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.FBUtils;
 
 @EFragment
-public class TaskFragmentLogin extends Fragment {
+public class TaskFragmentLoadUserAndGroups extends Fragment {
     TaskCallback mCallback;
 
-    public TaskFragmentLogin() {
+    public TaskFragmentLoadUserAndGroups() {
 
     }
 
