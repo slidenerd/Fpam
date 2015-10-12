@@ -217,7 +217,7 @@ public abstract class ActivityBase extends AppCompatActivity
     @Override
     public void afterPostsLoaded(String message, Group group) {
         mProgress.dismiss();
-        Snackbar.make(mFab, message + " " + group.getName(), Snackbar.LENGTH_LONG)
+        Snackbar.make(mFab, message, Snackbar.LENGTH_LONG)
                 .setAction("Yay!", null).show();
         NavUtils.broadcastSelectedGroup(this, group, true);
     }

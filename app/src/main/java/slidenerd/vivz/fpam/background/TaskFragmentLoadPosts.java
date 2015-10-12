@@ -84,6 +84,9 @@ public class TaskFragmentLoadPosts extends Fragment {
     void loadPostsAsync(@NonNull Group group, AccessToken token) {
         if (mApplication.isValidToken()) {
             Realm realm = null;
+            int originalLoadCount = 0;
+            int filteredLoadCount = 0;
+
             try {
                 realm = Realm.getDefaultInstance();
 
@@ -109,26 +112,42 @@ public class TaskFragmentLoadPosts extends Fragment {
                     posts = FBUtils.requestFeedFirstTime(token, Fpam.getGson(), group);
                     onProgressUpdate("Loaded", posts.size() + " posts from " + group.getName());
                 }
-                DataStore.storePosts(realm, posts);
+                originalLoadCount = posts.size();
 
                 //If we did retrieve posts, update the timestamp of when the group was loaded
 
                 if (!posts.isEmpty()) {
 
-                    //update the timestamp and the metadata of the group that was just loaded
+                    //Filter spam posts made by known spammers or containing certain words
+
+                    Filter.filterPostsOnLoad(token, realm, group, posts);
+
+                    filteredLoadCount = posts.size();
 
                     GroupMeta groupMeta = new GroupMeta(group.getId(), System.currentTimeMillis());
-                    DataStore.storeGroupMeta(realm, groupMeta);
+                    realm.beginTransaction();
+                    realm.copyToRealmOrUpdate(posts);
+
+                    //update the timestamp and the metadata of the group that was just loaded
+
+                    realm.copyToRealmOrUpdate(groupMeta);
+                    realm.commitTransaction();
 
                     //Limit the number of entries stored in the database, based on the cache settings of the app, if the admin has set the cache to 25, if the number of posts loaded were 25 but the number of posts already present in the database were 15, then get rid of the oldest 15 posts and store the new 25 posts in the database.
 
                     DataStore.limitStoredPosts(realm, group, maximumPostsStored);
 
-                    //Filter spam posts made by known spammers or containing certain words
-                    Filter.filterPostsOnLoad(token, realm, group, posts);
+
                 }
 
-                onPostsLoaded(posts.size() + " posts loaded for ", group);
+                String message = null;
+                if (originalLoadCount > 0) {
+                    message = originalLoadCount + " New Posts Loaded For " + group.getName() + (filteredLoadCount > 0 ? " And " + filteredLoadCount + " spam posts removed" : "");
+
+                } else {
+                    message = "No New Posts Loaded For " + group.getName();
+                }
+                onPostsLoaded(message, group);
             } catch (JSONException e) {
                 L.m("" + e);
             } catch (FacebookException e) {

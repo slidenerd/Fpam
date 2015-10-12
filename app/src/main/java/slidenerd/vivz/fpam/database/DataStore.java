@@ -63,12 +63,6 @@ public class DataStore {
         return src != null ? CopyUtils.duplicateAdmin(src) : null;
     }
 
-    public static void storePosts(Realm realm, ArrayList<Post> listPosts) {
-        realm.beginTransaction();
-        realm.copyToRealmOrUpdate(listPosts);
-        realm.commitTransaction();
-    }
-
     public static RealmResults<Post> getPosts(Realm realm, Group group) {
         return realm.where(Post.class).beginsWith("postId", group.getId()).findAllSorted("updatedTime", false);
     }
@@ -86,12 +80,6 @@ public class DataStore {
         L.m(numberOfPostsRemoved > 0 ? "Removed " + numberOfPostsRemoved : "Nothing to remove");
     }
 
-    public static void storeGroupMeta(Realm realm, GroupMeta groupMeta) {
-        realm.beginTransaction();
-        realm.copyToRealmOrUpdate(groupMeta);
-        realm.commitTransaction();
-    }
-
     public static ArrayList<GroupMeta> loadGroupMetas(Realm realm) {
         RealmResults<GroupMeta> results = realm.where(GroupMeta.class).findAll();
         return CopyUtils.duplicateGroupMetas(results);
@@ -101,31 +89,6 @@ public class DataStore {
         GroupMeta groupMeta = realm.where(GroupMeta.class).equalTo("groupId", group.getId()).findFirst();
         L.m((groupMeta == null) + "");
         return groupMeta != null ? groupMeta.getTimestamp() : 0;
-    }
-
-    public static void storeOrUpdateSpammer(Realm realm, String compositePrimaryKey, String spammerName) {
-
-        //The spammer exists in the database if we find a composite id such that it starts with the user id the person who made the post and ends with the group id where the person posted
-
-        Spammer spammer = realm.where(Spammer.class).equalTo("userGroupCompositeId", compositePrimaryKey).findFirst();
-
-        //If we did NOT find a spammer for the given user id and group id, add the person to the spammer's database and mark the number of spam posts as 1 for this entry.
-
-        if (spammer == null) {
-            spammer = new Spammer(compositePrimaryKey, spammerName, 1, System.currentTimeMillis());
-            realm.beginTransaction();
-            realm.copyToRealm(spammer);
-            realm.commitTransaction();
-        }
-
-        //If we found the id of the person making this post in the spammer's database, increment the number of spam posts made by this person.
-
-        else {
-            realm.beginTransaction();
-            spammer.setSpamCount(spammer.getSpamCount() + 1);
-            spammer.setTimestamp(System.currentTimeMillis());
-            realm.commitTransaction();
-        }
     }
 
     public static void storeOrUpdateSpammer(Realm realm, String compositePrimaryKey, String spammerName, int initialSpamCount) {

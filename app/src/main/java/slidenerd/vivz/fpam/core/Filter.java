@@ -50,9 +50,12 @@ public class Filter {
 
             String userId = post.getUserId();
 
-            //if the post was made by a spammer, add the post to the list of posts to be deleted
+            //Is the user id of the person making this post in the list of spammmers regardless of the group where the spammer made the post?
 
             Spammer spammer = realm.where(Spammer.class).beginsWith("userGroupCompositeId", userId).findFirst();
+
+            //if the post was made by a spammer, add the post to the list of posts to be deleted
+
             if (spammer != null) {
                 spammers.add(spammer);
                 deletePosts.add(post);
@@ -90,16 +93,19 @@ public class Filter {
 
                     String userId = post.getUserId();
 
-                    //Remove the post from Realm
+                    //Remove the post from the Collection
 
-                    realm.where(Post.class).equalTo("postId", post.getPostId()).findFirst().removeFromRealm();
+                    posts.remove(post);
 
                     //update the number of spam posts made by this spammer and the timestamp which indicates when this post was deleted
 
                     String compositePrimaryKey = ModelUtils.getUserGroupCompositePrimaryKey(userId, groupId);
+
+                    //if there is a spammer entry with the user id of the person making this post and the group id of this group
+
                     if (compositePrimaryKey.contains(groupId)) {
 
-                        //this spammer has spammed in this group before
+                        //this spammer has spammed in this group before, increment the number of spam posts made by this spammer and update the timestamp
 
                         spammer.setSpamCount(spammer.getSpamCount() + 1);
                         spammer.setTimestamp(System.currentTimeMillis());
