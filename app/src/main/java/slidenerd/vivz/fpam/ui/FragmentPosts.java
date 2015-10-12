@@ -2,7 +2,6 @@ package slidenerd.vivz.fpam.ui;
 
 
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -70,12 +69,6 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     private LoginManager mLoginManager;
     private ProgressDialog mProgressDialog;
     private Group mSelectedGroup;
-    private BroadcastReceiver mGroupSelectedReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-        }
-    };
 
     public FragmentPosts() {
         // Required empty public constructor

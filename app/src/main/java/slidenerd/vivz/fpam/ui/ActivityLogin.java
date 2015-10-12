@@ -26,6 +26,8 @@ import java.util.Set;
 
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
+import slidenerd.vivz.fpam.background.TaskLoadAdminAndGroups;
+import slidenerd.vivz.fpam.background.TaskLoadAdminAndGroups_;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.util.NavUtils;
 
@@ -34,13 +36,13 @@ import slidenerd.vivz.fpam.util.NavUtils;
  */
 @EActivity(R.layout.activity_login)
 @OptionsMenu(R.menu.menu_activity_login)
-public class ActivityLogin extends AppCompatActivity implements FacebookCallback<LoginResult>, TaskFragmentLoadUserAndGroups.TaskCallback {
+public class ActivityLogin extends AppCompatActivity implements FacebookCallback<LoginResult>, TaskLoadAdminAndGroups.TaskCallback {
     private static final String TAG_TASK_FRAGMENT = "task_fragment";
     @App
     Fpam mApplication;
     @ViewById(R.id.progress)
     ProgressBar mProgress;
-    private TaskFragmentLoadUserAndGroups_ mTaskFragment;
+    private TaskLoadAdminAndGroups_ mTaskFragment;
     private CallbackManager mCallbackManager;
     private AlertDialog mDialog;
 
@@ -80,9 +82,9 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCallbackManager = CallbackManager.Factory.create();
-        mTaskFragment = (TaskFragmentLoadUserAndGroups_) getSupportFragmentManager().findFragmentByTag(TAG_TASK_FRAGMENT);
+        mTaskFragment = (TaskLoadAdminAndGroups_) getSupportFragmentManager().findFragmentByTag(TAG_TASK_FRAGMENT);
         if (mTaskFragment == null) {
-            mTaskFragment = new TaskFragmentLoadUserAndGroups_();
+            mTaskFragment = new TaskLoadAdminAndGroups_();
             getSupportFragmentManager().beginTransaction().add(mTaskFragment, TAG_TASK_FRAGMENT).commit();
         }
     }

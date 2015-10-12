@@ -26,6 +26,8 @@ import org.parceler.Parcels;
 
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
+import slidenerd.vivz.fpam.background.TaskFragmentLoadPosts;
+import slidenerd.vivz.fpam.background.TaskFragmentLoadPosts_;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.DatabaseUtils;
 import slidenerd.vivz.fpam.util.NavUtils;

@@ -9,5 +9,4 @@
     <dimen name="app_bar_backdrop_height">144dp</dimen>
     <dimen name="profile_picture_size">96dp</dimen>
     <dimen name="nav_email_vertical_spacing">4dp</dimen>
-    <dimen name="toolbar_top_padding">0dp</dimen>
 </resources>

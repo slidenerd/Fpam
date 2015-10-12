@@ -1,4 +1,4 @@
-package slidenerd.vivz.fpam.ui;
+package slidenerd.vivz.fpam.background;
 
 import android.app.Activity;
 import android.content.Context;
@@ -65,7 +65,7 @@ public class TaskFragmentLoadPosts extends Fragment {
         setRetainInstance(true);
     }
 
-    void triggerLoadPosts(@NonNull Group group, AccessToken accessToken) {
+    public void triggerLoadPosts(@NonNull Group group, AccessToken accessToken) {
         if (mCallback != null) {
             mCallback.beforePostsLoaded("Loading posts for the group " + group.getName());
         } else {
@@ -167,7 +167,7 @@ public class TaskFragmentLoadPosts extends Fragment {
         mCallback = null;
     }
 
-    interface TaskCallback {
+    public interface TaskCallback {
         void beforePostsLoaded(String message);
 
         void onProgressUpdate(String title, String message);

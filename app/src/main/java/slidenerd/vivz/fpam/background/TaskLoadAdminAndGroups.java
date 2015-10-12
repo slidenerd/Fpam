@@ -1,4 +1,4 @@
-package slidenerd.vivz.fpam.ui;
+package slidenerd.vivz.fpam.background;
 
 import android.app.Activity;
 import android.content.Context;
@@ -24,10 +24,10 @@ import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.FBUtils;
 
 @EFragment
-public class TaskFragmentLoadUserAndGroups extends Fragment {
+public class TaskLoadAdminAndGroups extends Fragment {
     TaskCallback mCallback;
 
-    public TaskFragmentLoadUserAndGroups() {
+    public TaskLoadAdminAndGroups() {
 
     }
 
@@ -88,7 +88,7 @@ public class TaskFragmentLoadUserAndGroups extends Fragment {
         }
     }
 
-    interface TaskCallback {
+    public interface TaskCallback {
         void afterAdminAndGroupsLoaded();
     }
 }
