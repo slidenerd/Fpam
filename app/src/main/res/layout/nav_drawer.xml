@@ -8,6 +8,7 @@
     android:fitsSystemWindows="true"
     app:itemTextColor="@color/colorTextSecondary">
 
+    <!--Make the settings and logout button stick to the bottom of our navigation view which behaves like a FrameLayout-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,28 +16,55 @@
         android:background="@color/colorPrimary"
         android:orientation="horizontal">
 
-        <TextView
+        <LinearLayout
             android:id="@+id/action_settings"
             android:layout_width="0dp"
-            android:layout_height="?attr/listPreferredItemHeightSmall"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="?attr/selectableItemBackground"
-            android:drawableLeft="@drawable/ic_settings_white"
-            android:gravity="center"
-            android:text="@string/action_settings"
-            android:textAppearance="?attr/textAppearanceListItem"
-            android:textColor="@android:color/white" />
+            android:gravity="center">
 
-        <TextView
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:src="@drawable/ic_settings_white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="?attr/listPreferredItemHeightSmall"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:text="@string/action_settings"
+                android:textAppearance="?attr/textAppearanceListItem"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/action_logout"
             android:layout_width="0dp"
-            android:layout_height="?attr/listPreferredItemHeightSmall"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="?attr/selectableItemBackground"
-            android:drawableLeft="@drawable/ic_logout_white"
-            android:gravity="center"
-            android:text="@string/action_logout"
-            android:textAppearance="?attr/textAppearanceListItem"
-            android:textColor="@android:color/white" />
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:src="@drawable/ic_logout_white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="?attr/listPreferredItemHeightSmall"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:text="@string/action_logout"
+                android:textAppearance="?attr/textAppearanceListItem"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+
     </LinearLayout>
 </android.support.design.widget.NavigationView>

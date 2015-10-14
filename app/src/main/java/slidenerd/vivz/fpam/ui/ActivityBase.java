@@ -48,6 +48,7 @@ public abstract class ActivityBase extends AppCompatActivity
     private FragmentDrawer_ mDrawer;
     private FloatingActionButton mFab;
     private Group mSelectedGroup;
+    private DrawerLayout mDrawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,10 +78,10 @@ public abstract class ActivityBase extends AppCompatActivity
         //Initialize our retained fragment that performs the task of loading posts in the background
 
         initTaskFragment();
-        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawerLayout.setDrawerListener(toggle);
+                this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawerLayout.setDrawerListener(toggle);
         toggle.syncState();
 
         //Inflate the child class root View which is represented by a ViewStub in this layout
@@ -150,9 +151,8 @@ public abstract class ActivityBase extends AppCompatActivity
      */
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
@@ -160,6 +160,9 @@ public abstract class ActivityBase extends AppCompatActivity
 
     @OptionsItem(R.id.action_settings)
     boolean onSettingsSelected() {
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        }
         NavUtils.startActivitySettings(this);
         return true;
     }
@@ -181,13 +184,6 @@ public abstract class ActivityBase extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         switch (id) {
-            case R.id.action_settings:
-                onSettingsSelected();
-                break;
-            case R.id.action_logout:
-                moveToLogin();
-                logout();
-                break;
             default:
                 mSelectedGroup = mDrawer.getSelectedGroup(id);
                 if (mSelectedGroup != null) {
@@ -223,7 +219,8 @@ public abstract class ActivityBase extends AppCompatActivity
     }
 
 
-    private void logout() {
+    public void logout() {
+        moveToLogin();
         LoginManager loginManager = LoginManager.getInstance();
         loginManager.logOut();
     }

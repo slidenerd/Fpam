@@ -146,12 +146,12 @@ public class FragmentDrawer extends Fragment {
 
     @Click(R.id.action_settings)
     public void onSettingsClick() {
-        L.t(mContext, "settings clicked");
+        mActivity.onSettingsSelected();
     }
 
     @Click(R.id.action_logout)
     public void onLogoutClick() {
-        L.t(mContext, "logout clicked");
+        mActivity.logout();
     }
 
     /**

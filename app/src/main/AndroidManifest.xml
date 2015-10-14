@@ -48,9 +48,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".background.FilterPostService_"
-            android:exported="false"></service>
     </application>
 
 </manifest>
