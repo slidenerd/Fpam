@@ -24,7 +24,7 @@ import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.model.realm.GroupMeta;
+import slidenerd.vivz.fpam.model.realm.GroupMetaData;
 import slidenerd.vivz.fpam.model.realm.Spammer;
 import slidenerd.vivz.fpam.util.PrintUtils;
 
@@ -82,9 +82,9 @@ public class ActivityCache extends AppCompatActivity {
             String groupId = groupIdName.substring(groupIdName.indexOf(":") + 1, groupIdName.length());
             mRealm.beginTransaction();
             mRealm.where(Post.class).beginsWith("postId", groupId).findAllSorted("updatedTime", false).clear();
-            GroupMeta groupMeta = mRealm.where(GroupMeta.class).equalTo("groupId", groupId).findFirst();
-            if (groupMeta != null) {
-                groupMeta.setTimestamp(0);
+            GroupMetaData groupMetaData = mRealm.where(GroupMetaData.class).equalTo("groupId", groupId).findFirst();
+            if (groupMetaData != null) {
+                groupMetaData.setTimestamp(0);
             }
             mRealm.commitTransaction();
         }
@@ -105,9 +105,9 @@ public class ActivityCache extends AppCompatActivity {
             mSpinnerGroup.setVisibility(View.GONE);
 
         } else if (item.equals("Group Meta")) {
-            RealmResults<GroupMeta> results = mRealm.where(GroupMeta.class).findAll();
-            for (GroupMeta groupMeta : results) {
-                text.append(PrintUtils.toString(groupMeta));
+            RealmResults<GroupMetaData> results = mRealm.where(GroupMetaData.class).findAll();
+            for (GroupMetaData groupMetaData : results) {
+                text.append(PrintUtils.toString(groupMetaData));
             }
             mSpinnerGroup.setVisibility(View.GONE);
         } else if (item.equals("Post")) {

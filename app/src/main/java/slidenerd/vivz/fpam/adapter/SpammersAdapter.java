@@ -27,7 +27,6 @@ public class SpammersAdapter extends AbstractRealmAdapter<Spammer, SpammersAdapt
 
     }
 
-
     @Override
     public boolean hasHeader() {
         return false;

@@ -10,7 +10,7 @@ import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.model.realm.GroupMeta;
+import slidenerd.vivz.fpam.model.realm.GroupMetaData;
 import slidenerd.vivz.fpam.model.realm.Spammer;
 import slidenerd.vivz.fpam.util.CopyUtils;
 
@@ -80,15 +80,15 @@ public class DataStore {
         L.m(numberOfPostsRemoved > 0 ? "Removed " + numberOfPostsRemoved : "Nothing to remove");
     }
 
-    public static ArrayList<GroupMeta> loadGroupMetas(Realm realm) {
-        RealmResults<GroupMeta> results = realm.where(GroupMeta.class).findAll();
+    public static ArrayList<GroupMetaData> loadGroupMetas(Realm realm) {
+        RealmResults<GroupMetaData> results = realm.where(GroupMetaData.class).findAll();
         return CopyUtils.duplicateGroupMetas(results);
     }
 
     public static long getTimestamp(Realm realm, Group group) {
-        GroupMeta groupMeta = realm.where(GroupMeta.class).equalTo("groupId", group.getId()).findFirst();
-        L.m((groupMeta == null) + "");
-        return groupMeta != null ? groupMeta.getTimestamp() : 0;
+        GroupMetaData groupMetaData = realm.where(GroupMetaData.class).equalTo("groupId", group.getId()).findFirst();
+        L.m((groupMetaData == null) + "");
+        return groupMetaData != null ? groupMetaData.getTimestamp() : 0;
     }
 
     public static void storeOrUpdateSpammer(Realm realm, String compositePrimaryKey, String spammerName, int initialSpamCount) {
@@ -100,7 +100,7 @@ public class DataStore {
         //If we did NOT find a spammer for the given user id and group id, add the person to the spammer's database and mark the number of spam posts as 1 for this entry.
 
         if (spammer == null) {
-            spammer = new Spammer(compositePrimaryKey, spammerName, initialSpamCount, System.currentTimeMillis());
+            spammer = new Spammer(compositePrimaryKey, spammerName, initialSpamCount, System.currentTimeMillis(), false);
             realm.beginTransaction();
             realm.copyToRealm(spammer);
             realm.commitTransaction();

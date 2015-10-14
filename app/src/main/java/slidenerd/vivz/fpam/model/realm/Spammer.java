@@ -19,16 +19,18 @@ public class Spammer extends RealmObject {
     private String userName;
     private int spamCount;
     private long timestamp;
+    private boolean allowed;
 
     public Spammer() {
 
     }
 
-    public Spammer(String userGroupCompositeId, String userName, int spamCount, long timestamp) {
+    public Spammer(String userGroupCompositeId, String userName, int spamCount, long timestamp, boolean allowed) {
         this.userGroupCompositeId = userGroupCompositeId;
         this.userName = userName;
         this.spamCount = spamCount;
         this.timestamp = timestamp;
+        this.allowed = allowed;
     }
 
     public String getUserName() {
@@ -61,5 +63,13 @@ public class Spammer extends RealmObject {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public boolean isAllowed() {
+        return allowed;
+    }
+
+    public void setAllowed(boolean allowed) {
+        this.allowed = allowed;
     }
 }

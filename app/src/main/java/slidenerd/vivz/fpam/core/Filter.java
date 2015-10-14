@@ -116,7 +116,7 @@ public class Filter {
 
                         //this spammer hasnt spammed in this group before
 
-                        Spammer newSpammer = new Spammer(compositePrimaryKey, spammer.getUserName(), 1, System.currentTimeMillis());
+                        Spammer newSpammer = new Spammer(compositePrimaryKey, spammer.getUserName(), 1, System.currentTimeMillis(), false);
                         realm.copyToRealmOrUpdate(newSpammer);
                         L.m("adding new spammer " + spammer.getUserName());
                     }

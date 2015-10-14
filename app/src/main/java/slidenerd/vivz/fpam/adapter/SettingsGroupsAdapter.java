@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import io.realm.Realm;
@@ -57,15 +56,7 @@ public class SettingsGroupsAdapter extends AbstractRealmAdapter<Group, RecyclerV
             ItemHolder itemHolder = (ItemHolder) holder;
             final Group group = getItem(position);
             itemHolder.setGroupName(group.getName());
-            itemHolder.setMonitored(group.isMonitored());
-            itemHolder.mCheckMonitored.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    mRealm.beginTransaction();
-                    group.setIsMonitored(isChecked);
-                    mRealm.commitTransaction();
-                }
-            });
+            itemHolder.setMonitored(false);
         }
     }
 

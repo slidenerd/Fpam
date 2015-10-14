@@ -6,7 +6,7 @@ import java.util.List;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.model.realm.GroupMeta;
+import slidenerd.vivz.fpam.model.realm.GroupMetaData;
 import slidenerd.vivz.fpam.model.realm.Spammer;
 
 public class PrintUtils {
@@ -42,7 +42,8 @@ public class PrintUtils {
         return "\n" + spammer.getUserGroupCompositeId()
                 + "\n" + spammer.getUserName()
                 + "\n" + spammer.getSpamCount()
-                + "\n" + spammer.getTimestamp();
+                + "\n" + spammer.getTimestamp()
+                + "\n" + spammer.isAllowed();
     }
 
     public static String toString(Admin admin) {
@@ -65,10 +66,11 @@ public class PrintUtils {
                 + "\n" + group.getUnread();
     }
 
-    public static String toString(GroupMeta groupMeta) {
-        if (groupMeta == null) return "";
-        return "\n" + groupMeta.getGroupId()
-                + "\n" + groupMeta.getTimestamp()
-                + "\n" + new Date(groupMeta.getTimestamp());
+    public static String toString(GroupMetaData groupMetaData) {
+        if (groupMetaData == null) return "";
+        return "\n" + groupMetaData.getGroupId()
+                + "\n" + groupMetaData.getTimestamp()
+                + "\n" + new Date(groupMetaData.getTimestamp())
+                + "\n" + groupMetaData.isMonitored();
     }
 }

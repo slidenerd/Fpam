@@ -26,7 +26,7 @@ import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.model.realm.GroupMeta;
+import slidenerd.vivz.fpam.model.realm.GroupMetaData;
 import slidenerd.vivz.fpam.prefs.MyPrefs_;
 import slidenerd.vivz.fpam.util.DateUtils;
 import slidenerd.vivz.fpam.util.FBUtils;
@@ -125,13 +125,13 @@ public class TaskFragmentLoadPosts extends Fragment {
 
                     filteredLoadCount = posts.size();
 
-                    GroupMeta groupMeta = new GroupMeta(group.getId(), System.currentTimeMillis());
+                    GroupMetaData groupMetaData = new GroupMetaData(group.getId(), System.currentTimeMillis(), false);
                     realm.beginTransaction();
                     realm.copyToRealmOrUpdate(posts);
 
                     //update the timestamp and the metadata of the group that was just loaded
 
-                    realm.copyToRealmOrUpdate(groupMeta);
+                    realm.copyToRealmOrUpdate(groupMetaData);
                     realm.commitTransaction();
 
                     //Limit the number of entries stored in the database, based on the cache settings of the app, if the admin has set the cache to 25, if the number of posts loaded were 25 but the number of posts already present in the database were 15, then get rid of the oldest 15 posts and store the new 25 posts in the database.
