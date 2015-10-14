@@ -162,7 +162,7 @@ public class FragmentDrawer extends Fragment {
     @Nullable
     public Group getSelectedGroup(int selectedMenuId) {
         int sPosition = selectedMenuId - Constants.MENU_START_ID;
-        return !mGroups.isEmpty() && sPosition > 0 && sPosition < mGroups.size() ? mGroups.get(sPosition) : null;
+        return !mGroups.isEmpty() && sPosition >= 0 && sPosition < mGroups.size() ? mGroups.get(sPosition) : null;
     }
 
     @Override
