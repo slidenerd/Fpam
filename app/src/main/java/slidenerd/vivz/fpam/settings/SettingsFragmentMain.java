@@ -36,7 +36,7 @@ public class SettingsFragmentMain extends PreferenceFragment {
     public void onClickGroups() {
         getFragmentManager()
                 .beginTransaction()
-                .replace(R.id.main_content, new SettingsFragmentGroups_())
+                .replace(R.id.content_main, new SettingsFragmentGroups_())
                 .addToBackStack(getString(R.string.key_groups))
                 .commit();
     }
@@ -45,7 +45,7 @@ public class SettingsFragmentMain extends PreferenceFragment {
     public void onClickSpammers() {
         getFragmentManager()
                 .beginTransaction()
-                .replace(R.id.main_content, new SettingsFragmentSpammers_())
+                .replace(R.id.content_main, new SettingsFragmentSpammers_())
                 .addToBackStack(getString(R.string.key_groups))
                 .commit();
     }

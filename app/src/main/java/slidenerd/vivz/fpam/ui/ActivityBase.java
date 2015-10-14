@@ -21,7 +21,6 @@ import com.facebook.login.LoginManager;
 import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsItem;
-import org.androidannotations.annotations.OptionsMenu;
 import org.parceler.Parcels;
 
 import slidenerd.vivz.fpam.Fpam;
@@ -33,7 +32,6 @@ import slidenerd.vivz.fpam.util.DatabaseUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
 @EActivity
-@OptionsMenu(R.menu.menu_base)
 
 public abstract class ActivityBase extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, TaskFragmentLoadPosts.TaskCallback {
@@ -42,7 +40,7 @@ public abstract class ActivityBase extends AppCompatActivity
     private static final String TAG_FRAGMENT_DRAWER = "nav_drawer";
     private static final String TAG_FRAGMENT_TASK_POSTS = "task_fragment";
     @App
-    Fpam mApplication;
+    protected Fpam mApplication;
     private ProgressDialog mProgress;
     private TaskFragmentLoadPosts_ mTask;
     private FragmentDrawer_ mDrawer;
@@ -62,27 +60,21 @@ public abstract class ActivityBase extends AppCompatActivity
             return;
         }
 
-        //Initialize the Toolbar
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         //Initialize the Floating Action Button
 
         initFab();
 
-        //Initialize our Drawer Fragment that contains the navigation view and adds admin information and groups information
-
-        initNavigationDrawer();
-
         //Initialize our retained fragment that performs the task of loading posts in the background
 
         initTaskFragment();
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        mDrawerLayout.setDrawerListener(toggle);
-        toggle.syncState();
+
+        //Initialize our Drawer Fragment that contains the navigation view and adds admin information and groups information
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (hasDrawer()) {
+            initNavigationDrawer(toolbar);
+        }
 
         //Inflate the child class root View which is represented by a ViewStub in this layout
 
@@ -123,14 +115,6 @@ public abstract class ActivityBase extends AppCompatActivity
         });
     }
 
-    private void initNavigationDrawer() {
-        mDrawer = (FragmentDrawer_) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_DRAWER);
-        if (mDrawer == null) {
-            mDrawer = new FragmentDrawer_();
-            getSupportFragmentManager().beginTransaction().add(R.id.drawer_container, mDrawer, TAG_FRAGMENT_DRAWER).commit();
-        }
-    }
-
     private void initTaskFragment() {
         mTask = (TaskFragmentLoadPosts_) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_TASK_POSTS);
         if (mTask == null) {
@@ -138,6 +122,21 @@ public abstract class ActivityBase extends AppCompatActivity
             getSupportFragmentManager().beginTransaction().add(mTask, TAG_FRAGMENT_TASK_POSTS).commit();
         }
     }
+
+    private void initNavigationDrawer(Toolbar toolbar) {
+
+        mDrawer = (FragmentDrawer_) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_DRAWER);
+        if (mDrawer == null) {
+            mDrawer = new FragmentDrawer_();
+            getSupportFragmentManager().beginTransaction().add(R.id.drawer_container, mDrawer, TAG_FRAGMENT_DRAWER).commit();
+        }
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawerLayout.setDrawerListener(toggle);
+        toggle.syncState();
+    }
+
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -151,7 +150,7 @@ public abstract class ActivityBase extends AppCompatActivity
      */
     @Override
     public void onBackPressed() {
-        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+        if (hasDrawer() && mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
@@ -159,8 +158,8 @@ public abstract class ActivityBase extends AppCompatActivity
     }
 
     @OptionsItem(R.id.action_settings)
-    boolean onSettingsSelected() {
-        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+    protected boolean onSettingsSelected() {
+        if (hasDrawer() && mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
         }
         NavUtils.startActivitySettings(this);
@@ -168,13 +167,13 @@ public abstract class ActivityBase extends AppCompatActivity
     }
 
     @OptionsItem(R.id.action_export)
-    boolean onExportDatabaseSelected() {
+    protected boolean onExportDatabaseSelected() {
         DatabaseUtils.exportDatabase(this);
         return true;
     }
 
     @OptionsItem(R.id.action_cache)
-    boolean onCacheSelected() {
+    protected boolean onCacheSelected() {
         NavUtils.startActivityCache(this);
         return true;
     }
@@ -183,14 +182,10 @@ public abstract class ActivityBase extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        switch (id) {
-            default:
-                mSelectedGroup = mDrawer.getSelectedGroup(id);
-                if (mSelectedGroup != null) {
-                    setTitle(mSelectedGroup.getName());
-                    mTask.triggerLoadPosts(mSelectedGroup, mApplication.getToken());
-                }
-                break;
+        mSelectedGroup = mDrawer.getSelectedGroup(id);
+        if (mSelectedGroup != null) {
+            setTitle(mSelectedGroup.getName());
+            mTask.triggerLoadPosts(mSelectedGroup, mApplication.getToken());
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -225,6 +220,7 @@ public abstract class ActivityBase extends AppCompatActivity
         loginManager.logOut();
     }
 
+    public abstract boolean hasDrawer();
 
     /**
      * @return the layout id of the child activity

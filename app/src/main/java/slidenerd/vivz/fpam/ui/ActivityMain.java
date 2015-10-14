@@ -10,12 +10,19 @@ import android.support.v4.view.ViewPager;
 import android.view.View;
 
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.OptionsMenu;
 
 import slidenerd.vivz.fpam.R;
 
 @EActivity
+@OptionsMenu(R.menu.menu_main)
 public class ActivityMain extends ActivityBase {
     private ViewPager mPager;
+
+    @Override
+    public boolean hasDrawer() {
+        return true;
+    }
 
     @Override
     public int getContentView() {

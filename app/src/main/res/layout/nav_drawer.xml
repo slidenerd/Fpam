@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="start"
-    android:fitsSystemWindows="true"
     app:itemTextColor="@color/colorTextSecondary">
 
     <!--Make the settings and logout button stick to the bottom of our navigation view which behaves like a FrameLayout-->

@@ -170,6 +170,4 @@ public class FragmentDrawer extends Fragment {
         super.onDestroy();
         mRealm.close();
     }
-
-
 }
