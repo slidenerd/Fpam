@@ -49,8 +49,7 @@ public class PrintUtils {
     public static String toString(Admin admin) {
         if (admin == null) return "\n";
         return "\n" + admin.getId()
-                + "\n" + admin.getFirstName()
-                + "\n" + admin.getLastName()
+                + "\n" + admin.getName()
                 + "\n" + admin.getEmail()
                 + "\n" + admin.getWidth()
                 + "\n" + admin.getHeight()

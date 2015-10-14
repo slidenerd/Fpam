@@ -21,7 +21,7 @@ public class CopyUtils {
     }
 
     public static Admin duplicateAdmin(Admin src) {
-        Admin admin = new Admin(src.getId(), src.getEmail(), src.getFirstName(), src.getLastName(), src.getWidth(), src.getHeight(), src.isSilhouette(), src.getUrl());
+        Admin admin = new Admin(src.getId(), src.getEmail(), src.getName(), src.getWidth(), src.getHeight(), src.isSilhouette(), src.getUrl());
         return admin;
     }
 

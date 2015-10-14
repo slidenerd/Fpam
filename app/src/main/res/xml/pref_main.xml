@@ -17,7 +17,7 @@
         android:title="@string/pref_monitor" />
     <Preference
         android:key="@string/key_groups"
-        android:summary="@string/pref_summary_groups"
+        android:summary="@string/text_which_groups"
         android:title="@string/pref_title_groups" />
     <Preference
         android:key="@string/key_spammers"

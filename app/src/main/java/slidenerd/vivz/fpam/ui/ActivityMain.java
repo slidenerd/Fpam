@@ -42,7 +42,6 @@ public class ActivityMain extends ActivityBase {
     }
 
     public static class MainPagerAdapter extends FragmentStatePagerAdapter {
-        public static final int POSITION_POSTS = 0;
         public static final int TAB_COUNT = 2;
         private Resources mResources;
 
@@ -54,7 +53,7 @@ public class ActivityMain extends ActivityBase {
         @Override
         public Fragment getItem(int position) {
             Fragment fragment = null;
-            if (position == POSITION_POSTS) {
+            if (position == 0) {
                 fragment = FragmentPosts_.builder().build();
             } else {
                 fragment = FragmentStats_.builder().build();
@@ -69,7 +68,7 @@ public class ActivityMain extends ActivityBase {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            if (position == POSITION_POSTS) {
+            if (position == 0) {
                 return mResources.getString(R.string.tab_posts);
             } else {
                 return mResources.getString(R.string.tab_stats);

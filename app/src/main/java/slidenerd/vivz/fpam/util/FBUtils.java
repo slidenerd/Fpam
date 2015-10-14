@@ -39,7 +39,7 @@ public class FBUtils {
     @Nullable
     public static Admin requestMeSync(AccessToken accessToken, Gson gson) throws JSONException {
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,email,first_name,last_name,picture.type(normal).width(200).height(200)");
+        parameters.putString("fields", "id,email,name,picture.type(normal).width(200).height(200)");
         GraphRequest request = new GraphRequest(accessToken, "me");
         request.setParameters(parameters);
         GraphResponse graphResponse = request.executeAndWait();

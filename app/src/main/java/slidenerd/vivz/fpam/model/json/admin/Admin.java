@@ -14,8 +14,7 @@ public class Admin extends RealmObject {
     @PrimaryKey
     private String id;
     private String email;
-    private String firstName;
-    private String lastName;
+    private String name;
     private int width;
     private int height;
     private boolean isSilhouette;
@@ -24,11 +23,10 @@ public class Admin extends RealmObject {
     public Admin() {
     }
 
-    public Admin(String id, String email, String firstName, String lastName, int width, int height, boolean isSilhouette, String url) {
+    public Admin(String id, String email, String name, int width, int height, boolean isSilhouette, String url) {
         this.id = id;
         this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.name = name;
         this.width = width;
         this.height = height;
         this.isSilhouette = isSilhouette;
@@ -64,35 +62,6 @@ public class Admin extends RealmObject {
         this.email = email;
     }
 
-    /**
-     * @return The firstName
-     */
-    public String getFirstName() {
-        return firstName;
-    }
-
-    /**
-     * @param firstName The firstName
-     */
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    /**
-     * @return The lastName
-     */
-    public String getLastName() {
-        return lastName;
-    }
-
-    /**
-     * @param lastName The lastName
-     */
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-
     public int getWidth() {
         return width;
     }
@@ -123,5 +92,13 @@ public class Admin extends RealmObject {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

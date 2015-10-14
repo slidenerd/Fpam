@@ -113,7 +113,7 @@ public class FragmentDrawer extends Fragment {
         View headerView = mDrawer.inflateHeaderView(R.layout.nav_header_main);
         TextView textUserName = (TextView) headerView.findViewById(R.id.text_username);
         RoundedImageView imageProfile = (RoundedImageView) headerView.findViewById(R.id.image_profile);
-        textUserName.setText(admin.getFirstName() + " " + admin.getLastName());
+        textUserName.setText(admin.getName());
         Picasso.with(mContext).load(admin.getUrl()).into(imageProfile);
     }
 

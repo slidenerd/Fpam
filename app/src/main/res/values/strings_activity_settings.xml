@@ -39,7 +39,7 @@
     </string-array>
     <!--The second setting that lets you choose the GroupFields you want to monitor in the background-->
     <string name="pref_title_groups">Groups</string>
-    <string name="pref_summary_groups">Which groups do you want to monitor?</string>
+    <string name="text_which_groups">Which groups do you want to monitor?</string>
     <string name="pref_dialog_title_frequency">How often should Fpam search for Spam?</string>
     <string name="key_groups">key_groups</string>
     <string name="text_my_groups">My Groups</string>
@@ -48,4 +48,7 @@
     <string name="dialog_title_post_cache_size">How many posts should be stored in cache for each group?</string>
     <string name="key_post_cache_size">key_post_cache_size</string>
     <string name="title_post_cache_size">Cache Size</string>
+    <string name="tab_general">General</string>
+    <string name="tab_groups">Groups</string>
+    <string name="text_all_groups">All groups are monitored by default</string>
 </resources>

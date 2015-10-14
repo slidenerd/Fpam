@@ -31,13 +31,9 @@ public class AdminDeserializer implements JsonDeserializer<Admin> {
 
         final String email = root.get(AdminFields.EMAIL).getAsString();
 
-        //Retrieve 'first_name'
+        //Retrieve 'name'
 
-        final String firstName = root.get(AdminFields.FIRST_NAME).getAsString();
-
-        //Retrieve 'last_name'
-
-        final String lastName = root.get(AdminFields.LAST_NAME).getAsString();
+        final String name = root.get(AdminFields.NAME).getAsString();
 
         //Retrieve Json object 'picture' inside root json object
 
@@ -67,8 +63,7 @@ public class AdminDeserializer implements JsonDeserializer<Admin> {
 
         admin.setId(id);
         admin.setEmail(email);
-        admin.setFirstName(firstName);
-        admin.setLastName(lastName);
+        admin.setName(name);
         admin.setWidth(width);
         admin.setHeight(height);
         admin.setIsSilhouette(isSilhouette);
