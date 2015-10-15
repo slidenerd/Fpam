@@ -1,30 +1,36 @@
 package slidenerd.vivz.fpam.settings;
 
+import android.app.Activity;
+import android.content.Context;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.widget.TextView;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.ViewById;
 
 import slidenerd.vivz.fpam.R;
 
 /**
  * Created by vivz on 30/09/15.
  */
-@EFragment(R.layout.settings_spammers)
+@EFragment(R.layout.settings_general)
 public class SettingsFragmentGeneral extends Fragment {
+    private Context mContext;
 
-    @ViewById(R.id.text_empty)
-    TextView mTextEmpty;
-    @ViewById(R.id.recycler_spammers)
-    RecyclerView mRecyclerSpammers;
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mContext = activity;
+    }
 
     @AfterViews
     void onViewCreated() {
-        mRecyclerSpammers.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerSpammers.setHasFixedSize(true);
+
     }
+
 }

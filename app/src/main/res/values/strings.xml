@@ -26,4 +26,15 @@
     <string name="placeholder_name">Vladimir Makarov</string>
     <string name="placeholder_email">vivek.officialr@gmail.com</string>
     <string name="action_clear_group">Clear All Posts In Group</string>
+    <string name="placeholder_setting_title">Setting Title</string>
+    <string name="placeholder_setting_summary">This is the summary of our setting</string>
+    <string name="text_common">Common</string>
+    <string name="text_summary_cache">25 posts</string>
+    <string name="text_confirm_deletion">Delete Post On Swipe</string>
+    <string name="text_summary_confirm_deletion">Ask before deleting posts on swipe</string>
+    <string name="text_spam">Spam</string>
+    <string name="text_spammers">List Of Spammers</string>
+    <string name="text_summary_spammers">List of people spamming your groups</string>
+    <string name="text_keywords">Spam Keywords</string>
+    <string name="text_summary_keywords">Posts with keywords are considered spam</string>
 </resources>
