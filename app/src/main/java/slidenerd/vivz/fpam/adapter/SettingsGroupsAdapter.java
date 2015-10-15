@@ -21,6 +21,7 @@ public class SettingsGroupsAdapter extends AbstractRealmAdapter<Group, RecyclerV
     private LayoutInflater mInflater;
     private Realm mRealm;
 
+
     public SettingsGroupsAdapter(Context context, Realm realm, @NonNull RealmResults<Group> results) {
         super(context, realm, results);
         mRealm = realm;

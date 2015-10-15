@@ -37,4 +37,5 @@
     <string name="text_summary_spammers">List of people spamming your groups</string>
     <string name="text_keywords">Spam Keywords</string>
     <string name="text_summary_keywords">Posts with keywords are considered spam</string>
+    <string name="text_summary_scan_frequency">Every 2 hours</string>
 </resources>

@@ -2,7 +2,7 @@
     <!--The title of our Settings Activity-->
     <string name="title_activity_settings">Settings</string>
     <!--The first setting for Active Scan-->
-    <string name="pref_monitor">Monitor Spam</string>
+    <string name="text_scan_frequency">Scan Frequency</string>
     <string name="key_monitor_frequency">key_monitor_frequency</string>
     <string-array name="pref_monitor_frequency_titles">
         <item>Never</item>
@@ -41,7 +41,6 @@
     <string name="pref_title_groups">Groups</string>
     <string name="text_which_groups">Which groups do you want to monitor?</string>
     <string name="pref_dialog_title_frequency">How often should Fpam search for Spam?</string>
-    <string name="key_groups">key_groups</string>
     <string name="text_my_groups">My Groups</string>
     <string name="text_no_groups">No groups found.</string>
     <string name="pref_summary_spammers_blacklist">List of people spamming you</string>
