@@ -4,6 +4,10 @@ package slidenerd.vivz.fpam.extras;
  * Created by vivz on 27/09/15.
  */
 public interface Constants {
+
+    String PERMISSION_EMAIL = "email";
+    String PERMISSION_GROUPS = "user_managed_groups";
+    String PUBLISH_ACTIONS = "publish_actions";
     int RESULTS_PER_PAGE = 25;
     int DEFAULT_NUMBER_OF_ITEMS_TO_FETCH = 25;
     /*

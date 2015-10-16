@@ -1,6 +1,5 @@
 package slidenerd.vivz.fpam.ui;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -8,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -20,15 +21,15 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.res.StringArrayRes;
 
 import java.util.Arrays;
-import java.util.Set;
 
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.background.TaskLoadAdminAndGroups;
 import slidenerd.vivz.fpam.background.TaskLoadAdminAndGroups_;
-import slidenerd.vivz.fpam.log.L;
+import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
 /**
@@ -36,47 +37,59 @@ import slidenerd.vivz.fpam.util.NavUtils;
  */
 @EActivity(R.layout.activity_login)
 @OptionsMenu(R.menu.menu_activity_login)
-public class ActivityLogin extends AppCompatActivity implements FacebookCallback<LoginResult>, TaskLoadAdminAndGroups.TaskCallback {
+public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAndGroups.TaskCallback {
     private static final String TAG_TASK_FRAGMENT = "task_fragment";
     @App
     Fpam mApplication;
     @ViewById(R.id.progress)
     ProgressBar mProgress;
+    @StringArrayRes(R.array.read_permissions)
+    String[] mReadPermissions;
     private TaskLoadAdminAndGroups_ mTaskFragment;
     private CallbackManager mCallbackManager;
     private AlertDialog mDialog;
 
-    private void showDialogJustifyingPermissions(AccessToken accessToken) {
-        Set<String> setDeclinedPermissions = accessToken.getDeclinedPermissions();
-        if (!setDeclinedPermissions.isEmpty()) {
-            mDialog = new AlertDialog.Builder(this)
-                    .setTitle("Fpam would love your approval")
-                    .setMessage("Fpam wants the following permissions from you to work \n Email: Needed to maintain your spam settings \n GroupFields: Needed to access a list of groups you own so that Fpam can manage them. Fpam won't post in any group without asking you. \n Friends: Fpam needs this to keep everything in sync between you and your buddy admins. Fpam won't message your friends or post on their timeline without asking you.")
-                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialog) {
-                            initLoginManager();
-                        }
-                    })
-                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                        @Override
-                        public void onDismiss(DialogInterface dialog) {
-                            initLoginManager();
-                        }
-                    })
-                    .create();
-            if (mDialog != null && !mDialog.isShowing()) {
-                mDialog.show();
-            }
-        } else {
-            if (mApplication.isValidToken(accessToken)) {
+
+    private FacebookCallback<LoginResult> mFacebookCallback = new FacebookCallback<LoginResult>() {
+        @Override
+        public void onSuccess(LoginResult loginResult) {
+            AccessToken token = loginResult.getAccessToken();
+
+            //if we have an access token which is neither null nor expired, has the permission to read email of the person logging in and groups, then we jump into the app
+
+            if (FBUtils.isValidAndCanReadEmailGroups(token)) {
                 mProgress.setVisibility(View.VISIBLE);
-                mTaskFragment.loadAdminAndGroupsInBackground(accessToken);
-            } else {
-                L.m("access token is null or expired");
+                mTaskFragment.loadAdminAndGroupsInBackground(token);
+            }
+
+            //redirect the person to the login screen after displaying a dialog that shows why and how the permissions are going to be used
+
+            else {
+                new MaterialDialog.Builder(ActivityLogin.this)
+                        .title(R.string.text_permission_declined)
+                        .customView(R.layout.request_permission, true)
+                        .autoDismiss(false)
+                        .cancelable(false)
+                        .positiveText(R.string.text_ok)
+                        .onAny(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
+                                initLoginManager();
+                            }
+                        }).show();
             }
         }
-    }
+
+        @Override
+        public void onCancel() {
+
+        }
+
+        @Override
+        public void onError(FacebookException error) {
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +102,7 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
         }
     }
 
+
     /**
      * Create the Login Manager responsible for facebook login and login with the initial read permissions.
      */
@@ -99,24 +113,8 @@ public class ActivityLogin extends AppCompatActivity implements FacebookCallback
 
     private void initLoginManager() {
         LoginManager loginManager = LoginManager.getInstance();
-        loginManager.registerCallback(mCallbackManager, this);
-        loginManager.logInWithReadPermissions(this, Arrays.asList("email", "user_managed_groups", "user_friends"));
-    }
-
-    @Override
-    public void onSuccess(LoginResult loginResult) {
-        AccessToken accessToken = loginResult.getAccessToken();
-        showDialogJustifyingPermissions(accessToken);
-    }
-
-    @Override
-    public void onCancel() {
-        L.m("You cancelled while logging in");
-    }
-
-    @Override
-    public void onError(FacebookException e) {
-        L.t(ActivityLogin.this, "Couldn't connect with Facebook Servers " + e);
+        loginManager.registerCallback(mCallbackManager, mFacebookCallback);
+        loginManager.logInWithReadPermissions(this, Arrays.asList(mReadPermissions));
     }
 
     @Override

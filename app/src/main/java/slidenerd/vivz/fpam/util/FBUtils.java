@@ -17,6 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import io.realm.RealmResults;
@@ -28,7 +29,27 @@ import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.model.pojo.DeleteResponseInfo;
 
+import static slidenerd.vivz.fpam.extras.Constants.PERMISSION_EMAIL;
+import static slidenerd.vivz.fpam.extras.Constants.PERMISSION_GROUPS;
+import static slidenerd.vivz.fpam.extras.Constants.PUBLISH_ACTIONS;
+
 public class FBUtils {
+
+    public static final boolean isValid(AccessToken token) {
+        return token != null && !token.isExpired();
+    }
+
+    /**
+     * @param token access token obtained from Facebook
+     * @return true if the token is not null , not expired and contains all the read permissions which in our case would be email and groups else return false.
+     */
+    public static final boolean isValidAndCanReadEmailGroups(AccessToken token) {
+        return isValid(token) && token.getPermissions().containsAll(Arrays.asList(PERMISSION_EMAIL, PERMISSION_GROUPS));
+    }
+
+    public static final boolean isValidAndCanPublish(AccessToken token) {
+        return isValid(token) && token.getPermissions().contains(PUBLISH_ACTIONS);
+    }
 
     /**
      * Specify the fields of the logged in user that you are interested to retrieve. Fire a Graph Request synchronously and get its JSON object.

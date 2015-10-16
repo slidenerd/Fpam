@@ -83,7 +83,7 @@ public class TaskFragmentLoadPosts extends Fragment {
      */
     @Background
     void loadPostsAsync(@NonNull Group group, AccessToken token) {
-        if (mApplication.isValidToken()) {
+        if (FBUtils.isValid(token)) {
             Realm realm = null;
             int originalLoadCount = 0;
             int filteredLoadCount = 0;

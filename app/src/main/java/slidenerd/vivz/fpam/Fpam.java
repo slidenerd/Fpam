@@ -1,6 +1,8 @@
 package slidenerd.vivz.fpam;
 
 import android.app.Application;
+import android.content.Context;
+import android.support.multidex.MultiDex;
 
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
@@ -10,8 +12,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import org.androidannotations.annotations.EApplication;
-
-import java.util.Set;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -28,8 +28,6 @@ import slidenerd.vivz.fpam.model.json.group.Group;
  */
 @EApplication
 public class Fpam extends Application {
-
-    private static final String PUBLISH_ACTIONS = "publish_actions";
 
     public static Gson getGson() {
         Gson gson = new GsonBuilder()
@@ -51,30 +49,19 @@ public class Fpam extends Application {
         return gson;
     }
 
-    public boolean isValidToken() {
-        AccessToken token = getToken();
-        return token != null && !token.isExpired();
-    }
-
-    public boolean isValidToken(AccessToken token) {
-        return token != null && !token.isExpired();
+    /**
+     * Needed to support multidex since Fpam has more than 65536 methods that can be invoked inside a single dex thereby causing a DexOverflowException if multidex is not enabled in the build.gradle file
+     *
+     * @param base
+     */
+    @Override
+    public void attachBaseContext(Context base) {
+        MultiDex.install(base);
+        super.attachBaseContext(base);
     }
 
     public AccessToken getToken() {
         return AccessToken.getCurrentAccessToken();
-    }
-
-    public boolean hasPermissionsPublishActions() {
-        if (isValidToken()) {
-            AccessToken token = getToken();
-            Set<String> permissions = token.getPermissions();
-            return !permissions.isEmpty() && permissions.contains(PUBLISH_ACTIONS);
-        }
-        return false;
-    }
-
-    public boolean shouldRedirectToLogin() {
-        return !isValidToken();
     }
 
     @Override

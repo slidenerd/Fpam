@@ -44,6 +44,7 @@ import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 import slidenerd.vivz.fpam.widget.RecyclerViewEmptySupport;
 
@@ -83,7 +84,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         mLoginManager.registerCallback(mCallbackManager, this);
 
         //Check if our app has publish_actions permissions, its needed to perform deletes
-        if (!mApplication.hasPermissionsPublishActions()) {
+        if (FBUtils.isValidAndCanPublish(mApplication.getToken())) {
             mLoginManager.logInWithPublishPermissions(FragmentPosts.this, Arrays.asList("publish_actions"));
         }
 

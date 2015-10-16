@@ -29,6 +29,7 @@ import slidenerd.vivz.fpam.background.TaskFragmentLoadPosts;
 import slidenerd.vivz.fpam.background.TaskFragmentLoadPosts_;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.DatabaseUtils;
+import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
 @EActivity
@@ -55,7 +56,7 @@ public abstract class ActivityBase extends AppCompatActivity
 
         //If the access token has expired or null, take the user back to the login screen, and call return in addition to finish() of the activity to halt processing any remaining code inside onCreate
 
-        if (mApplication.shouldRedirectToLogin()) {
+        if (!FBUtils.isValid(mApplication.getToken())) {
             moveToLogin();
             return;
         }
