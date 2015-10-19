@@ -137,7 +137,7 @@ public class SettingsFragmentGeneral extends Fragment {
      * Called when you click anywhere, the icon or title or summary related to swipe to delete posts
      */
     @Click({R.id.text_delete, R.id.text_summary_delete, R.id.icon_delete})
-    void onClickSwipeDelete() {
+    void onClickDelete() {
 
         //if the option was disabled, enable it, else disable it
 
@@ -145,15 +145,15 @@ public class SettingsFragmentGeneral extends Fragment {
 
         //update summary based on the new state
 
-        updateSummarySwipeToDelete();
+        updateSummaryDelete();
     }
 
     @CheckedChange(R.id.switch_delete)
-    void onChangeSwipeDelete() {
-        updateSummarySwipeToDelete();
+    void onChangeDelete() {
+        updateSummaryDelete();
     }
 
-    void updateSummarySwipeToDelete() {
+    void updateSummaryDelete() {
 
         //check if the option to delete posts on swipe is enabled or disabled
 

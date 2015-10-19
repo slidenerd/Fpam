@@ -30,7 +30,7 @@
     <string name="placeholder_setting_summary">This is the summary of our setting</string>
 
     <string name="text_summary_keywords">Posts with keywords are considered spam</string>
-    <string name="text_summary_scan_frequency">Every 2 hours</string>
+    <string name="pref_summary_scan_frequency">Every 2 hours</string>
     <string name="text_permission_declined">Permission Declined</string>
     <string name="request_permission_sentence_1">1. Fpam would love to have your approval to access your email address and list of groups you manage on Facebook</string>
     <string name="request_permission_sentence_2">2. Fpam uses your email address to sync all your app settings. Fpam won\'t spam you</string>

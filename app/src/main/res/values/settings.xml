@@ -2,8 +2,8 @@
     <!--The title of our Settings Activity-->
     <string name="title_activity_settings">Settings</string>
     <!--The first setting for Active Scan-->
-    <string name="text_scan_frequency">Scan Frequency</string>
-    <string-array name="pref_monitor_frequency_titles">
+    <string name="pref_scan_frequency">Scan Frequency</string>
+    <string-array name="pref_scan_frequency_titles">
         <item>Never</item>
         <item>Every 15 minutes</item>
         <item>Every 30 minutes</item>
@@ -14,7 +14,7 @@
         <item>Every 12 hours</item>
         <item>Once a day</item>
     </string-array>
-    <string-array name="pref_monitor_frequency_values">
+    <integer-array name="pref_scan_frequency_values">
         <item>-1</item>
         <item>15</item>
         <item>30</item>
@@ -24,7 +24,7 @@
         <item>480</item>
         <item>720</item>
         <item>1440</item>
-    </string-array>
+    </integer-array>
 
     <string-array name="pref_cache_sizes">
         <item>25</item>

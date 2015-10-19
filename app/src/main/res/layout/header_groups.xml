@@ -5,20 +5,22 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/text_scan_frequency"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="4dp"
         android:paddingTop="4dp"
-        android:text="@string/text_scan_frequency"
+        android:text="@string/pref_scan_frequency"
         android:textColor="@color/colorTextPrimary"
         android:textSize="16sp" />
 
     <TextView
+        android:id="@+id/text_summary_scan_frequency"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="4dp"
         android:paddingTop="4dp"
-        android:text="@string/text_summary_scan_frequency"
+        android:text="@string/pref_summary_scan_frequency"
         android:textColor="@color/colorTextSecondary"
         android:textSize="14sp" />
 

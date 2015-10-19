@@ -20,12 +20,20 @@ import slidenerd.vivz.fpam.model.json.group.Group;
 public class SettingsGroupsAdapter extends AbstractRealmAdapter<Group, RecyclerView.ViewHolder> {
     private LayoutInflater mInflater;
     private Realm mRealm;
+    private View mHeaderView;
 
 
     public SettingsGroupsAdapter(Context context, Realm realm, @NonNull RealmResults<Group> results) {
         super(context, realm, results);
         mRealm = realm;
         mInflater = LayoutInflater.from(context);
+    }
+
+    public void setHeaderView(View headerView) {
+        if (headerView == null) {
+            throw new IllegalArgumentException("Header View cannot be null for SettingsGroupsAdapter");
+        }
+        mHeaderView = headerView;
     }
 
     @Override
@@ -41,8 +49,10 @@ public class SettingsGroupsAdapter extends AbstractRealmAdapter<Group, RecyclerV
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == ItemType.HEADER.ordinal()) {
-            View view = mInflater.inflate(R.layout.header_groups, parent, false);
-            HeaderHolder holder = new HeaderHolder(view);
+            if (mHeaderView == null) {
+                throw new IllegalArgumentException("Header View cannot be null for SettingsGroupsAdapter");
+            }
+            HeaderHolder holder = new HeaderHolder(mHeaderView);
             return holder;
         } else {
             View view = mInflater.inflate(R.layout.row_groups, parent, false);
