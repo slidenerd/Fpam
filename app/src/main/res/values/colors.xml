@@ -11,6 +11,7 @@
     <color name="colorAccent">@color/flat_pink</color>
     <color name="colorTextPrimary">#212121</color>
     <color name="colorTextSecondary">#727272</color>
+    <color name="colorTextSecondaryDisabled">#88727272</color>
     <color name="colorWindowBackground">@color/flat_white</color>
     <color name="colorDrawerHeader">@color/flat_gray</color>
     <color name="colorDivider">#88B6B6B6</color>

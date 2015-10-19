@@ -2,6 +2,7 @@ package slidenerd.vivz.fpam.settings;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,14 +25,16 @@ import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.SettingsGroupsAdapter;
 import slidenerd.vivz.fpam.database.DataStore;
+import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.extras.MyPrefs_;
 import slidenerd.vivz.fpam.model.json.group.Group;
 
 /**
+ * TODO save the list of groups selected by the user
  * Created by vivz on 30/09/15.
  */
 @EFragment(R.layout.settings_groups)
-public class SettingsFragmentGroups extends Fragment implements View.OnClickListener {
+public class SettingsFragmentGroups extends Fragment implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     @Pref
     MyPrefs_ mPref;
@@ -53,6 +56,7 @@ public class SettingsFragmentGroups extends Fragment implements View.OnClickList
     private TextView mTextSummaryScanFrequency;
     private Realm mRealm;
     private Context mContext;
+    private SettingsGroupsAdapter mAdapter;
 
     @Override
     public void onAttach(Context context) {
@@ -74,47 +78,27 @@ public class SettingsFragmentGroups extends Fragment implements View.OnClickList
 
     @AfterViews
     void onViewCreated() {
-        initRecyclerView();
-        updateSummaryScanFrequency();
-    }
-
-    private void initRecyclerView() {
+        int selectedIndex = getSelectedIndex();
         mRecyclerGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerGroups.setHasFixedSize(true);
         RealmResults<Group> results = DataStore.getGroups(mRealm);
-        SettingsGroupsAdapter adapter = new SettingsGroupsAdapter(getActivity(), mRealm, results);
+        mAdapter = new SettingsGroupsAdapter(getActivity(), mRealm, results);
         mHeaderGroups = LayoutInflater.from(mContext).inflate(R.layout.header_groups, mRecyclerGroups, false);
-        adapter.setHeaderView(mHeaderGroups);
-        mRecyclerGroups.setAdapter(adapter);
+        mAdapter.setHeaderView(mHeaderGroups);
+        mRecyclerGroups.setAdapter(mAdapter);
+        mAdapter.setEnabled(selectedIndex != 0);
         mTextScanFrequency = (TextView) mHeaderGroups.findViewById(R.id.text_scan_frequency);
         mTextSummaryScanFrequency = (TextView) mHeaderGroups.findViewById(R.id.text_summary_scan_frequency);
         mTextScanFrequency.setOnClickListener(this);
         mTextSummaryScanFrequency.setOnClickListener(this);
-    }
-
-    private void updateSummaryScanFrequency() {
-        int scanFrequency = mPref.scanFrequency().get();
-        int selectedIndex = 0;
-        for (int i = 0; i < mScanFrequencyValues.length; i++) {
-            if (mScanFrequencyValues[i] == scanFrequency) {
-                selectedIndex = i;
-            }
-        }
         String selectedSummary = mScanFrequencyTitles[selectedIndex];
         mTextSummaryScanFrequency.setText(selectedSummary);
+        mPref.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     public void onClick(View v) {
-        int scanFrequency = mPref.scanFrequency().get();
-        int selectedIndex = 0;
-        for (int i = 0; i < mScanFrequencyValues.length; i++) {
-            if (mScanFrequencyValues[i] == scanFrequency) {
-                selectedIndex = i;
-            }
-        }
-        String selectedSummary = mScanFrequencyTitles[selectedIndex];
-        mTextSummaryScanFrequency.setText(selectedSummary);
+        int selectedIndex = getSelectedIndex();
         new MaterialDialog.Builder(mContext)
                 .title(R.string.pref_scan_frequency)
                 .items(R.array.pref_scan_frequency_titles)
@@ -134,6 +118,31 @@ public class SettingsFragmentGroups extends Fragment implements View.OnClickList
                 })
                 .build()
                 .show();
+    }
+
+    private int getSelectedIndex() {
+        int scanFrequency = mPref.scanFrequency().get();
+        int selectedIndex = 0;
+        for (int i = 0; i < mScanFrequencyValues.length; i++) {
+            if (mScanFrequencyValues[i] == scanFrequency) {
+                selectedIndex = i;
+            }
+        }
+        return selectedIndex;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mPref.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.key_scan_frequency))) {
+            int newValue = mPref.scanFrequency().get();
+            mAdapter.setEnabled(newValue != Constants.NA);
+        }
     }
 
     @Override

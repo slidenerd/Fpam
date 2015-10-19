@@ -37,4 +37,6 @@
     <string name="request_permission_sentence_3">3. Fpam will let you manage your groups from the app to control spam</string>
     <string name="request_permission_sentence_4">4. Fpam won\'t post anywhere without asking you</string>
     <string name="text_ok">OK</string>
+    <string name="key_scan_frequency">key_scan_frequency</string>
+    <string name="key_cache_size">key_cache_size</string>
 </resources>
