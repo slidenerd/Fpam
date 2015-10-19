@@ -20,7 +20,6 @@ import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.extras.MyPrefs_;
-import slidenerd.vivz.fpam.log.L;
 
 /**
  * Created by vivz on 30/09/15.
@@ -29,20 +28,34 @@ import slidenerd.vivz.fpam.log.L;
 public class SettingsFragmentGeneral extends Fragment {
     @Pref
     MyPrefs_ mPref;
-    @StringRes(R.string.text_summary_swipe_delete_on)
-    String mDeleteOn;
-    @StringRes(R.string.text_summary_swipe_delete_off)
-    String mDeleteOff;
-    @StringArrayRes(R.array.cache_size_entries)
-    String[] cacheEntries;
+
+    //The summary to be displayed when the user has enabled swipe to delete posts
+
+    @StringRes(R.string.pref_delete_on)
+    String mStringDeleteOn;
+
+    //The summary to be displayed when the user has disabled swipe to delete posts
+
+    @StringRes(R.string.pref_delete_off)
+    String mStringDeleteOff;
+
+    //The number of posts to be stored in the database for offline access for each group
+
+    @StringArrayRes(R.array.pref_cache_sizes)
+    String[] mCacheSizes;
+
+    //The textview controlling the summary to be displayed when the user has selected the number of posts to be stored in the database
+
     @ViewById(R.id.text_summary_cache)
     TextView mTextSummaryCache;
-    @ViewById(R.id.text_summary_confirm_deletion)
-    TextView mTextSummarySwipeDelete;
-    @ViewById(R.id.switch_confirm_deletion)
+
+    //The textview controlling the summary to be displayed when the user has enabled or disabled swipe to delete posts
+
+    @ViewById(R.id.text_summary_delete)
+    TextView mTextSummaryDelete;
+
+    @ViewById(R.id.switch_delete)
     Switch mSwitchDelete;
-    boolean mSwipeToDelete;
-    int mStoredCacheSize;
     private Context mContext;
 
     @Override
@@ -59,32 +72,60 @@ public class SettingsFragmentGeneral extends Fragment {
 
     @AfterViews
     void onViewCreated() {
-        mSwipeToDelete = mPref.swipeToDelete().get();
-        mStoredCacheSize = mPref.cacheSize().get();
-        mTextSummaryCache.setText(mStoredCacheSize + "");
-        mSwitchDelete.setChecked(mSwipeToDelete);
-        mTextSummarySwipeDelete.setText(mSwipeToDelete ? mDeleteOn : mDeleteOff);
+
+        //Load the value of the setting that indicates whether the user should delete posts on swipe
+
+        boolean shouldDelete = mPref.swipeToDelete().get();
+
+        //Load the number of posts to be stored in the database for each group
+
+        int cacheSize = mPref.cacheSize().get();
+
+        //Initialize views based on setting values
+
+        mTextSummaryCache.setText(getString(R.string.pref_summary_cache, cacheSize + ""));
+        mSwitchDelete.setChecked(shouldDelete);
+        mTextSummaryDelete.setText(shouldDelete ? mStringDeleteOn : mStringDeleteOff);
     }
 
+    /**
+     * Called when you click anywhere , icon or title or summary related to cache size in the first tab 'General' in the Settings screen
+     */
     @Click({R.id.text_cache, R.id.text_summary_cache, R.id.icon_cache})
     void onClickCacheSize() {
 
-        int selectedIndex = -1;
-        for (int i = 0; i < cacheEntries.length; i++) {
-            if (cacheEntries[i].equals(mStoredCacheSize + "")) {
+        //Load the number of posts to be stored in the database for each group
+
+        int cacheSize = mPref.cacheSize().get();
+
+        //Let the first item be selected by default
+
+        int selectedIndex = 0;
+        for (int i = 0; i < mCacheSizes.length; i++) {
+            if (mCacheSizes[i].equals(cacheSize + "")) {
+
+                //Update the selected index based on what the person has actually selected.
+
                 selectedIndex = i;
             }
         }
 
+        //Display a dialog containing the user choices for the number of items to be stored in the database
+
         new MaterialDialog.Builder(mContext)
-                .title(R.string.title_post_cache_size)
-                .items(R.array.cache_size_entries)
+                .title(R.string.pref_cache)
+                .items(R.array.pref_cache_sizes)
                 .itemsCallbackSingleChoice(selectedIndex, new MaterialDialog.ListCallbackSingleChoice() {
                     @Override
                     public boolean onSelection(MaterialDialog materialDialog, View view, int position, CharSequence charSequence) {
-                        L.t(mContext, "item selected at " + position);
-                        mPref.cacheSize().put(Integer.parseInt(cacheEntries[position]));
-                        mTextSummaryCache.setText(cacheEntries[position]);
+
+                        //Store the new value of cache size selected by the user in the SharedPreferences
+
+                        mPref.cacheSize().put(Integer.parseInt(mCacheSizes[position]));
+
+                        //Update the summary to reflect the new value of cache size selected by the user
+
+                        mTextSummaryCache.setText(getString(R.string.pref_summary_cache, mCacheSizes[position]));
                         return true;
                     }
                 })
@@ -92,22 +133,39 @@ public class SettingsFragmentGeneral extends Fragment {
                 .show();
     }
 
-    @Click({R.id.text_confirm_deletion, R.id.text_summary_confirm_deletion, R.id.icon_delete})
+    /**
+     * Called when you click anywhere, the icon or title or summary related to swipe to delete posts
+     */
+    @Click({R.id.text_delete, R.id.text_summary_delete, R.id.icon_delete})
     void onClickSwipeDelete() {
+
+        //if the option was disabled, enable it, else disable it
+
         mSwitchDelete.toggle();
+
+        //update summary based on the new state
+
         updateSummarySwipeToDelete();
     }
 
-    @CheckedChange(R.id.switch_confirm_deletion)
+    @CheckedChange(R.id.switch_delete)
     void onChangeSwipeDelete() {
         updateSummarySwipeToDelete();
     }
 
     void updateSummarySwipeToDelete() {
-        mSwipeToDelete = mSwitchDelete.isChecked();
-        L.t(mContext, mSwipeToDelete + "");
-        mPref.swipeToDelete().put(mSwipeToDelete);
-        mTextSummarySwipeDelete.setText(mSwipeToDelete ? mDeleteOn : mDeleteOff);
+
+        //check if the option to delete posts on swipe is enabled or disabled
+
+        boolean shouldDelete = mSwitchDelete.isChecked();
+
+        //update the SharedPreferences accordingly
+
+        mPref.swipeToDelete().put(shouldDelete);
+
+        //update the summary to be displayed accordingly
+
+        mTextSummaryDelete.setText(shouldDelete ? mStringDeleteOn : mStringDeleteOff);
     }
 
 }

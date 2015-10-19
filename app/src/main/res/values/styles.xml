@@ -92,11 +92,11 @@
     <style name="settings_general_switch">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_alignBottom">@+id/text_summary_confirm_deletion</item>
+        <item name="android:layout_alignBottom">@+id/text_summary_delete</item>
         <item name="android:layout_alignParentRight">true</item>
-        <item name="android:layout_alignTop">@+id/text_confirm_deletion</item>
+        <item name="android:layout_alignTop">@+id/text_delete</item>
         <item name="android:layout_below">@+id/separator_1</item>
-        <item name="android:layout_toRightOf">@+id/text_summary_confirm_deletion</item>
+        <item name="android:layout_toRightOf">@+id/text_summary_delete</item>
     </style>
 
 </resources>

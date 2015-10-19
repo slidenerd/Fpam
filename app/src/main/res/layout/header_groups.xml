@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:paddingBottom="2dp"
         android:paddingTop="24dp"
-        android:text="@string/text_which_groups"
+        android:text="@string/pref_groups"
         android:textColor="@color/colorTextPrimary"
         android:textSize="16sp" />
 
@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:paddingBottom="24dp"
         android:paddingTop="2dp"
-        android:text="@string/text_all_groups"
+        android:text="@string/pref_summary_groups"
         android:textColor="@color/colorTextSecondary"
         android:textSize="14sp" />
 </LinearLayout>

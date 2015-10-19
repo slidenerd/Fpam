@@ -125,7 +125,7 @@ public class FragmentDrawer extends Fragment {
     public void addGroupsToDrawer(ArrayList<Group> list) {
         Menu menu = mDrawer.getMenu();
         if (mGroups.isEmpty()) {
-            MenuItem item = menu.add(100, 100, 100, R.string.text_no_groups);
+            MenuItem item = menu.add(100, 100, 100, R.string.text_groups_none);
             item.setIcon(android.R.drawable.stat_notify_error);
         } else {
             int i = Constants.MENU_START_ID;

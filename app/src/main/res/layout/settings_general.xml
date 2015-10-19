@@ -5,7 +5,7 @@
     <TextView
         android:id="@+id/text_common"
         style="@style/settings_general_common"
-        android:text="@string/text_common" />
+        android:text="@string/pref_section_common" />
 
 
     <ImageView
@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_below="@+id/text_common"
         android:layout_toRightOf="@+id/icon_cache"
-        android:text="@string/title_post_cache_size" />
+        android:text="@string/pref_cache" />
 
     <TextView
         android:id="@+id/text_summary_cache"
@@ -30,7 +30,7 @@
         android:layout_width="match_parent"
         android:layout_below="@+id/text_cache"
         android:layout_toRightOf="@+id/icon_cache"
-        android:text="@string/text_summary_cache" />
+        android:text="@string/pref_summary_cache" />
 
     <View
         android:id="@+id/separator_1"
@@ -42,43 +42,43 @@
     <ImageView
         android:id="@+id/icon_delete"
         style="@style/settings_general_icon"
-        android:layout_alignBottom="@+id/text_summary_confirm_deletion"
-        android:layout_alignTop="@+id/text_confirm_deletion"
+        android:layout_alignBottom="@+id/text_summary_delete"
+        android:layout_alignTop="@+id/text_delete"
         android:layout_below="@+id/separator_1"
         android:src="@drawable/ic_delete_grey" />
 
     <TextView
-        android:id="@+id/text_confirm_deletion"
+        android:id="@+id/text_delete"
         style="@style/settings_general_title"
         android:layout_width="wrap_content"
         android:layout_below="@+id/separator_1"
         android:layout_toRightOf="@id/icon_delete"
-        android:text="@string/text_swipe_delete" />
+        android:text="@string/pref_delete" />
 
     <TextView
-        android:id="@+id/text_summary_confirm_deletion"
+        android:id="@+id/text_summary_delete"
         style="@style/settings_general_summary"
         android:layout_width="wrap_content"
-        android:layout_below="@+id/text_confirm_deletion"
+        android:layout_below="@+id/text_delete"
         android:layout_toRightOf="@id/icon_delete"
-        android:text="@string/text_summary_swipe_delete_off" />
+        android:text="@string/pref_delete_off" />
 
     <Switch
-        android:id="@+id/switch_confirm_deletion"
+        android:id="@+id/switch_delete"
         style="@style/settings_general_switch"
         android:checked="false" />
 
     <View
         android:id="@+id/separator_2"
         style="@style/settings_general_separator"
-        android:layout_alignLeft="@+id/text_confirm_deletion"
-        android:layout_below="@+id/text_summary_confirm_deletion"
+        android:layout_alignLeft="@+id/text_delete"
+        android:layout_below="@+id/text_summary_delete"
         android:layout_toRightOf="@+id/icon_delete" />
 
     <TextView
         android:id="@+id/text_spam"
         style="@style/settings_general_spam"
-        android:text="@string/text_spam" />
+        android:text="@string/pref_section_spam" />
 
 
     <ImageView
@@ -95,7 +95,7 @@
         android:layout_width="match_parent"
         android:layout_below="@id/text_spam"
         android:layout_toRightOf="@+id/icon_spammers"
-        android:text="@string/text_spammers" />
+        android:text="@string/pref_spammers" />
 
     <TextView
         android:id="@+id/text_summary_spammers"
@@ -103,7 +103,7 @@
         android:layout_width="match_parent"
         android:layout_below="@id/text_spammers"
         android:layout_toRightOf="@+id/icon_spammers"
-        android:text="@string/text_summary_spammers" />
+        android:text="@string/pref_summary_spammers" />
 
     <View
         android:id="@+id/separator_3"
@@ -126,7 +126,7 @@
         android:layout_width="match_parent"
         android:layout_below="@id/separator_3"
         android:layout_toRightOf="@+id/icon_keywords"
-        android:text="@string/text_keywords" />
+        android:text="@string/pref_keywords" />
 
     <TextView
         android:id="@+id/text_summary_keywords"

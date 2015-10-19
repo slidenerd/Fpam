@@ -26,28 +26,25 @@
         <item>1440</item>
     </string-array>
 
-    <string-array name="cache_size_entries">
+    <string-array name="pref_cache_sizes">
         <item>25</item>
         <item>50</item>
         <item>100</item>
     </string-array>
     <!--The second setting that lets you choose the GroupFields you want to monitor in the background-->
-    <string name="pref_title_groups">Groups</string>
-    <string name="text_which_groups">Which groups do you want to monitor?</string>
-    <string name="pref_dialog_title_frequency">How often should Fpam search for Spam?</string>
-    <string name="text_my_groups">My Groups</string>
-    <string name="text_no_groups">No groups found.</string>
-    <string name="title_post_cache_size">Cache Size</string>
+    <string name="pref_groups">Which groups do you want to monitor?</string>
+    <string name="text_groups_none">No groups found.</string>
+    <string name="pref_cache">Cache Size</string>
     <string name="tab_general">General</string>
     <string name="tab_groups">Groups</string>
-    <string name="text_all_groups">All groups are monitored by default</string>
-    <string name="text_common">Common</string>
-    <string name="text_summary_cache">25 posts</string>
-    <string name="text_swipe_delete">Swipe To Delete</string>
-    <string name="text_summary_swipe_delete_off">Ask me everytime when I swipe</string>
-    <string name="text_summary_swipe_delete_on">Delete posts when I swipe them</string>
-    <string name="text_spam">Spam</string>
-    <string name="text_spammers">List Of Spammers</string>
-    <string name="text_summary_spammers">List of people spamming your groups</string>
-    <string name="text_keywords">Spam Keywords</string>
+    <string name="pref_summary_groups">All groups are monitored by default</string>
+    <string name="pref_section_common">Common</string>
+    <string name="pref_summary_cache">%1$s posts</string>
+    <string name="pref_delete">Swipe To Delete</string>
+    <string name="pref_delete_off">Ask me everytime when I swipe</string>
+    <string name="pref_delete_on">Delete posts when I swipe them</string>
+    <string name="pref_section_spam">Spam</string>
+    <string name="pref_spammers">List Of Spammers</string>
+    <string name="pref_summary_spammers">List of people spamming your groups</string>
+    <string name="pref_keywords">Spam Keywords</string>
 </resources>
