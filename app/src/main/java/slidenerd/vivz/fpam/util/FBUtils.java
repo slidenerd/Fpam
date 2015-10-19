@@ -29,9 +29,8 @@ import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.model.pojo.DeleteResponseInfo;
 
-import static slidenerd.vivz.fpam.extras.Constants.PERMISSION_EMAIL;
-import static slidenerd.vivz.fpam.extras.Constants.PERMISSION_GROUPS;
 import static slidenerd.vivz.fpam.extras.Constants.PUBLISH_ACTIONS;
+import static slidenerd.vivz.fpam.extras.Constants.READ_PERMISSIONS;
 
 public class FBUtils {
 
@@ -44,7 +43,7 @@ public class FBUtils {
      * @return true if the token is not null , not expired and contains all the read permissions which in our case would be email and groups else return false.
      */
     public static final boolean isValidAndCanReadEmailGroups(AccessToken token) {
-        return isValid(token) && token.getPermissions().containsAll(Arrays.asList(PERMISSION_EMAIL, PERMISSION_GROUPS));
+        return isValid(token) && token.getPermissions().containsAll(Arrays.asList(READ_PERMISSIONS));
     }
 
     public static final boolean isValidAndCanPublish(AccessToken token) {

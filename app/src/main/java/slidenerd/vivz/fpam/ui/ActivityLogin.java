@@ -2,7 +2,6 @@ package slidenerd.vivz.fpam.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -21,7 +20,6 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
-import org.androidannotations.annotations.res.StringArrayRes;
 
 import java.util.Arrays;
 
@@ -29,6 +27,7 @@ import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.background.TaskLoadAdminAndGroups;
 import slidenerd.vivz.fpam.background.TaskLoadAdminAndGroups_;
+import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
@@ -43,11 +42,8 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
     Fpam mApplication;
     @ViewById(R.id.progress)
     ProgressBar mProgress;
-    @StringArrayRes(R.array.read_permissions)
-    String[] mReadPermissions;
     private TaskLoadAdminAndGroups_ mTaskFragment;
     private CallbackManager mCallbackManager;
-    private AlertDialog mDialog;
 
 
     private FacebookCallback<LoginResult> mFacebookCallback = new FacebookCallback<LoginResult>() {
@@ -112,9 +108,10 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
     }
 
     private void initLoginManager() {
+        String[] readPermissions = Constants.READ_PERMISSIONS;
         LoginManager loginManager = LoginManager.getInstance();
         loginManager.registerCallback(mCallbackManager, mFacebookCallback);
-        loginManager.logInWithReadPermissions(this, Arrays.asList(mReadPermissions));
+        loginManager.logInWithReadPermissions(this, Arrays.asList(readPermissions));
     }
 
     @Override

@@ -7,6 +7,7 @@ public interface Constants {
 
     String PERMISSION_EMAIL = "email";
     String PERMISSION_GROUPS = "user_managed_groups";
+    String[] READ_PERMISSIONS = new String[]{PERMISSION_EMAIL, PERMISSION_GROUPS};
     String PUBLISH_ACTIONS = "publish_actions";
     int RESULTS_PER_PAGE = 25;
     int DEFAULT_NUMBER_OF_ITEMS_TO_FETCH = 25;

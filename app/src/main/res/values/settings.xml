@@ -3,7 +3,6 @@
     <string name="title_activity_settings">Settings</string>
     <!--The first setting for Active Scan-->
     <string name="text_scan_frequency">Scan Frequency</string>
-    <string name="key_monitor_frequency">key_monitor_frequency</string>
     <string-array name="pref_monitor_frequency_titles">
         <item>Never</item>
         <item>Every 15 minutes</item>
@@ -27,12 +26,7 @@
         <item>1440</item>
     </string-array>
 
-    <string-array name="post_cache_entries">
-        <item>25</item>
-        <item>50</item>
-        <item>100</item>
-    </string-array>
-    <string-array name="post_cache_entry_values">
+    <string-array name="cache_size_entries">
         <item>25</item>
         <item>50</item>
         <item>100</item>
@@ -43,11 +37,17 @@
     <string name="pref_dialog_title_frequency">How often should Fpam search for Spam?</string>
     <string name="text_my_groups">My Groups</string>
     <string name="text_no_groups">No groups found.</string>
-    <string name="pref_summary_spammers_blacklist">List of people spamming you</string>
-    <string name="dialog_title_post_cache_size">How many posts should be stored in cache for each group?</string>
-    <string name="key_post_cache_size">key_post_cache_size</string>
     <string name="title_post_cache_size">Cache Size</string>
     <string name="tab_general">General</string>
     <string name="tab_groups">Groups</string>
     <string name="text_all_groups">All groups are monitored by default</string>
+    <string name="text_common">Common</string>
+    <string name="text_summary_cache">25 posts</string>
+    <string name="text_swipe_delete">Swipe To Delete</string>
+    <string name="text_summary_swipe_delete_off">Ask me everytime when I swipe</string>
+    <string name="text_summary_swipe_delete_on">Delete posts when I swipe them</string>
+    <string name="text_spam">Spam</string>
+    <string name="text_spammers">List Of Spammers</string>
+    <string name="text_summary_spammers">List of people spamming your groups</string>
+    <string name="text_keywords">Spam Keywords</string>
 </resources>

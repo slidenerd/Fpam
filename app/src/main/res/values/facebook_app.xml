@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_id">1671072936462544</string>
-
-    <string-array name="read_permissions">
-        <item>email</item>
-        <item>user_managed_groups</item>
-    </string-array>
-</resources>

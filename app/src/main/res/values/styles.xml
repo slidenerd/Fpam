@@ -58,15 +58,14 @@
     <style name="settings_general_icon">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginRight">24dp</item>
+        <item name="android:paddingRight">24dp</item>
     </style>
 
     <!--The first tab of the Settings screen known as 'General' with titles, icons, summaries and separators where each summary uses this style-->
     <style name="settings_general_summary">
-        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginBottom">4dp</item>
-        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:paddingTop">4dp</item>
         <item name="android:textColor">@color/colorTextSecondary</item>
         <item name="android:textSize">14sp</item>
     </style>
@@ -82,10 +81,9 @@
 
     <!--The first tab of the Settings screen known as 'General' with titles, icons, summaries and separators where each title uses this style-->
     <style name="settings_general_title">
-        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginBottom">2dp</item>
-        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:paddingTop">8dp</item>
         <item name="android:textColor">@color/colorTextPrimary</item>
         <item name="android:textSize">16sp</item>
     </style>

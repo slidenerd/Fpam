@@ -27,10 +27,10 @@ import io.realm.Realm;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.extras.Constants;
+import slidenerd.vivz.fpam.extras.MyPrefs_;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.prefs.MyPrefs_;
 import slidenerd.vivz.fpam.widget.RoundedImageView;
 
 /**
