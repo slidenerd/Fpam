@@ -16,6 +16,7 @@ import org.json.JSONException;
 import java.util.ArrayList;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
@@ -60,9 +61,27 @@ public class TaskLoadAdminAndGroups extends Fragment {
                 L.m("Fpam encountered problems downloading admin data, hence admin and groups data have not been downloaded");
                 return;
             }
-            ArrayList<Group> listGroups = FBUtils.requestGroupsSync(accessToken, gson);
+            RealmResults<Group> results = realm.where(Group.class).findAll();
+            String[] ids = new String[results.size()];
+            long[] timestamps = new long[results.size()];
+            boolean[] monitored = new boolean[results.size()];
+            for (int i = 0; i < results.size(); i++) {
+                Group group = results.get(i);
+                ids[i] = group.getId();
+                timestamps[i] = group.getTimestamp();
+                monitored[i] = group.isMonitored();
+            }
+            ArrayList<Group> groups = FBUtils.requestGroupsSync(accessToken, gson);
+            for (Group group : groups) {
+                for (int j = 0; j < results.size(); j++) {
+                    if (group.getId().equals(ids[j])) {
+                        group.setMonitored(monitored[j]);
+                        group.setTimestamp(timestamps[j]);
+                    }
+                }
+            }
             DataStore.storeAdmin(realm, admin);
-            DataStore.storeGroups(realm, listGroups);
+            DataStore.storeGroups(realm, groups);
 
         } catch (JSONException e) {
             L.m("" + e);

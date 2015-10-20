@@ -1,12 +1,10 @@
 package slidenerd.vivz.fpam.util;
 
-import java.util.Date;
 import java.util.List;
 
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.model.realm.GroupMetaData;
 import slidenerd.vivz.fpam.model.realm.Spammer;
 
 public class PrintUtils {
@@ -62,14 +60,8 @@ public class PrintUtils {
         return "\n" + group.getId()
                 + "\n" + group.getName()
                 + "\n" + group.getIcon()
-                + "\n" + group.getUnread();
-    }
-
-    public static String toString(GroupMetaData groupMetaData) {
-        if (groupMetaData == null) return "";
-        return "\n" + groupMetaData.getGroupId()
-                + "\n" + groupMetaData.getTimestamp()
-                + "\n" + new Date(groupMetaData.getTimestamp())
-                + "\n" + groupMetaData.isMonitored();
+                + "\n" + group.getUnread()
+                + "\n" + group.getTimestamp()
+                + "\n" + group.isMonitored();
     }
 }

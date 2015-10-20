@@ -20,15 +20,21 @@ public class Group extends RealmObject {
 
     private int unread;
 
+    private long timestamp;
+
+    private boolean monitored;
+
     public Group() {
 
     }
 
-    public Group(String id, String name, String icon, int unread) {
+    public Group(String id, String name, String icon, int unread, long timestamp, boolean monitored) {
         this.id = id;
         this.name = name;
         this.icon = icon;
         this.unread = unread;
+        this.timestamp = timestamp;
+        this.monitored = monitored;
     }
 
 
@@ -86,5 +92,21 @@ public class Group extends RealmObject {
      */
     public void setUnread(int unread) {
         this.unread = unread;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public boolean isMonitored() {
+        return monitored;
+    }
+
+    public void setMonitored(boolean monitored) {
+        this.monitored = monitored;
     }
 }

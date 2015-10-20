@@ -200,7 +200,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     @Receiver(actions = NavUtils.ACTION_LOAD_FEED, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
     public void onBroadcastSelectedGroup(Context context, Intent intent) {
         mSelectedGroup = Parcels.unwrap(intent.getExtras().getParcelable(NavUtils.EXTRA_SELECTED_GROUP));
-        RealmResults<Post> results = DataStore.getPosts(mRealm, mSelectedGroup);
+        RealmResults<Post> results = DataStore.loadPosts(mRealm, mSelectedGroup);
         mAdapter.setData(results);
         if (!results.isEmpty())
             mRecyclerPosts.smoothScrollToPosition(0);

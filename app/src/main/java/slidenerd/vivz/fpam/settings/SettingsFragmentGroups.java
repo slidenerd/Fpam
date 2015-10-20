@@ -81,7 +81,7 @@ public class SettingsFragmentGroups extends Fragment implements View.OnClickList
         int selectedIndex = getSelectedIndex();
         mRecyclerGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerGroups.setHasFixedSize(true);
-        RealmResults<Group> results = DataStore.getGroups(mRealm);
+        RealmResults<Group> results = DataStore.loadGroups(mRealm);
         mAdapter = new SettingsGroupsAdapter(getActivity(), mRealm, results);
         mHeaderGroups = LayoutInflater.from(mContext).inflate(R.layout.header_groups, mRecyclerGroups, false);
         mAdapter.setHeaderView(mHeaderGroups);

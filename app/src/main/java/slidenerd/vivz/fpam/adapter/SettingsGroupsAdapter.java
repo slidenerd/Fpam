@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import io.realm.Realm;
@@ -77,7 +78,7 @@ public class SettingsGroupsAdapter extends AbstractRealmAdapter<Group, RecyclerV
             ItemHolder itemHolder = (ItemHolder) holder;
             final Group group = getItem(position);
             itemHolder.setGroupName(group.getName(), mEnabled);
-            itemHolder.setMonitored(false, mEnabled);
+            itemHolder.setMonitored(group.isMonitored(), mEnabled);
         }
     }
 
@@ -88,7 +89,7 @@ public class SettingsGroupsAdapter extends AbstractRealmAdapter<Group, RecyclerV
         }
     }
 
-    public class ItemHolder extends RecyclerView.ViewHolder {
+    public class ItemHolder extends RecyclerView.ViewHolder implements CompoundButton.OnCheckedChangeListener {
 
         private CheckBox mCheckMonitored;
         private TextView mTextGroupName;
@@ -97,6 +98,7 @@ public class SettingsGroupsAdapter extends AbstractRealmAdapter<Group, RecyclerV
             super(itemView);
             mCheckMonitored = (CheckBox) itemView.findViewById(R.id.check_monitored);
             mTextGroupName = (TextView) itemView.findViewById(R.id.text_group_name);
+            mCheckMonitored.setOnCheckedChangeListener(this);
         }
 
         public void setGroupName(String text, boolean enabled) {
@@ -111,8 +113,16 @@ public class SettingsGroupsAdapter extends AbstractRealmAdapter<Group, RecyclerV
         }
 
         public void setMonitored(boolean monitored, boolean enabled) {
-            mCheckMonitored.setChecked(enabled ? monitored : false);
             mCheckMonitored.setEnabled(enabled);
+            mCheckMonitored.setChecked(enabled ? monitored : false);
+        }
+
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            mRealm.beginTransaction();
+            Group group = getItem(getAdapterPosition());
+            group.setMonitored(isChecked);
+            mRealm.commitTransaction();
         }
     }
 }

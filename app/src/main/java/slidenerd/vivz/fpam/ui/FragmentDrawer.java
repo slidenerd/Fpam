@@ -76,8 +76,8 @@ public class FragmentDrawer extends Fragment {
         super.onCreate(savedInstanceState);
         mRealm = Realm.getInstance(mContext);
         if (savedInstanceState == null) {
-            mAdmin = DataStore.loadAdmin(mRealm);
-            mGroups = DataStore.loadGroups(mRealm);
+            mAdmin = DataStore.copyLoadAdmin(mRealm);
+            mGroups = DataStore.copyLoadGroups(mRealm);
             L.m("Loading From Realm ");
         } else {
             mAdmin = Parcels.unwrap(savedInstanceState.getParcelable("admin"));

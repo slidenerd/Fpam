@@ -20,4 +20,6 @@ public interface MyPrefs {
 
     @DefaultBoolean(value = false, keyRes = R.string.key_swipe_to_delete)
     boolean swipeToDelete();
+
+    String monitoredGroups();
 }

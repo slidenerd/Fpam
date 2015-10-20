@@ -10,7 +10,6 @@ import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.model.realm.GroupMetaData;
 import slidenerd.vivz.fpam.model.realm.Spammer;
 import slidenerd.vivz.fpam.util.CopyUtils;
 
@@ -19,9 +18,9 @@ public class DataStore {
     /**
      * In the first step, check if the list of groups to be stored is empty. If we have 1-N groups to store, use shared preferences to do the same. Convert the list of groups into a JSON string and store that.
      */
-    public static void storeGroups(Realm realm, ArrayList<Group> listGroups) {
+    public static void storeGroups(Realm realm, ArrayList<Group> groups) {
         realm.beginTransaction();
-        realm.copyToRealmOrUpdate(listGroups);
+        realm.copyToRealmOrUpdate(groups);
         realm.commitTransaction();
     }
 
@@ -30,13 +29,18 @@ public class DataStore {
      *
      * @return a list of groups that were retrieved from the backend, if the admin owns no groups or if there was a problem while retrieving data, then return an empty list.
      */
-    public static ArrayList<Group> loadGroups(Realm realm) {
+    public static ArrayList<Group> copyLoadGroups(Realm realm) {
         RealmResults<Group> realmGroups = realm.where(Group.class).findAllSorted("name");
         return CopyUtils.duplicateGroups(realmGroups);
     }
 
-    public static RealmResults<Group> getGroups(Realm realm) {
+    public static RealmResults<Group> loadGroups(Realm realm) {
         return realm.where(Group.class).findAllSorted("name");
+    }
+
+    public static long getLastLoadedTimestamp(Realm realm, String groupId) {
+        Group group = realm.where(Group.class).equalTo("id", groupId).findFirst();
+        return group != null ? group.getTimestamp() : 0;
     }
 
     /**
@@ -57,13 +61,13 @@ public class DataStore {
      * @return an admin whose account is currently logged in if the login was successful, on any error, it returns null
      */
     @Nullable
-    public static Admin loadAdmin(Realm realm) {
+    public static Admin copyLoadAdmin(Realm realm) {
         //read the picture data first
         Admin src = realm.where(Admin.class).findFirst();
         return src != null ? CopyUtils.duplicateAdmin(src) : null;
     }
 
-    public static RealmResults<Post> getPosts(Realm realm, Group group) {
+    public static RealmResults<Post> loadPosts(Realm realm, Group group) {
         return realm.where(Post.class).beginsWith("postId", group.getId()).findAllSorted("updatedTime", false);
     }
 
@@ -78,17 +82,6 @@ public class DataStore {
         }
         realm.commitTransaction();
         L.m(numberOfPostsRemoved > 0 ? "Removed " + numberOfPostsRemoved : "Nothing to remove");
-    }
-
-    public static ArrayList<GroupMetaData> loadGroupMetas(Realm realm) {
-        RealmResults<GroupMetaData> results = realm.where(GroupMetaData.class).findAll();
-        return CopyUtils.duplicateGroupMetas(results);
-    }
-
-    public static long getTimestamp(Realm realm, Group group) {
-        GroupMetaData groupMetaData = realm.where(GroupMetaData.class).equalTo("groupId", group.getId()).findFirst();
-        L.m((groupMetaData == null) + "");
-        return groupMetaData != null ? groupMetaData.getTimestamp() : 0;
     }
 
     public static void storeOrUpdateSpammer(Realm realm, String compositePrimaryKey, String spammerName, int initialSpamCount) {

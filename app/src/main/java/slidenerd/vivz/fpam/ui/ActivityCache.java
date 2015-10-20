@@ -24,7 +24,6 @@ import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.model.realm.GroupMetaData;
 import slidenerd.vivz.fpam.model.realm.Spammer;
 import slidenerd.vivz.fpam.util.PrintUtils;
 
@@ -50,9 +49,9 @@ public class ActivityCache extends AppCompatActivity {
 
     @AfterViews
     void initUI() {
-        String[] tables = new String[]{"Admin", "Group", "Group Meta", "Post", "Spammer"};
+        String[] tables = new String[]{"Admin", "Group", "Post", "Spammer"};
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, tables);
-        ArrayList<Group> groups = DataStore.loadGroups(mRealm);
+        ArrayList<Group> groups = DataStore.copyLoadGroups(mRealm);
         ArrayList<String> groupIdNames = new ArrayList<>(groups.size());
         for (Group group : groups) {
             groupIdNames.add(group.getName() + ":" + group.getId());
@@ -66,8 +65,8 @@ public class ActivityCache extends AppCompatActivity {
     public void groupItemSelected(boolean selected, String item) {
         groupSelected = mSpinnerGroup.getSelectedItemPosition();
         String groupId = item.substring(item.indexOf(":") + 1, item.length());
-        Group temp = new Group(groupId, "", "", 0);
-        RealmResults<Post> results = DataStore.getPosts(mRealm, temp);
+        Group temp = new Group(groupId, "", "", 0, 0, false);
+        RealmResults<Post> results = DataStore.loadPosts(mRealm, temp);
         StringBuffer text = new StringBuffer();
         for (Post post : results) {
             text.append(PrintUtils.toString(post));
@@ -82,10 +81,6 @@ public class ActivityCache extends AppCompatActivity {
             String groupId = groupIdName.substring(groupIdName.indexOf(":") + 1, groupIdName.length());
             mRealm.beginTransaction();
             mRealm.where(Post.class).beginsWith("postId", groupId).findAllSorted("updatedTime", false).clear();
-            GroupMetaData groupMetaData = mRealm.where(GroupMetaData.class).equalTo("groupId", groupId).findFirst();
-            if (groupMetaData != null) {
-                groupMetaData.setTimestamp(0);
-            }
             mRealm.commitTransaction();
         }
     }
@@ -104,12 +99,6 @@ public class ActivityCache extends AppCompatActivity {
             }
             mSpinnerGroup.setVisibility(View.GONE);
 
-        } else if (item.equals("Group Meta")) {
-            RealmResults<GroupMetaData> results = mRealm.where(GroupMetaData.class).findAll();
-            for (GroupMetaData groupMetaData : results) {
-                text.append(PrintUtils.toString(groupMetaData));
-            }
-            mSpinnerGroup.setVisibility(View.GONE);
         } else if (item.equals("Post")) {
             mSpinnerGroup.setVisibility(View.VISIBLE);
         } else if (item.equals("Spammer")) {

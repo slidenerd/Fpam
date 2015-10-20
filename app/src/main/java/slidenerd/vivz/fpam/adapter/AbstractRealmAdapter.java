@@ -21,12 +21,14 @@ public abstract class AbstractRealmAdapter<T extends RealmObject, VH extends Rec
     public static final int HEADER_COUNT = 1;
     public static final int FOOTER_COUNT = 1;
     //Our data source
+    protected Realm mRealm;
     protected RealmResults<T> mResults;
     private Context mContext;
 
     public AbstractRealmAdapter(Context context, Realm realm, @NonNull RealmResults<T> results) {
         //load data from subclasses
         mContext = context;
+        mRealm = realm;
         mResults = results;
         notifyItemRangeInserted(0, getItemCount());
     }

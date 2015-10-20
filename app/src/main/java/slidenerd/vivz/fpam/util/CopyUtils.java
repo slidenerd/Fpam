@@ -1,20 +1,17 @@
 package slidenerd.vivz.fpam.util;
 
-import android.support.annotation.NonNull;
-
 import java.util.ArrayList;
 
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.model.realm.GroupMetaData;
 
 public class CopyUtils {
     public static ArrayList<Group> duplicateGroups(RealmResults<Group> listSourceGroups) {
         ArrayList<Group> listDestinationGroups = new ArrayList<>();
         for (Group sourceGroup : listSourceGroups) {
-            Group destinationGroup = new Group(sourceGroup.getId(), sourceGroup.getName(), sourceGroup.getIcon(), sourceGroup.getUnread());
+            Group destinationGroup = new Group(sourceGroup.getId(), sourceGroup.getName(), sourceGroup.getIcon(), sourceGroup.getUnread(), sourceGroup.getTimestamp(), sourceGroup.isMonitored());
             listDestinationGroups.add(destinationGroup);
         }
         return listDestinationGroups;
@@ -49,21 +46,5 @@ public class CopyUtils {
             clones.add(clone);
         }
         return clones;
-    }
-
-    public static ArrayList<GroupMetaData> duplicateGroupMetas(RealmResults<GroupMetaData> results) {
-        ArrayList<GroupMetaData> groupMetaDatas = new ArrayList<>();
-        for (GroupMetaData realmGroupMetaData : results) {
-            GroupMetaData groupMetaData = duplicateGroupMeta(realmGroupMetaData);
-            groupMetaDatas.add(groupMetaData);
-        }
-        return groupMetaDatas;
-    }
-
-    public static GroupMetaData duplicateGroupMeta(@NonNull GroupMetaData realmGroupMetaData) {
-        GroupMetaData groupMetaData = new GroupMetaData();
-        groupMetaData.setGroupId(realmGroupMetaData.getGroupId());
-        groupMetaData.setTimestamp(realmGroupMetaData.getTimestamp());
-        return groupMetaData;
     }
 }

@@ -27,7 +27,6 @@ import slidenerd.vivz.fpam.extras.MyPrefs_;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.model.realm.GroupMetaData;
 import slidenerd.vivz.fpam.util.DateUtils;
 import slidenerd.vivz.fpam.util.FBUtils;
 
@@ -97,7 +96,7 @@ public class TaskFragmentLoadPosts extends Fragment {
 
                 //Get the time stamp of when this group was last loaded and convert that timestamp to UTC format
 
-                long lastLoadedTimestamp = DateUtils.getUTCTimestamp(DataStore.getTimestamp(realm, group));
+                long lastLoadedTimestamp = DateUtils.getUTCTimestamp(DataStore.getLastLoadedTimestamp(realm, group.getId()));
                 ArrayList<Post> posts;
 
                 //If the group was loaded before as indicated by a valid timestamp, then fetch all posts made since that timestamp or maximum number of posts as per the cache size from the app settings whichever is greater
@@ -125,13 +124,10 @@ public class TaskFragmentLoadPosts extends Fragment {
 
                     filteredLoadCount = posts.size();
 
-                    GroupMetaData groupMetaData = new GroupMetaData(group.getId(), System.currentTimeMillis(), false);
+                    Group realmGroup = realm.where(Group.class).equalTo("id", group.getId()).findFirst();
                     realm.beginTransaction();
                     realm.copyToRealmOrUpdate(posts);
-
-                    //update the timestamp and the metadata of the group that was just loaded
-
-                    realm.copyToRealmOrUpdate(groupMetaData);
+                    realmGroup.setTimestamp(System.currentTimeMillis());
                     realm.commitTransaction();
 
                     //Limit the number of entries stored in the database, based on the cache settings of the app, if the admin has set the cache to 25, if the number of posts loaded were 25 but the number of posts already present in the database were 15, then get rid of the oldest 15 posts and store the new 25 posts in the database.
