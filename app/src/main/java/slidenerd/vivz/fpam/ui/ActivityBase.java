@@ -179,6 +179,12 @@ public abstract class ActivityBase extends AppCompatActivity
         return true;
     }
 
+    @OptionsItem(R.id.action_custom_post)
+    protected boolean onPostSelected() {
+        ActivityPost_.intent(this).start();
+        return true;
+    }
+
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.

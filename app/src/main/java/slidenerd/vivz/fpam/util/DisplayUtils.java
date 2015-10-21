@@ -45,4 +45,14 @@ public class DisplayUtils {
         float dp = px / (metrics.densityDpi / 160f);
         return dp;
     }
+
+    public static int getResolvedColor(Context context, int color) {
+        int resolvedColor;
+        if (VersionUtils.isMarshmallowOrMore()) {
+            resolvedColor = context.getResources().getColor(color, context.getTheme());
+        } else {
+            resolvedColor = context.getResources().getColor(color);
+        }
+        return resolvedColor;
+    }
 }

@@ -23,6 +23,9 @@ import slidenerd.vivz.fpam.util.VersionUtils;
 public class SettingsGroupsAdapter extends AbstractRealmAdapter<Group, RecyclerView.ViewHolder> {
     private LayoutInflater mInflater;
     private View mHeaderView;
+
+    //A variable to enable or disable all items. If the user chooses NEVER to monitor groups, all items are disabled, else enabled.
+
     private boolean mEnabled;
     private Context mContext;
     private Resources mResources;
@@ -117,6 +120,12 @@ public class SettingsGroupsAdapter extends AbstractRealmAdapter<Group, RecyclerV
             mCheckMonitored.setChecked(enabled ? monitored : false);
         }
 
+        /**
+         * Whenever the user selects a group for background scan, update its monitored status accordingly.
+         *
+         * @param buttonView the checkbox that was selected
+         * @param isChecked  whether the group is being monitored or not in the background
+         */
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             mRealm.beginTransaction();

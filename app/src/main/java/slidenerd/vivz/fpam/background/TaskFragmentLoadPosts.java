@@ -124,6 +124,8 @@ public class TaskFragmentLoadPosts extends Fragment {
 
                     filteredLoadCount = posts.size();
 
+                    //Get this group object from realm in order to update its timestamp
+
                     Group realmGroup = realm.where(Group.class).equalTo("id", group.getId()).findFirst();
                     realm.beginTransaction();
                     realm.copyToRealmOrUpdate(posts);

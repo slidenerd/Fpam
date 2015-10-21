@@ -16,4 +16,10 @@
         android:orderInCategory="300"
         android:title="@string/title_activity_cache"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_custom_post"
+        android:orderInCategory="400"
+        android:title="@string/title_activity_cache"
+        app:showAsAction="never" />
+
 </menu>

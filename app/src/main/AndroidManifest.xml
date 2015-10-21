@@ -47,7 +47,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity
+            android:name=".ui.ActivityPost_"
+            android:label="@string/title_activity_post" />
     </application>
 
 </manifest>
