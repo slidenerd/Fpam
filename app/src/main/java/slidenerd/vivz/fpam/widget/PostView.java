@@ -3,7 +3,6 @@ package slidenerd.vivz.fpam.widget;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -15,38 +14,38 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.util.DisplayUtils;
+import slidenerd.vivz.fpam.util.ViewUtils;
 
 /**
  * TODO: document your custom view class.
  */
 public class PostView extends View {
-    private static final float DEFAULT_USERNAME_TEXT_SIZE_DP = 16.0F;
-    private static final float DEFAULT_UPDATED_TIME_TEXT_SIZE_DP = 12.0F;
-    private static final float DEFAULT_MESSAGE_TEXT_SIZE_DP = 14.0F;
-    private static final float DEFAULT_READ_MORE_TEXT_SIZE_DP = 12.0F;
-
+    public static final int CHARACTER_LIMIT = 200;
+    private static final float USERNAME_TEXTSIZE_SP = 16.0F;
+    private static final float UPDATED_TIME_TEXTSIZE_SP = 12.0F;
+    private static final float MESSAGE_TEXTSIZE_SP = 14.0F;
+    private static final float HANDLE_TEXTSIZE_SP = 12.0F;
     private static final int DEFAULT_HEIGHT_DP = 48;
-
-    private String mExampleString; // TODO: use a default from R.string...
-    private int mExampleColor = Color.RED; // TODO: use a default from R.color...
-    private float mExampleDimension = 0; // TODO: use a default from R.dimen...
+    public static int timesCalled = 0;
     private Drawable mExampleDrawable;
 
-    private int mPostWidth;
-    private int mPostHeight;
-    private TextPaint mPaintContent;
+    private int mWidth;
+    private int mHeight;
+    private TextPaint mPaint;
 
     private float mTextWidth;
     private float mTextHeight;
 
-    private String mStringUserName = null;
-    private String mStringUpdatedTime = null;
-    private String mStringMessage = null;
-    private String mStringReadMore = "Read More";
+    private String mUserName = null;
+    private String mUpdatedTime = null;
+    private String mMessage = null;
+    private String mHandle = "Read More";
     private Context mContext;
 
     private int mPaddingLeft;
@@ -54,25 +53,30 @@ public class PostView extends View {
     private int mPaddingTop;
     private int mPaddingBottom;
 
-    private int mContentWidth;
-    private int mContentHeight;
-
     private Rect mRectUserName;
     private Rect mRectUpdatedTime;
     private Rect mRectMessage;
     private Rect mRectReadMore;
 
-    private StaticLayout mLayout;
+    //Container for the multiline text which is a part of the post message.
+    private StaticLayout mLayoutMessage;
 
     private float mTextSizeUserName;
-    private float mTextSizeUdpatedTime;
+    private float mTextSizeUpdatedTime;
     private float mTextSizeMessage;
-    private float mTextSizeReadMore;
 
-    private RectF mBoundsReadMore;
+    //Size of the handle 'Read More'
+    private float mTextSizeHandle;
 
+    private RectF mBoundsHandle;
+
+    //initialize the message in collapsed state
     private boolean mCollapsed = true;
-    private boolean mShowReadMore = false;
+
+    //dont show 'Read More' handle by default
+    private boolean mShowHandle = false;
+
+    private int previousNumberOfLines = 0;
 
 
     public PostView(Context context) {
@@ -97,17 +101,6 @@ public class PostView extends View {
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.PostView, defStyle, 0);
 
-        mExampleString = a.getString(
-                R.styleable.PostView_exampleString);
-        mExampleColor = a.getColor(
-                R.styleable.PostView_exampleColor,
-                mExampleColor);
-        // Use getDimensionPixelSize or getDimensionPixelOffset when dealing with
-        // values that should fall on pixel boundaries.
-        mExampleDimension = a.getDimension(
-                R.styleable.PostView_exampleDimension,
-                mExampleDimension);
-
         if (a.hasValue(R.styleable.PostView_exampleDrawable)) {
             mExampleDrawable = a.getDrawable(
                     R.styleable.PostView_exampleDrawable);
@@ -115,28 +108,29 @@ public class PostView extends View {
         }
         a.recycle();
 
-        mTextSizeUserName = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, DEFAULT_USERNAME_TEXT_SIZE_DP, getResources().getDisplayMetrics());
-        mTextSizeUdpatedTime = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, DEFAULT_UPDATED_TIME_TEXT_SIZE_DP, getResources().getDisplayMetrics());
-        mTextSizeMessage = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, DEFAULT_MESSAGE_TEXT_SIZE_DP, getResources().getDisplayMetrics());
-        mTextSizeReadMore = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, DEFAULT_READ_MORE_TEXT_SIZE_DP, getResources().getDisplayMetrics());
+        mTextSizeUserName = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, USERNAME_TEXTSIZE_SP, getResources().getDisplayMetrics());
+        mTextSizeUpdatedTime = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, UPDATED_TIME_TEXTSIZE_SP, getResources().getDisplayMetrics());
+        mTextSizeMessage = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXTSIZE_SP, getResources().getDisplayMetrics());
+        mTextSizeHandle = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, HANDLE_TEXTSIZE_SP, getResources().getDisplayMetrics());
 
-        mPaintContent = new TextPaint();
-        mPaintContent.setFlags(Paint.ANTI_ALIAS_FLAG);
-        mPaintContent.setTextAlign(Paint.Align.LEFT);
+        mPaint = new TextPaint();
+        mPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+        mPaint.setTextAlign(Paint.Align.LEFT);
 
         mPaddingLeft = getPaddingLeft();
         mPaddingRight = getPaddingRight();
         mPaddingTop = getPaddingTop();
         mPaddingBottom = getPaddingBottom();
 
-        mPostWidth = DisplayUtils.getWidthPixels(mContext);
-        mPostHeight = (int) DisplayUtils.convertDpToPixel(DEFAULT_HEIGHT_DP, context);
+        mWidth = DisplayUtils.getWidthPixels(mContext);
+        //set a default height of 100dp which will be changed again inside onMeasure
+        mHeight = (int) DisplayUtils.convertDpToPixel(DEFAULT_HEIGHT_DP, context);
 
         mRectUserName = new Rect();
         mRectUpdatedTime = new Rect();
         mRectMessage = new Rect();
         mRectReadMore = new Rect();
-        mBoundsReadMore = new RectF();
+        mBoundsHandle = new RectF();
 
     }
 
@@ -145,50 +139,42 @@ public class PostView extends View {
         height += mPaddingTop;
         height += mPaddingBottom;
 
-        if (mStringUserName != null && !mStringUserName.equals("")) {
-            mPaintContent.setTextSize(mTextSizeUserName);
-            mPaintContent.getTextBounds(mStringUserName, 0, mStringUserName.length(), mRectUserName);
+        if (mUserName != null && !mUserName.equals("")) {
+            mPaint.setTextSize(mTextSizeUserName);
+            mPaint.getTextBounds(mUserName, 0, mUserName.length(), mRectUserName);
             height += mRectUserName.height();
         }
 
-        if (mStringUpdatedTime != null && !mStringUpdatedTime.equals("")) {
-            mPaintContent.setTextSize(mTextSizeUdpatedTime);
-            mPaintContent.getTextBounds(mStringUpdatedTime, 0, mStringUpdatedTime.length(), mRectUpdatedTime);
+        if (mUpdatedTime != null && !mUpdatedTime.equals("")) {
+            mPaint.setTextSize(mTextSizeUpdatedTime);
+            mPaint.getTextBounds(mUpdatedTime, 0, mUpdatedTime.length(), mRectUpdatedTime);
             height += mRectUpdatedTime.height();
         }
 
-        if (mStringMessage != null && !mStringMessage.equals("")) {
-            mPaintContent.setTextSize(mTextSizeMessage);
-            mPaintContent.getTextBounds(mStringMessage, 0, mStringMessage.length(), mRectMessage);
-            height += mLayout.getHeight();
+        if (mMessage != null && !mMessage.equals("")) {
+            mPaint.setTextSize(mTextSizeMessage);
+            mPaint.getTextBounds(mMessage, 0, mMessage.length(), mRectMessage);
+            height += mLayoutMessage.getHeight();
         }
 
-        if (mShowReadMore) {
-            mPaintContent.setTextSize(mTextSizeReadMore);
-            mPaintContent.getTextBounds(mStringReadMore, 0, mStringReadMore.length(), mRectReadMore);
+        if (mShowHandle) {
+            mPaint.setTextSize(mTextSizeHandle);
+            mPaint.getTextBounds(mHandle, 0, mHandle.length(), mRectReadMore);
             height += mRectReadMore.height();
         }
-
         return height;
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-
-        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
-        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
-
         int totalWidth;
         int totalHeight;
-        totalWidth = resolveSize(mPostWidth, widthMeasureSpec);
-        mContentWidth = totalWidth - mPaddingLeft - mPaddingRight;
+        totalWidth = resolveSize(mWidth, widthMeasureSpec);
         //calculate post height based on the size of the post
-        mPostHeight = calculateHeight();
-        totalHeight = resolveSize(mPostHeight, heightMeasureSpec);
-        mContentHeight = totalHeight - mPaddingTop - mPaddingBottom;
+        mHeight = calculateHeight();
+        totalHeight = resolveSize(mHeight, heightMeasureSpec);
         //MUST CALL THIS
+        L.m("onMeasure called " + (timesCalled++) + " times");
         setMeasuredDimension(totalWidth, totalHeight);
     }
 
@@ -198,66 +184,62 @@ public class PostView extends View {
         float x = mPaddingLeft;
         float y = mPaddingTop;
 
-        if (mStringUserName != null && !mStringUserName.equals("")) {
-            mPaintContent.setTextSize(mTextSizeUserName);
-            mPaintContent.setColor(DisplayUtils.getResolvedColor(mContext, R.color.colorPrimary));
-            mPaintContent.getTextBounds(mStringUserName, 0, mStringUserName.length(), mRectUserName);
+        if (mUserName != null && !mUserName.equals("")) {
+            mPaint.setTextSize(mTextSizeUserName);
+            mPaint.setColor(DisplayUtils.getResolvedColor(mContext, R.color.colorPrimary));
             y += mRectUserName.height();
-            canvas.drawText(mStringUserName, x, y, mPaintContent);
+            canvas.drawText(mUserName, x, y, mPaint);
         }
 
-        if (mStringUpdatedTime != null && !mStringUpdatedTime.equals("")) {
-            mPaintContent.setTextSize(mTextSizeUdpatedTime);
-            mPaintContent.setColor(DisplayUtils.getResolvedColor(mContext, R.color.colorTextSecondary));
-            mPaintContent.getTextBounds(mStringUpdatedTime, 0, mStringUpdatedTime.length(), mRectUpdatedTime);
+        if (mUpdatedTime != null && !mUpdatedTime.equals("")) {
+            mPaint.setTextSize(mTextSizeUpdatedTime);
+            mPaint.setColor(DisplayUtils.getResolvedColor(mContext, R.color.colorTextSecondary));
             y += mRectUpdatedTime.height();
-            canvas.drawText(mStringUpdatedTime, x, y, mPaintContent);
+            canvas.drawText(mUpdatedTime, x, y, mPaint);
         }
 
-        if (mStringMessage != null && !mStringMessage.equals("")) {
-            mPaintContent.setTextSize(mTextSizeMessage);
-            mPaintContent.setColor(DisplayUtils.getResolvedColor(mContext, R.color.colorTextPrimary));
-            mPaintContent.getTextBounds(mStringMessage, 0, mStringMessage.length(), mRectMessage);
+        if (mMessage != null && !mMessage.equals("")) {
+            mPaint.setTextSize(mTextSizeMessage);
+            mPaint.setColor(DisplayUtils.getResolvedColor(mContext, R.color.colorTextPrimary));
             canvas.save();
             canvas.translate(x, y);
             //draws static layout on canvas
-            mLayout.draw(canvas);
+            mLayoutMessage.draw(canvas);
             canvas.restore();
-            y += mLayout.getHeight();
+            y += mLayoutMessage.getHeight();
         }
 
-        if (mShowReadMore) {
-            mPaintContent.setTextSize(mTextSizeReadMore);
-            mPaintContent.setColor(DisplayUtils.getResolvedColor(mContext, R.color.colorPrimary));
-            mPaintContent.getTextBounds(mStringReadMore, 0, mStringReadMore.length(), mRectReadMore);
+        if (mShowHandle) {
+            mPaint.setTextSize(mTextSizeHandle);
+            mPaint.setColor(DisplayUtils.getResolvedColor(mContext, R.color.colorPrimary));
             y += mRectReadMore.height();
-            canvas.drawText(mStringReadMore, mPostWidth - mPaddingRight - mRectReadMore.width(), y, mPaintContent);
-            mBoundsReadMore.set(mPostWidth - mPaddingRight - mRectReadMore.width(), y - mRectReadMore.height(), mPostWidth - mPaddingRight, y);
+            canvas.drawText(mHandle, mWidth - mPaddingRight - mRectReadMore.width(), y, mPaint);
+            mBoundsHandle.set(mWidth - mPaddingRight - mRectReadMore.width(), y - mRectReadMore.height(), mWidth - mPaddingRight, y);
         }
 
     }
 
     public String getUserName() {
-        return mStringUserName;
+        return mUserName;
     }
 
     public void setUserName(String userName) {
-        mStringUserName = userName;
+        mUserName = userName;
         invalidate();
     }
 
     public String getUpdatedTime() {
-        return mStringUpdatedTime;
+        return mUpdatedTime;
     }
 
     public void setUpdatedTime(String updatedTime) {
-        mStringUpdatedTime = updatedTime;
+        mUpdatedTime = updatedTime;
         invalidate();
     }
 
     public void setMessage(String message) {
-        mStringMessage = message;
-        initDynamicLayout();
+        mMessage = message;
+        initStaticLayout();
         requestLayout();
     }
 
@@ -267,8 +249,7 @@ public class PostView extends View {
         float touchY = event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_UP:
-                if (mShowReadMore && mBoundsReadMore.contains(touchX, touchY)) {
-                    L.m("yes " + touchX + " " + touchY + " " + mBoundsReadMore);
+                if (mShowHandle && mBoundsHandle.contains(touchX, touchY)) {
                     expandCollapseMessage();
                 }
 
@@ -279,16 +260,34 @@ public class PostView extends View {
 
     private void expandCollapseMessage() {
         mCollapsed = !mCollapsed;
-        initDynamicLayout();
-        requestLayout();
+        int previousHeight = calculateHeight();
+        initStaticLayout();
+        if (mCollapsed) {
+            ViewUtils.collapse(this, previousHeight);
+        } else {
+            ViewUtils.expand(this, previousHeight);
+        }
     }
 
-    private void initDynamicLayout() {
-        mPaintContent.setTextSize(mTextSizeMessage);
-        if (mStringMessage != null && !mStringMessage.equals("")) {
-            mShowReadMore = mStringMessage.length() > 200;
-            String text = mStringMessage.length() < 200 ? mStringMessage : mStringMessage.substring(0, 200);
-            mLayout = new StaticLayout(mCollapsed ? text : mStringMessage, mPaintContent, mPostWidth - mPaddingLeft - mPaddingRight, Layout.Alignment.ALIGN_NORMAL, 1.0F, 1.0F, true);
+    private void initStaticLayout() {
+        mPaint.setTextSize(mTextSizeMessage);
+        if (mMessage != null && !mMessage.equals("")) {
+            mShowHandle = mMessage.length() > CHARACTER_LIMIT;
+            String text = mMessage.length() < CHARACTER_LIMIT ? mMessage : mMessage.substring(0, CHARACTER_LIMIT);
+            mLayoutMessage = new StaticLayout(mCollapsed ? text : mMessage, mPaint, mWidth - mPaddingLeft - mPaddingRight, Layout.Alignment.ALIGN_NORMAL, 1.0F, 1.0F, true);
+        }
+    }
+
+    public class ExpandAnimation extends Animation {
+
+        @Override
+        protected void applyTransformation(float interpolatedTime, Transformation t) {
+
+        }
+
+        @Override
+        public boolean willChangeBounds() {
+            return true;
         }
     }
 }
