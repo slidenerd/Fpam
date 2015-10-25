@@ -4,11 +4,11 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.log.L;
 
 /**
  * Created by vivz on 05/10/15.
@@ -31,8 +31,12 @@ public class ViewUtils {
         Animation a = new Animation() {
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
+//                L.m("interpolated time " + interpolatedTime);
                 v.getLayoutParams().height = (int) (initialHeight + (targetHeight - initialHeight) * interpolatedTime);
-                v.requestLayout();
+                if (interpolatedTime < 0.1 || interpolatedTime > 0.9 || interpolatedTime > 0.45 && interpolatedTime < 0.55) {
+                    v.requestLayout();
+                }
+
             }
 
             @Override
@@ -42,8 +46,9 @@ public class ViewUtils {
         };
 
         // 1dp/ms
-        a.setDuration(500);
+        a.setDuration(200);
         v.startAnimation(a);
+
     }
 
     public static void collapse(final View v, final int initialHeight) {
@@ -54,8 +59,9 @@ public class ViewUtils {
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
                 v.getLayoutParams().height = initialHeight - (int) ((initialHeight - targetHeight) * interpolatedTime);
-                v.requestLayout();
-
+                if (interpolatedTime < 0.1 || interpolatedTime > 0.9 || interpolatedTime > 0.45 && interpolatedTime < 0.55) {
+                    v.requestLayout();
+                }
             }
 
             @Override
@@ -65,7 +71,7 @@ public class ViewUtils {
         };
 
         // 1dp/ms
-        a.setDuration(500);
+        a.setDuration(200);
         v.startAnimation(a);
     }
 }
