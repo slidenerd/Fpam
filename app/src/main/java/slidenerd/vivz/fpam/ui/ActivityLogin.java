@@ -28,6 +28,7 @@ import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.background.TaskLoadAdminAndGroups;
 import slidenerd.vivz.fpam.background.TaskLoadAdminAndGroups_;
 import slidenerd.vivz.fpam.extras.Constants;
+import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
@@ -50,9 +51,9 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
         @Override
         public void onSuccess(LoginResult loginResult) {
             AccessToken token = loginResult.getAccessToken();
-
             //if we have an access token which is neither null nor expired, has the permission to read email of the person logging in and groups, then we jump into the app
 
+            mApplication.setToken(token);
             if (FBUtils.isValidAndCanReadEmailGroups(token)) {
                 mProgress.setVisibility(View.VISIBLE);
                 mTaskFragment.loadAdminAndGroupsInBackground(token);
@@ -78,12 +79,12 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
 
         @Override
         public void onCancel() {
-
+            L.m("You cancelled");
         }
 
         @Override
         public void onError(FacebookException error) {
-
+            L.m("Error " + error);
         }
     };
 
@@ -97,7 +98,6 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
             getSupportFragmentManager().beginTransaction().add(mTaskFragment, TAG_TASK_FRAGMENT).commit();
         }
     }
-
 
     /**
      * Create the Login Manager responsible for facebook login and login with the initial read permissions.

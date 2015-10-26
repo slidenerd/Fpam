@@ -51,16 +51,18 @@ public class Filter {
 
             String userId = post.getUserId();
 
-            //Is the user id of the person making this post in the list of spammmers regardless of the group where the spammer made the post?
+            if (userId != null && !userId.trim().isEmpty()) {
+                //Is the user id of the person making this post in the list of spammmers regardless of the group where the spammer made the post?
 
-            Spammer spammer = realm.where(Spammer.class).beginsWith("userGroupCompositeId", userId).findFirst();
+                Spammer spammer = realm.where(Spammer.class).beginsWith("userGroupCompositeId", userId).findFirst();
 
-            //if the post was made by a spammer, add the post to the list of posts to be deleted
+                //if the post was made by a spammer, add the post to the list of posts to be deleted
 
-            if (spammer != null) {
-                spammers.add(spammer);
-                deletePosts.add(post);
-                size++;
+                if (spammer != null) {
+                    spammers.add(spammer);
+                    deletePosts.add(post);
+                    size++;
+                }
             }
         }
 
@@ -168,6 +170,7 @@ public class Filter {
             //update the number of spam posts made by this spammer and the timestamp which indicates when this post was deleted
 
             if (numberOfPostsDeleted > 0) {
+                L.m("Delete successful by " + post.getUserName());
                 DataStore.storeOrUpdateSpammer(realm, compositePrimaryKey, post.getUserName(), numberOfPostsDeleted);
             }
         }

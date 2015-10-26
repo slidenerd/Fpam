@@ -27,6 +27,7 @@ import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.background.TaskFragmentLoadPosts;
 import slidenerd.vivz.fpam.background.TaskFragmentLoadPosts_;
+import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.DatabaseUtils;
 import slidenerd.vivz.fpam.util.FBUtils;
@@ -192,6 +193,7 @@ public abstract class ActivityBase extends AppCompatActivity
         mSelectedGroup = mDrawer.getSelectedGroup(id);
         if (mSelectedGroup != null) {
             setTitle(mSelectedGroup.getName());
+            L.m("token " + mApplication.getToken());
             mTask.triggerLoadPosts(mSelectedGroup, mApplication.getToken());
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

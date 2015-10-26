@@ -29,6 +29,8 @@ import slidenerd.vivz.fpam.model.json.group.Group;
 @EApplication
 public class Fpam extends Application {
 
+    private AccessToken mToken;
+
     public static Gson getGson() {
         Gson gson = new GsonBuilder()
                 .setExclusionStrategies(new ExclusionStrategy() {
@@ -61,7 +63,11 @@ public class Fpam extends Application {
     }
 
     public AccessToken getToken() {
-        return AccessToken.getCurrentAccessToken();
+        return mToken;
+    }
+
+    public void setToken(AccessToken accessToken) {
+        mToken = accessToken;
     }
 
     @Override

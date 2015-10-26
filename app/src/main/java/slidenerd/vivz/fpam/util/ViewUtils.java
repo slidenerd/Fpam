@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 
@@ -26,17 +25,14 @@ public class ViewUtils {
         v.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         final int targetHeight = v.getMeasuredHeight();
 
-        // Older versions of android (pre API 21) cancel animations for views with a height of 0.
-        v.getLayoutParams().height = initialHeight;
         Animation a = new Animation() {
+
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
 //                L.m("interpolated time " + interpolatedTime);
-                v.getLayoutParams().height = (int) (initialHeight + (targetHeight - initialHeight) * interpolatedTime);
-                if (interpolatedTime < 0.1 || interpolatedTime > 0.9 || interpolatedTime > 0.45 && interpolatedTime < 0.55) {
-                    v.requestLayout();
-                }
-
+                int difference = Math.abs(targetHeight - initialHeight);
+                v.getLayoutParams().height = (int) (initialHeight + difference * interpolatedTime);
+                v.requestLayout();
             }
 
             @Override
@@ -46,7 +42,7 @@ public class ViewUtils {
         };
 
         // 1dp/ms
-        a.setDuration(200);
+        a.setDuration(1000);
         v.startAnimation(a);
 
     }
@@ -56,12 +52,12 @@ public class ViewUtils {
         final int targetHeight = v.getMeasuredHeight();
 
         Animation a = new Animation() {
+
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
-                v.getLayoutParams().height = initialHeight - (int) ((initialHeight - targetHeight) * interpolatedTime);
-                if (interpolatedTime < 0.1 || interpolatedTime > 0.9 || interpolatedTime > 0.45 && interpolatedTime < 0.55) {
-                    v.requestLayout();
-                }
+                int difference = Math.abs(initialHeight - targetHeight);
+                v.getLayoutParams().height = initialHeight - (int) (difference * interpolatedTime);
+                v.requestLayout();
             }
 
             @Override
@@ -71,7 +67,7 @@ public class ViewUtils {
         };
 
         // 1dp/ms
-        a.setDuration(200);
+        a.setDuration(1000);
         v.startAnimation(a);
     }
 }

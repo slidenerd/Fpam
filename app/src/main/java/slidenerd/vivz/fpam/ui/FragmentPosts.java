@@ -84,8 +84,8 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         mLoginManager.registerCallback(mCallbackManager, this);
 
         //Check if our app has publish_actions permissions, its needed to perform deletes
-        if (FBUtils.isValidAndCanPublish(mApplication.getToken())) {
-            mLoginManager.logInWithPublishPermissions(FragmentPosts.this, Arrays.asList("publish_actions"));
+        if (!FBUtils.isValidAndCanPublish(mApplication.getToken())) {
+            mLoginManager.logInWithPublishPermissions(FragmentPosts.this, Arrays.asList(Constants.PUBLISH_ACTIONS));
         }
 
         if (savedInstanceState != null) {
@@ -112,6 +112,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         super.onViewCreated(view, savedInstanceState);
         RealmResults<Post> results = mRealm.where(Post.class).beginsWith("postId", "NONE").findAll();
         mAdapter = new PostAdapter(getActivity(), mRealm, results);
+        mAdapter.setHasStableIds(true);
         mAdapter.setDeleteListener(this);
         mTextEmpty = (TextView) view.findViewById(R.id.text_empty_posts);
         mRecyclerPosts = (RecyclerViewEmptySupport) view.findViewById(R.id.recycler_posts);
@@ -131,7 +132,8 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
      */
     @Override
     public void onSuccess(LoginResult loginResult) {
-
+        AccessToken accessToken = loginResult.getAccessToken();
+        mApplication.setToken(accessToken);
     }
 
     /**

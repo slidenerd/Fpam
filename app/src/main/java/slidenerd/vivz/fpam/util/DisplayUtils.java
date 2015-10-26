@@ -25,7 +25,7 @@ public class DisplayUtils {
      * @param context Context to get resources and device specific display metrics
      * @return A float value to represent px equivalent to dp depending on device density
      */
-    public static float convertDpToPixel(float dp, Context context) {
+    public static float dpToPx(float dp, Context context) {
         Resources resources = context.getApplicationContext().getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
         float px = dp * (metrics.densityDpi / 160f);
@@ -39,7 +39,7 @@ public class DisplayUtils {
      * @param context Context to get resources and device specific display metrics
      * @return A float value to represent dp equivalent to px value
      */
-    public static float convertPixelsToDp(float px, Context context) {
+    public static float pxToDp(float px, Context context) {
         Resources resources = context.getApplicationContext().getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
         float dp = px / (metrics.densityDpi / 160f);

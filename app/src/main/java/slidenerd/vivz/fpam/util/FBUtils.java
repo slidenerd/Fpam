@@ -63,7 +63,7 @@ public class FBUtils {
         GraphRequest request = new GraphRequest(accessToken, "me");
         request.setParameters(parameters);
         GraphResponse graphResponse = request.executeAndWait();
-        return gson.fromJson(graphResponse.getJSONObject().toString(), Admin.class);
+        return graphResponse.getJSONObject() == null ? null : gson.fromJson(graphResponse.getJSONObject().toString(), Admin.class);
     }
 
     /**

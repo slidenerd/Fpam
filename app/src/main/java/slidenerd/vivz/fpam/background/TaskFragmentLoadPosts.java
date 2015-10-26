@@ -157,7 +157,7 @@ public class TaskFragmentLoadPosts extends Fragment {
                 }
             }
         } else {
-            onPostsLoaded("Did not find a valid access token while loading", group);
+            onPostsLoaded("Did not find a valid access token while loading" + token, group);
         }
     }
 
