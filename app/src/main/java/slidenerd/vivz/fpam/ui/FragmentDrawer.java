@@ -10,9 +10,10 @@ import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
@@ -31,7 +32,6 @@ import slidenerd.vivz.fpam.extras.MyPrefs_;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.widget.RoundedImageView;
 
 /**
  * TODO show the drawer if its the first time else hide it, make the logout and settings work, align the images inside the drawer
@@ -112,9 +112,13 @@ public class FragmentDrawer extends Fragment {
     public void addHeaderToDrawer(@NonNull Admin admin) {
         View headerView = mDrawer.inflateHeaderView(R.layout.nav_header_main);
         TextView textUserName = (TextView) headerView.findViewById(R.id.text_username);
-        RoundedImageView imageProfile = (RoundedImageView) headerView.findViewById(R.id.image_profile);
+        ImageView imageProfile = (ImageView) headerView.findViewById(R.id.image_profile);
         textUserName.setText(admin.getName());
-        Picasso.with(mContext).load(admin.getUrl()).into(imageProfile);
+        Glide.with(mContext)
+                .load(admin.getUrl())
+                .asBitmap()
+                .transform(new CropCircleTransform(mContext))
+                .into(imageProfile);
     }
 
     /**

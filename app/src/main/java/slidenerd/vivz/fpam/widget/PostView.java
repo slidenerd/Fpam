@@ -7,7 +7,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -17,12 +16,7 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
-
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.ui.CircleTransform;
 import slidenerd.vivz.fpam.util.DisplayUtils;
 import slidenerd.vivz.fpam.util.ValidationUtils;
 import slidenerd.vivz.fpam.util.ViewUtils;
@@ -85,13 +79,11 @@ public class PostView extends View {
     private boolean mCollapsed = true;
     //dont show 'Read More' handle by default
     private boolean mShowHandle = false;
-    private int mSizeUserImage;
-    private int mWidthPostImage;
-    private int mHeightPostImage;
-    private Bitmap mUserImage;
-    private Bitmap mPostImage;
-    private String mUserImageUri;
-    private String mPostImageUri;
+    private int mSizeProfilePicture;
+    private int mWidthPostPicture;
+    private int mHeightPostPicture;
+    private Bitmap mProfilePicture;
+    private Bitmap mPostPicture;
 
     private float mSpace1;
     private float mSpace2;
@@ -130,7 +122,7 @@ public class PostView extends View {
         mSizeHandle = TypedValue.applyDimension(TO_SP, TEXT_SIZE_HANDLE, metrics);
 
         //Init font sizes for
-        mSizeUserImage = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, PROFILE_PICTURE_RADIUS, metrics));
+        mSizeProfilePicture = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, PROFILE_PICTURE_RADIUS, metrics));
         mSpace1 = TypedValue.applyDimension(TO_DP, MARGIN_RIGHT_USER_IMAGE, metrics);
         mSpace2 = TypedValue.applyDimension(TO_DP, MARGIN_BOTTON_USER_NAME, metrics);
         mSpace3 = TypedValue.applyDimension(TO_DP, 20.0F, metrics);
@@ -141,8 +133,8 @@ public class PostView extends View {
         //set a default height of 96dp which will be changed again inside onMeasure
         mHeight = (int) DisplayUtils.dpToPx(HEIGHT, context);
 
-        mWidthPostImage = mWidth;
-        mHeightPostImage = Math.round(mWidthPostImage * 9 / 16.0F);
+        mWidthPostPicture = mWidth;
+        mHeightPostPicture = Math.round(mWidthPostPicture * 9 / 16.0F);
     }
 
     private void init(Context context, AttributeSet attrs, int defStyle) {
@@ -160,7 +152,7 @@ public class PostView extends View {
         mRectHandle = new Rect();
         mBoundsHandle = new RectF();
 
-        mUserImage = BitmapFactory.decodeResource(getResources(), R.drawable.ic_profile);
+        mProfilePicture = BitmapFactory.decodeResource(getResources(), R.drawable.ic_profile);
     }
 
     /**
@@ -187,7 +179,7 @@ public class PostView extends View {
         }
 
         //We always have a default user image loaded, hence take the maximum of the image height and the height obtained by adding the 'name', 'updated_time' and space between them into account
-        height = Math.max(mUserImage.getHeight(), height);
+        height = Math.max(mProfilePicture.getHeight(), height);
 
         //To the maximum of user image height and the section containing 'name' and 'updated_time', add spacing to account for separation between user image and the next element regardless of whether its a post image or message.
         height += mSpace3;
@@ -205,8 +197,8 @@ public class PostView extends View {
         }
 
         //Add the height of the post image if any to the total height
-        if (mPostImage != null) {
-            height += mHeightPostImage;
+        if (mPostPicture != null) {
+            height += mHeightPostPicture;
         }
         height += mPadBottom;
         return Math.round(height);
@@ -235,8 +227,8 @@ public class PostView extends View {
         float y = mPadTop;
 
         //If the image is null, we already have spacing added to x and y in the form of mPadLeft and mPadTop, if the image is not null, then we add the spacing between the image and the username represented mSpace1
-        canvas.drawBitmap(mUserImage, mPadLeft, mPadTop, mPaint);
-        x += mUserImage.getWidth() + mSpace1;
+        canvas.drawBitmap(mProfilePicture, mPadLeft, mPadTop, mPaint);
+        x += mProfilePicture.getWidth() + mSpace1;
 
         //If we have a valid 'name' draw it, and add the space between 'name' and 'updated_time' represented by mSpace2.
         if (ValidationUtils.notNullOrEmpty(mName)) {
@@ -256,7 +248,7 @@ public class PostView extends View {
         }
 
         //We always have a profile picture placeholder displayed for the user regardless of whether a real one is loaded from the internet or not, the height of our first section is the maximum of the height of our profile picture and the sum of heights of the sections 'name' plus 'updated_time'
-        y = Math.max(mUserImage.getHeight(), y);
+        y = Math.max(mProfilePicture.getHeight(), y);
         y += mSpace3;
 
         //If we have a valid 'message' draw it
@@ -293,9 +285,9 @@ public class PostView extends View {
             y += mSpace3 / 2;
         }
 
-        if (mPostImage != null) {
-            canvas.drawBitmap(mPostImage, 0, y, mPaint);
-            y += mHeightPostImage;
+        if (mPostPicture != null) {
+            canvas.drawBitmap(mPostPicture, 0, y, mPaint);
+            y += mHeightPostPicture;
         }
     }
 
@@ -306,11 +298,8 @@ public class PostView extends View {
     public void setUserName(String userName) {
         mName = userName;
 
-        if (ValidationUtils.notNullOrEmpty(userName)) {
-            //Redraw if the 'name' changes
-
-            invalidate();
-        }
+        //Redraw if the 'name' changes
+        invalidate();
     }
 
     public String getUpdatedTime() {
@@ -320,72 +309,38 @@ public class PostView extends View {
     public void setUpdatedTime(String updatedTime) {
         mTime = updatedTime;
 
-        if (ValidationUtils.notNullOrEmpty(updatedTime)) {
-            //Redraw if the 'updated_time' changes
-            invalidate();
-        }
+        //Redraw if the 'updated_time' changes
+        invalidate();
+
     }
 
     public void setMessage(String message) {
         mMessage = message;
 
-        if (ValidationUtils.notNullOrEmpty(message)) {
-            //Build our layout containing multiline text once again
-            initStaticLayout();
+        //Build our layout containing multiline text once again
+        initStaticLayout();
 
-            //Depending on whether we want to show the full text or partial text, the height of the post may change, hence call requestLayout()
-            requestLayout();
-        }
+        //Depending on whether we want to show the full text or partial text, the height of the post may change, hence call requestLayout()
+        requestLayout();
+
     }
 
-    public void setProfilePicture(String uri) {
-        mUserImageUri = uri;
-        Picasso.with(mContext)
-                .load(uri)
-                .resize(mSizeUserImage, mSizeUserImage)
-                .transform(new CircleTransform())
-                .centerCrop()
-                .into(new Target() {
-                    @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        mUserImage = bitmap;
-                        requestLayout();
-                    }
-
-                    @Override
-                    public void onBitmapFailed(Drawable errorDrawable) {
-                        L.m("failed");
-                    }
-
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                    }
-                });
+    public void setProfilePicture(Bitmap profilePicture) {
+        mProfilePicture = profilePicture;
+        requestLayout();
     }
 
-    public void setPostPicture(String uri) {
-        mPostImageUri = uri;
-        Picasso.with(mContext)
-                .load(uri)
-                .resize(mWidthPostImage, mHeightPostImage)
-                .centerCrop()
-                .into(new Target() {
-                    @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        mPostImage = bitmap;
-                        requestLayout();
-                    }
+    public void setPostPicture(Bitmap postPicture) {
+        mPostPicture = postPicture;
+        requestLayout();
+    }
 
-                    @Override
-                    public void onBitmapFailed(Drawable errorDrawable) {
-                        L.m("failed");
-                    }
+    public int getPostPictureWidth() {
+        return mWidthPostPicture;
+    }
 
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-                    }
-                });
+    public int getPostPictureHeight() {
+        return mHeightPostPicture;
     }
 
     @Override
@@ -425,9 +380,13 @@ public class PostView extends View {
     private void initStaticLayout() {
         mPaint.setTextSize(mSizeMessage);
         //Show the 'Read More' or 'Read Less' handle if there are more than CHARACTER_LIMIT characters
-        mShowHandle = mMessage.length() > CHARACTER_LIMIT;
-        //Show only a part of the text if it exceeds CHARACTER_LIMIT
-        String text = mMessage.length() < CHARACTER_LIMIT ? mMessage : mMessage.substring(0, CHARACTER_LIMIT);
-        mLayoutMessage = new StaticLayout(mCollapsed ? text : mMessage, mPaint, Math.round(mWidth - mPadLeft - mPadRight), Layout.Alignment.ALIGN_NORMAL, 1.2F, 0.0F, true);
+        boolean validMessage = ValidationUtils.notNullOrEmpty(mMessage);
+        mShowHandle = validMessage && mMessage.length() > CHARACTER_LIMIT;
+        if (validMessage) {
+            //Show only a part of the text if it exceeds CHARACTER_LIMIT
+            String text = mMessage.length() < CHARACTER_LIMIT ? mMessage : mMessage.substring(0, CHARACTER_LIMIT);
+            mLayoutMessage = new StaticLayout(mCollapsed ? text : mMessage, mPaint, Math.round(mWidth - mPadLeft - mPadRight), Layout.Alignment.ALIGN_NORMAL, 1.2F, 0.0F, true);
+        }
+
     }
 }

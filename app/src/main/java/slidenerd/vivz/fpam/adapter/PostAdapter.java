@@ -1,11 +1,16 @@
 package slidenerd.vivz.fpam.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.ViewTarget;
 
 import java.text.SimpleDateFormat;
 
@@ -13,6 +18,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.model.json.feed.Post;
+import slidenerd.vivz.fpam.ui.CropTransformation;
 import slidenerd.vivz.fpam.util.CopyUtils;
 import slidenerd.vivz.fpam.util.DisplayUtils;
 import slidenerd.vivz.fpam.widget.PostView;
@@ -40,7 +46,6 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
 
         screenWidth = DisplayUtils.getWidthPixels(mContext);
         imageViewHeight = (int) (screenWidth * 9.0 / 16.0);
-
     }
 
 
@@ -66,12 +71,27 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
     }
 
     @Override
-    public void onBindViewHolder(ItemHolder holder, int position) {
+    public void onBindViewHolder(final ItemHolder holder, int position) {
         Post post = getItem(position);
         holder.setUserName(post.getUserName());
         holder.setUpdatedTime(post.getUpdatedTime());
         holder.setMessage(post.getMessage());
-        holder.setPicture(post.getPicture());
+        String uri = post.getPicture();
+        if (uri != null) {
+            Glide.with(mContext)
+                    .load(uri)
+                    .asBitmap()
+                    .transform(new CropTransformation(mContext, holder.getPostPictureWidth(), holder.getPostPictureHeight()))
+                    .into(new ViewTarget<PostView, Bitmap>(holder.mPostView) {
+                        @Override
+                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            holder.setPostPicture(resource);
+                        }
+                    });
+        } else {
+            Glide.clear(holder.mPostView);
+            holder.setPostPicture(null);
+        }
 
     }
 
@@ -108,8 +128,16 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
             mPostView.setMessage(message);
         }
 
-        public void setPicture(String picture) {
+        public void setPostPicture(Bitmap picture) {
             mPostView.setPostPicture(picture);
+        }
+
+        public int getPostPictureWidth() {
+            return mPostView.getPostPictureWidth();
+        }
+
+        public int getPostPictureHeight() {
+            return mPostView.getPostPictureHeight();
         }
     }
 }

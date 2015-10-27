@@ -126,7 +126,6 @@
     <orderEntry type="library" exported="" name="core-0.8.3.0" level="project" />
     <orderEntry type="library" exported="" name="design-23.1.0" level="project" />
     <orderEntry type="library" exported="" name="multidex-1.0.1" level="project" />
-    <orderEntry type="library" exported="" name="picasso-2.5.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-games-8.1.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-drive-8.1.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-panorama-8.1.0" level="project" />
@@ -142,6 +141,7 @@
     <orderEntry type="library" exported="" name="mediarouter-v7-22.2.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-identity-8.1.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-fitness-8.1.0" level="project" />
+    <orderEntry type="library" exported="" name="glide-3.6.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-nearby-8.1.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-appindexing-8.1.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-gcm-8.1.0" level="project" />

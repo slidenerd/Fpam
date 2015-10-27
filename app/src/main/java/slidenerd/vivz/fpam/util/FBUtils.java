@@ -177,6 +177,9 @@ public class FBUtils {
         Bundle parameters = new Bundle();
         parameters.putString("fields", "from{name,id,picture},message,caption,comments{from,message},description,name,full_picture,type,updated_time,attachments{type},link,created_time");
         parameters.putString("since", sinceUnixEpoch + "");
+
+        Bundle parametersSubsequent = new Bundle();
+        parametersSubsequent.putString("fields", "from{name,id,picture},message,caption,comments{from,message},description,name,full_picture,type,updated_time,attachments{type},link,created_time");
         boolean hasMoreData = false;
         GraphRequest request = new GraphRequest(token, "/" + group.getId() + "/feed");
         request.setParameters(parameters);
@@ -207,10 +210,12 @@ public class FBUtils {
                     }
                     request = response.getRequestForPagedResults(GraphResponse.PagingDirection.NEXT);
 
+
                     //We have more data if posts retrieved in the current iteration are not empty and we have a valid pagination request for the next round and we have not reached the limit or maximum number of posts to retrieve yet
 
                     hasMoreData = !posts.isEmpty() && request != null && numberOfPostsRetrieved != maximumNumberOfPostsToRetrieve;
                     if (hasMoreData) {
+                        request.setParameters(parametersSubsequent);
                         response = request.executeAndWait();
                     }
                 }

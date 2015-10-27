@@ -33,7 +33,7 @@ public abstract class AbstractMutableRealmAdapter<T extends RealmObject, VH exte
                 T item = mResults.get(itemPosition);
                 item.removeFromRealm();
                 mRealm.commitTransaction();
-                notifyItemRemoved(position);
+                notifyDataSetChanged();
             }
         }
     }
