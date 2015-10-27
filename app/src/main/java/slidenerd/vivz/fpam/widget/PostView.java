@@ -49,6 +49,8 @@ public class PostView extends View {
     //Default height of a post prior to onMeasure
     private static final int HEIGHT = 72;
     private static final int PROFILE_PICTURE_RADIUS = 40;
+    private static final float MARGIN_RIGHT_USER_IMAGE = 16.0F;
+    private static final float MARGIN_BOTTON_USER_NAME = 4.0F;
     //Width of our post view
     private int mWidth;
     //Height of our post view
@@ -129,9 +131,9 @@ public class PostView extends View {
 
         //Init font sizes for
         mSizeUserImage = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, PROFILE_PICTURE_RADIUS, metrics));
-        mSpace1 = TypedValue.applyDimension(TO_DP, 16.0F, metrics);
-        mSpace2 = TypedValue.applyDimension(TO_DP, 4.0F, metrics);
-        mSpace3 = TypedValue.applyDimension(TO_DP, 10.0F, metrics);
+        mSpace1 = TypedValue.applyDimension(TO_DP, MARGIN_RIGHT_USER_IMAGE, metrics);
+        mSpace2 = TypedValue.applyDimension(TO_DP, MARGIN_BOTTON_USER_NAME, metrics);
+        mSpace3 = TypedValue.applyDimension(TO_DP, 20.0F, metrics);
 
         //Get the width of our device
         mWidth = DisplayUtils.getWidthPixels(mContext);
@@ -169,7 +171,6 @@ public class PostView extends View {
 
         //Add padding
         height += mPadTop;
-        height += mPadBottom;
 
         //If we have a valid 'name' take its height into account and the space between the 'name' and the 'updated_time' into account
         if (ValidationUtils.notNullOrEmpty(mName)) {
@@ -188,9 +189,6 @@ public class PostView extends View {
         //We always have a default user image loaded, hence take the maximum of the image height and the height obtained by adding the 'name', 'updated_time' and space between them into account
         height = Math.max(mUserImage.getHeight(), height);
 
-        //Add this padding space to account for separation between user image and post message or image whichever comes next.
-        height += mPadTop;
-
         //To the maximum of user image height and the section containing 'name' and 'updated_time', add spacing to account for separation between user image and the next element regardless of whether its a post image or message.
         height += mSpace3;
 
@@ -202,7 +200,7 @@ public class PostView extends View {
             if (mShowHandle) {
                 mPaint.setTextSize(mSizeHandle);
                 mPaint.getTextBounds(mHandle, 0, mHandle.length(), mRectHandle);
-                height += mSpace3 + mRectHandle.height() + mSpace3;
+                height += mSpace3 / 2 + mRectHandle.height() + mSpace3 / 2;
             }
         }
 
@@ -210,6 +208,7 @@ public class PostView extends View {
         if (mPostImage != null) {
             height += mHeightPostImage;
         }
+        height += mPadBottom;
         return Math.round(height);
     }
 
@@ -236,10 +235,9 @@ public class PostView extends View {
         float y = mPadTop;
 
         //If the image is null, we already have spacing added to x and y in the form of mPadLeft and mPadTop, if the image is not null, then we add the spacing between the image and the username represented mSpace1
-        if (mUserImage != null) {
-            canvas.drawBitmap(mUserImage, mPadLeft, mPadTop, mPaint);
-            x += mUserImage.getWidth() + mSpace1;
-        }
+        canvas.drawBitmap(mUserImage, mPadLeft, mPadTop, mPaint);
+        x += mUserImage.getWidth() + mSpace1;
+
         //If we have a valid 'name' draw it, and add the space between 'name' and 'updated_time' represented by mSpace2.
         if (ValidationUtils.notNullOrEmpty(mName)) {
             mPaint.setTextSize(mSizeName);
@@ -259,13 +257,11 @@ public class PostView extends View {
 
         //We always have a profile picture placeholder displayed for the user regardless of whether a real one is loaded from the internet or not, the height of our first section is the maximum of the height of our profile picture and the sum of heights of the sections 'name' plus 'updated_time'
         y = Math.max(mUserImage.getHeight(), y);
-        y += mPadTop;
         y += mSpace3;
 
         //If we have a valid 'message' draw it
         if (ValidationUtils.notNullOrEmpty(mMessage)) {
             x = mPadLeft;
-            y += mSpace3;
             mPaint.setTextSize(mSizeMessage);
             mPaint.setColor(DisplayUtils.getResolvedColor(mContext, R.color.colorTextPrimary));
             //Save the state of the canvas prior to translation
@@ -282,7 +278,7 @@ public class PostView extends View {
             y += mLayoutMessage.getHeight();
 
             //Add the top separation between the message and the handle regardless of whether the handle is shown or not
-            y += mSpace3;
+            y += mSpace3 / 2;
 
             //if we have a handle draw it
             if (mShowHandle) {
@@ -294,7 +290,7 @@ public class PostView extends View {
             }
 
             //Add the bottom separation between the message and the handle regardless of whether the handle is shown or not
-            y += mSpace3;
+            y += mSpace3 / 2;
         }
 
         if (mPostImage != null) {

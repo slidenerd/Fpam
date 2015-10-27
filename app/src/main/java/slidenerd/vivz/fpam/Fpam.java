@@ -63,7 +63,7 @@ public class Fpam extends Application {
     }
 
     public AccessToken getToken() {
-        return mToken;
+        return AccessToken.getCurrentAccessToken();
     }
 
     public void setToken(AccessToken accessToken) {
@@ -77,5 +77,6 @@ public class Fpam extends Application {
         Realm.setDefaultConfiguration(config);
         FacebookSdk.sdkInitialize(this);
         FacebookSdk.setIsDebugEnabled(true);
+
     }
 }
