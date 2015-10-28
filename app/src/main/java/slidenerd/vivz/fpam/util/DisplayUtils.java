@@ -2,6 +2,7 @@ package slidenerd.vivz.fpam.util;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Point;
 import android.util.DisplayMetrics;
 
 /**
@@ -9,13 +10,11 @@ import android.util.DisplayMetrics;
  */
 public class DisplayUtils {
     public static int getWidthPixels(Context context) {
-        int widthPixels = context.getApplicationContext().getResources().getDisplayMetrics().widthPixels;
-        return widthPixels;
+        return context.getApplicationContext().getResources().getDisplayMetrics().widthPixels;
     }
 
     public static int getHeightPixels(Context context) {
-        int heightPixels = context.getApplicationContext().getResources().getDisplayMetrics().heightPixels;
-        return heightPixels;
+        return context.getApplicationContext().getResources().getDisplayMetrics().heightPixels;
     }
 
     /**
@@ -42,8 +41,7 @@ public class DisplayUtils {
     public static float pxToDp(float px, Context context) {
         Resources resources = context.getApplicationContext().getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
-        float dp = px / (metrics.densityDpi / 160f);
-        return dp;
+        return px / (metrics.densityDpi / 160f);
     }
 
     public static int getResolvedColor(Context context, int color) {
@@ -54,5 +52,12 @@ public class DisplayUtils {
             resolvedColor = context.getResources().getColor(color);
         }
         return resolvedColor;
+    }
+
+    public static Point getPostImageSize(Context context) {
+        DisplayMetrics metrics = context.getApplicationContext().getResources().getDisplayMetrics();
+        int width = metrics.widthPixels;
+        int height = Math.round(width * 9.0F / 16.0F);
+        return new Point(width, height);
     }
 }

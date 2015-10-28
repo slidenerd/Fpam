@@ -32,6 +32,7 @@ import slidenerd.vivz.fpam.extras.MyPrefs_;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.ui.transform.CropCircleTransform;
 
 /**
  * TODO show the drawer if its the first time else hide it, make the logout and settings work, align the images inside the drawer

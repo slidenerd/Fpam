@@ -42,6 +42,6 @@
         android:layout_margin="@dimen/fab_margin"
         android:src="@android:drawable/ic_dialog_email"
         android:visibility="gone"
-        app:layout_behavior="slidenerd.vivz.fpam.ui.ScrollingFABBehavior" />
+        app:layout_behavior="slidenerd.vivz.fpam.ui.behavior.ScrollingFABBehavior" />
 
 </android.support.design.widget.CoordinatorLayout>

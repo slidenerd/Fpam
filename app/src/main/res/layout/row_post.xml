@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<slidenerd.vivz.fpam.widget.PostView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/post_view"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="16dp" />
+    android:layout_height="match_parent"
+    android:background="#F44536">
+
+    <slidenerd.vivz.fpam.widget.PostView
+        android:id="@+id/post_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="#FFF"
+        android:padding="16dp" />
+</FrameLayout>

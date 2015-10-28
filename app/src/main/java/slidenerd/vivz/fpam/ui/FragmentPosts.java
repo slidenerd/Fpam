@@ -30,6 +30,7 @@ import org.androidannotations.annotations.UiThread;
 import org.json.JSONException;
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import io.realm.Realm;
@@ -38,19 +39,21 @@ import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.PostAdapter;
 import slidenerd.vivz.fpam.adapter.SwipeHelper;
-import slidenerd.vivz.fpam.core.Filter;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.pojo.DeleteRequestInfo;
+import slidenerd.vivz.fpam.model.pojo.DeleteResponseInfo;
 import slidenerd.vivz.fpam.util.FBUtils;
+import slidenerd.vivz.fpam.util.ModelUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 import slidenerd.vivz.fpam.widget.RecyclerViewEmptySupport;
 
 
 /**
- * TODO handle error conditions, handle the loginmanager properly, how the items are shown while deleting and after deleting, move the background activities to a retained fragment
+ * TODO handle error conditions, handle the loginmanager properly, how the items are shown while deleting and after deleting, move the background activities to a retained fragment, move the scroll position to wherever the user was previously after restoring adapter on delete
  * A simple {@link Fragment} subclass.
  */
 @EFragment
@@ -69,6 +72,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     private LoginManager mLoginManager;
     private ProgressDialog mProgressDialog;
     private Group mSelectedGroup;
+    private RealmResults<Post> mResults;
 
     public FragmentPosts() {
         // Required empty public constructor
@@ -110,8 +114,8 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        RealmResults<Post> results = mRealm.where(Post.class).beginsWith("postId", "NONE").findAll();
-        mAdapter = new PostAdapter(getActivity(), mRealm, results);
+        mResults = mRealm.where(Post.class).beginsWith("postId", "NONE").findAll();
+        mAdapter = new PostAdapter(getActivity(), mRealm, mResults);
         mAdapter.setHasStableIds(true);
         mAdapter.setDeleteListener(this);
         mTextEmpty = (TextView) view.findViewById(R.id.text_empty_posts);
@@ -119,6 +123,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         mRecyclerPosts.setEmptyView(mTextEmpty);
         mRecyclerPosts.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerPosts.setAdapter(mAdapter);
+        mRecyclerPosts.setHasFixedSize(false);
         ItemTouchHelper.Callback callback = new SwipeHelper(mAdapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(mRecyclerPosts);
@@ -141,7 +146,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
      */
     @Override
     public void onCancel() {
-
+        L.m("You cancelled");
     }
 
     /**
@@ -151,7 +156,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
      */
     @Override
     public void onError(FacebookException e) {
-
+        L.m("onError " + e);
     }
 
     @Override
@@ -174,8 +179,52 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         Realm realm = null;
         try {
             realm = Realm.getDefaultInstance();
-            int numberOfPostsDeleted = Filter.filterPostsOnDelete(token, realm, group, post);
-            afterDelete(position, numberOfPostsDeleted > 0);
+            RealmResults<Post> results = realm.where(Post.class).beginsWith("postId", group.getId()).findAllSorted("updatedTime", false);
+            //realm.where(Post.class).equalTo("userId", post.getUserId()).findAll();
+            ArrayList<DeleteRequestInfo> deletes = new ArrayList<>();
+            for (int i = 0; i < results.size(); i++) {
+                Post current = results.get(i);
+                if (current.getUserId().equals(post.getUserId())) {
+                    DeleteRequestInfo info = new DeleteRequestInfo(i, current);
+                    deletes.add(info);
+                }
+            }
+            if (!deletes.isEmpty()) {
+                ArrayList<DeleteResponseInfo> infos = FBUtils.requestDeletePosts(token, deletes);
+
+                String compositePrimaryKey = ModelUtils.getUserGroupCompositePrimaryKey(post.getUserId(), group.getId());
+
+                realm.beginTransaction();
+                int numberOfPostsDeleted = 0;
+                for (DeleteResponseInfo info : infos) {
+
+                    //If the post was removed successfully from the Facebook Graph API, remove the corresponding post from realm as well
+
+                    if (info.getSuccess()) {
+
+                        //Remove the post from Realm
+
+                        realm.where(Post.class).equalTo("postId", info.getPost().getPostId()).findFirst().removeFromRealm();
+                        numberOfPostsDeleted++;
+
+                    } else {
+                        L.m("Delete failed for " + info.getPost().getPostId() + " made by " + info.getPost().getUserName());
+                    }
+                }
+
+                //update the number of spam posts made by this spammer and the timestamp which indicates when this post was deleted
+
+                realm.commitTransaction();
+
+                //update the number of spam posts made by this spammer and the timestamp which indicates when this post was deleted
+
+                if (numberOfPostsDeleted > 0) {
+                    onItemsRemoved();
+                    L.m("Delete successful by " + post.getUserName());
+                    DataStore.storeOrUpdateSpammer(realm, compositePrimaryKey, post.getUserName(), numberOfPostsDeleted);
+                }
+            }
+            afterDelete(position, true);
         } catch (JSONException e) {
             L.m(e + "");
         } finally {
@@ -186,10 +235,15 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     }
 
     @UiThread
+    void onItemsRemoved() {
+        mResults = DataStore.loadPosts(mRealm, mSelectedGroup);
+        mAdapter = new PostAdapter(getActivity(), mRealm, mResults);
+        mRecyclerPosts.setAdapter(mAdapter);
+    }
+
+
+    @UiThread
     void afterDelete(int position, boolean success) {
-        if (success) {
-            mAdapter.notifyDataSetChanged();
-        }
         mProgressDialog.dismiss();
     }
 
@@ -202,9 +256,9 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     @Receiver(actions = NavUtils.ACTION_LOAD_FEED, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
     public void onBroadcastSelectedGroup(Context context, Intent intent) {
         mSelectedGroup = Parcels.unwrap(intent.getExtras().getParcelable(NavUtils.EXTRA_SELECTED_GROUP));
-        RealmResults<Post> results = DataStore.loadPosts(mRealm, mSelectedGroup);
-        mAdapter.setData(results);
-        if (!results.isEmpty())
+        mResults = DataStore.loadPosts(mRealm, mSelectedGroup);
+        mAdapter.setData(mResults);
+        if (!mResults.isEmpty())
             mRecyclerPosts.smoothScrollToPosition(0);
     }
 }

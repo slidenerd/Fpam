@@ -1,6 +1,7 @@
 <resources>
     <declare-styleable name="PostView">
-        <attr name="exampleString" format="string" />
+        <attr name="handleExpanded" format="string" />
+        <attr name="handleCollapsed" format="string" />
         <attr name="exampleDimension" format="dimension" />
         <attr name="exampleColor" format="color" />
         <attr name="exampleDrawable" format="color|reference" />

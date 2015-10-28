@@ -1,4 +1,4 @@
-package slidenerd.vivz.fpam.ui;
+package slidenerd.vivz.fpam.ui.behavior;
 
 import android.content.Context;
 import android.support.design.widget.AppBarLayout;

@@ -20,13 +20,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import io.realm.RealmResults;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.extras.FeedFields;
 import slidenerd.vivz.fpam.extras.GroupFields;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.pojo.DeleteRequestInfo;
 import slidenerd.vivz.fpam.model.pojo.DeleteResponseInfo;
 
 import static slidenerd.vivz.fpam.extras.Constants.PUBLISH_ACTIONS;
@@ -232,41 +232,42 @@ public class FBUtils {
         return jsonObject != null && jsonObject.has("success") && !jsonObject.isNull("success") && jsonObject.getBoolean("success");
     }
 
-    public static ArrayList<DeleteResponseInfo> requestDeletePosts(AccessToken token, ArrayList<Post> posts) throws JSONException {
+    public static ArrayList<DeleteResponseInfo> requestDeletePosts(AccessToken token, ArrayList<DeleteRequestInfo> infos) throws JSONException {
         ArrayList<DeleteResponseInfo> responseInfos = new ArrayList<>();
         GraphRequestBatch requests = new GraphRequestBatch();
-        for (Post post : posts) {
+        for (DeleteRequestInfo info : infos) {
+            Post post = info.getPost();
             GraphRequest graphRequest = new GraphRequest(token, post.getPostId(), null, HttpMethod.DELETE);
             requests.add(graphRequest);
         }
         List<GraphResponse> responses = requests.executeAndWait();
         for (int i = 0; i < responses.size(); i++) {
             GraphResponse response = responses.get(i);
-            Post post = posts.get(i);
+            Post post = infos.get(i).getPost();
             JSONObject jsonObject = response.getJSONObject();
             boolean success = (jsonObject != null && jsonObject.has("success") && !jsonObject.isNull("success") && jsonObject.getBoolean("success"));
-            DeleteResponseInfo responseInfo = new DeleteResponseInfo(success, post);
+            DeleteResponseInfo responseInfo = new DeleteResponseInfo(success, infos.get(i).getPosition(), post);
             responseInfos.add(responseInfo);
         }
         return responseInfos;
     }
 
-    public static ArrayList<DeleteResponseInfo> requestDeletePosts(AccessToken token, RealmResults<Post> posts) throws JSONException, FacebookException {
-        ArrayList<DeleteResponseInfo> responseInfos = new ArrayList<>();
-        GraphRequestBatch requests = new GraphRequestBatch();
-        for (Post post : posts) {
-            GraphRequest graphRequest = new GraphRequest(token, post.getPostId(), null, HttpMethod.DELETE);
-            requests.add(graphRequest);
-        }
-        List<GraphResponse> responses = requests.executeAndWait();
-        for (int i = 0; i < responses.size(); i++) {
-            GraphResponse response = responses.get(i);
-            Post post = posts.get(i);
-            JSONObject jsonObject = response.getJSONObject();
-            boolean success = (jsonObject != null && jsonObject.has("success") && !jsonObject.isNull("success") && jsonObject.getBoolean("success"));
-            DeleteResponseInfo responseInfo = new DeleteResponseInfo(success, post);
-            responseInfos.add(responseInfo);
-        }
-        return responseInfos;
-    }
+//    public static ArrayList<DeleteResponseInfo> requestDeletePosts(AccessToken token, RealmResults<Post> posts) throws JSONException, FacebookException {
+//        ArrayList<DeleteResponseInfo> responseInfos = new ArrayList<>();
+//        GraphRequestBatch requests = new GraphRequestBatch();
+//        for (Post post : posts) {
+//            GraphRequest graphRequest = new GraphRequest(token, post.getPostId(), null, HttpMethod.DELETE);
+//            requests.add(graphRequest);
+//        }
+//        List<GraphResponse> responses = requests.executeAndWait();
+//        for (int i = 0; i < responses.size(); i++) {
+//            GraphResponse response = responses.get(i);
+//            Post post = posts.get(i);
+//            JSONObject jsonObject = response.getJSONObject();
+//            boolean success = (jsonObject != null && jsonObject.has("success") && !jsonObject.isNull("success") && jsonObject.getBoolean("success"));
+//            DeleteResponseInfo responseInfo = new DeleteResponseInfo(success, post);
+//            responseInfos.add(responseInfo);
+//        }
+//        return responseInfos;
+//    }
 }

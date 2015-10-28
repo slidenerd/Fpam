@@ -40,4 +40,5 @@
     <string name="key_scan_frequency">key_scan_frequency</string>
     <string name="key_cache_size">key_cache_size</string>
     <string name="title_activity_post">Post</string>
+    <string name="handle_expanded">Read More</string>
 </resources>

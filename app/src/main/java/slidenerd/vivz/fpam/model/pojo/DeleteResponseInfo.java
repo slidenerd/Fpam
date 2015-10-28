@@ -7,11 +7,17 @@ import slidenerd.vivz.fpam.model.json.feed.Post;
  */
 public class DeleteResponseInfo {
     private boolean success;
+    private int position;
     private Post post;
 
     public DeleteResponseInfo(boolean success, Post post) {
+        this(success, 0, post);
+    }
+
+    public DeleteResponseInfo(boolean success, int position, Post post) {
         this.success = success;
         this.post = post;
+        this.position = position;
     }
 
     public boolean getSuccess() {
@@ -28,5 +34,13 @@ public class DeleteResponseInfo {
 
     public void setPost(Post post) {
         this.post = post;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 }

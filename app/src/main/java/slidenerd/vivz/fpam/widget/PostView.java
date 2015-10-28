@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.Layout;
@@ -19,7 +20,6 @@ import android.view.View;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.util.DisplayUtils;
 import slidenerd.vivz.fpam.util.ValidationUtils;
-import slidenerd.vivz.fpam.util.ViewUtils;
 
 /**
  * TODO: document your custom view class, move all dimension related information as setters to XML, manage custom view state inside RecyclerView
@@ -44,7 +44,7 @@ public class PostView extends View {
     private static final int HEIGHT = 72;
     private static final int PROFILE_PICTURE_RADIUS = 40;
     private static final float MARGIN_RIGHT_USER_IMAGE = 16.0F;
-    private static final float MARGIN_BOTTON_USER_NAME = 4.0F;
+    private static final float MARGIN_BOTTOM_NAME = 4.0F;
     //Width of our post view
     private int mWidth;
     //Height of our post view
@@ -54,7 +54,7 @@ public class PostView extends View {
     private String mName = null;
     private String mTime = null;
     private String mMessage = null;
-    private String mHandle = "Read More";
+    private String mHandle;
     private Context mContext;
     //Padding
     private float mPadLeft;
@@ -76,10 +76,9 @@ public class PostView extends View {
     //Bounds of the handle 'Read More' or 'Read Less' which is used to fire an event when the user clicks the handle
     private RectF mBoundsHandle;
     //initialize the message in collapsed state
-    private boolean mCollapsed = true;
+    private boolean mCollapsed = false;
     //dont show 'Read More' handle by default
     private boolean mShowHandle = false;
-    private int mSizeProfilePicture;
     private int mWidthPostPicture;
     private int mHeightPostPicture;
     private Bitmap mProfilePicture;
@@ -122,9 +121,8 @@ public class PostView extends View {
         mSizeHandle = TypedValue.applyDimension(TO_SP, TEXT_SIZE_HANDLE, metrics);
 
         //Init font sizes for
-        mSizeProfilePicture = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, PROFILE_PICTURE_RADIUS, metrics));
         mSpace1 = TypedValue.applyDimension(TO_DP, MARGIN_RIGHT_USER_IMAGE, metrics);
-        mSpace2 = TypedValue.applyDimension(TO_DP, MARGIN_BOTTON_USER_NAME, metrics);
+        mSpace2 = TypedValue.applyDimension(TO_DP, MARGIN_BOTTOM_NAME, metrics);
         mSpace3 = TypedValue.applyDimension(TO_DP, 20.0F, metrics);
 
         //Get the width of our device
@@ -133,14 +131,16 @@ public class PostView extends View {
         //set a default height of 96dp which will be changed again inside onMeasure
         mHeight = (int) DisplayUtils.dpToPx(HEIGHT, context);
 
-        mWidthPostPicture = mWidth;
-        mHeightPostPicture = Math.round(mWidthPostPicture * 9 / 16.0F);
+        Point size = DisplayUtils.getPostImageSize(context);
+        mWidthPostPicture = size.x;
+        mHeightPostPicture = size.y;
     }
 
     private void init(Context context, AttributeSet attrs, int defStyle) {
         mContext = context;
         initSizes(context);
 
+        mHandle = getResources().getString(R.string.handle_expanded);
         //TODO add support for LTR and RTL based on the locale
         mPaint = new TextPaint();
         mPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
@@ -351,28 +351,26 @@ public class PostView extends View {
             case MotionEvent.ACTION_UP:
                 if (mShowHandle && mBoundsHandle.contains(touchX, touchY)) {
 
-                    //Fire the toggle method to run the expand animation if the message is collapsed and run the collapse animation if the message is expanded
-                    toggleMessageHeight();
                 }
                 break;
         }
         return true;
     }
 
-    private void toggleMessageHeight() {
-        mCollapsed = !mCollapsed;
+    public void toggleMessage(boolean collapse) {
+        mCollapsed = collapse;
+        initStaticLayout(collapse);
+    }
 
-        //Get the height of the message prior to expanding or contracting it
-        final int previousHeight = calculateHeight();
-        initStaticLayout();
-
-        //Get the height of the message after expanding or contracting it
-        int currentHeight = calculateHeight();
-        //Perform animation
-        if (mCollapsed) {
-            ViewUtils.collapse(this, previousHeight);
-        } else {
-            ViewUtils.expand(this, previousHeight);
+    private void initStaticLayout(boolean collapse) {
+        mPaint.setTextSize(mSizeMessage);
+        //Show the 'Read More' or 'Read Less' handle if there are more than CHARACTER_LIMIT characters
+        boolean validMessage = ValidationUtils.notNullOrEmpty(mMessage);
+        mShowHandle = validMessage && mMessage.length() > CHARACTER_LIMIT;
+        if (validMessage) {
+            //Show only a part of the shorterText if it exceeds CHARACTER_LIMIT
+            String shorterText = mMessage.length() < CHARACTER_LIMIT ? mMessage : mMessage.substring(0, CHARACTER_LIMIT);
+            mLayoutMessage = new StaticLayout(collapse ? shorterText : mMessage, mPaint, Math.round(mWidth - mPadLeft - mPadRight), Layout.Alignment.ALIGN_NORMAL, 1.2F, 0.0F, true);
         }
 
     }

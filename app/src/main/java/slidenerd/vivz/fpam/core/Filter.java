@@ -1,18 +1,16 @@
 package slidenerd.vivz.fpam.core;
 
 import com.facebook.AccessToken;
-import com.facebook.FacebookException;
 
 import org.json.JSONException;
 
 import java.util.ArrayList;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
-import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.pojo.DeleteRequestInfo;
 import slidenerd.vivz.fpam.model.pojo.DeleteResponseInfo;
 import slidenerd.vivz.fpam.model.realm.Spammer;
 import slidenerd.vivz.fpam.util.FBUtils;
@@ -42,7 +40,7 @@ public class Filter {
         //find the group id to which this post belongs
 
         String groupId = group.getId();
-        ArrayList<Post> deletePosts = new ArrayList<>(posts.size());
+        ArrayList<DeleteRequestInfo> deletes = new ArrayList<>(posts.size());
         ArrayList<Spammer> spammers = new ArrayList<>(posts.size());
         int size = 0;
         for (Post post : posts) {
@@ -60,7 +58,7 @@ public class Filter {
 
                 if (spammer != null) {
                     spammers.add(spammer);
-                    deletePosts.add(post);
+                    deletes.add(new DeleteRequestInfo(0, post));
                     size++;
                 }
             }
@@ -68,12 +66,12 @@ public class Filter {
 
         //Check if we have posts to delete before requesting deletion to avoid crash
 
-        if (!deletePosts.isEmpty()) {
+        if (!deletes.isEmpty()) {
 
 
             //Execute the deletes on all the posts
 
-            ArrayList<DeleteResponseInfo> infos = FBUtils.requestDeletePosts(token, deletePosts);
+            ArrayList<DeleteResponseInfo> infos = FBUtils.requestDeletePosts(token, deletes);
 
             //Begin a transaction outside the loop to avoid consuming resources while iterating
 
@@ -135,45 +133,5 @@ public class Filter {
             L.m("to delete list was empty");
         }
         return message.toString();
-    }
-
-    public static int filterPostsOnDelete(AccessToken token, Realm realm, Group group, Post post) throws JSONException, FacebookException {
-        int numberOfPostsDeleted = 0;
-        RealmResults<Post> results = realm.where(Post.class).equalTo("userId", post.getUserId()).findAll();
-        if (!results.isEmpty()) {
-            ArrayList<DeleteResponseInfo> infos = FBUtils.requestDeletePosts(token, results);
-
-            String compositePrimaryKey = ModelUtils.getUserGroupCompositePrimaryKey(post.getUserId(), group.getId());
-
-            realm.beginTransaction();
-            for (DeleteResponseInfo info : infos) {
-
-                //If the post was removed successfully from the Facebook Graph API, remove the corresponding post from realm as well
-
-                if (info.getSuccess()) {
-
-                    //Remove the post from Realm
-
-                    realm.where(Post.class).equalTo("postId", info.getPost().getPostId()).findFirst().removeFromRealm();
-
-                    numberOfPostsDeleted++;
-
-                } else {
-                    L.m("Delete failed for " + info.getPost().getPostId() + " made by " + info.getPost().getUserName());
-                }
-            }
-
-            //update the number of spam posts made by this spammer and the timestamp which indicates when this post was deleted
-
-            realm.commitTransaction();
-
-            //update the number of spam posts made by this spammer and the timestamp which indicates when this post was deleted
-
-            if (numberOfPostsDeleted > 0) {
-                L.m("Delete successful by " + post.getUserName());
-                DataStore.storeOrUpdateSpammer(realm, compositePrimaryKey, post.getUserName(), numberOfPostsDeleted);
-            }
-        }
-        return numberOfPostsDeleted;
     }
 }
