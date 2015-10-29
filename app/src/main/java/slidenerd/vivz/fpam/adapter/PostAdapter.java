@@ -1,17 +1,16 @@
 package slidenerd.vivz.fpam.adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.ViewTarget;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -19,7 +18,7 @@ import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.ui.transform.CropTransformation;
 import slidenerd.vivz.fpam.util.CopyUtils;
-import slidenerd.vivz.fpam.widget.PostView;
+import slidenerd.vivz.fpam.util.DisplayUtils;
 
 /**
  * Created by vivz on 29/08/15.
@@ -29,6 +28,7 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
     private Context mContext;
     private LayoutInflater mLayoutInflater;
     private DeleteListener mListener;
+
 
     public PostAdapter(Context context, Realm realm, RealmResults<Post> results) {
         super(context, realm, results);
@@ -52,30 +52,37 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
 
     @Override
     public ItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = mLayoutInflater.inflate(R.layout.row_post, parent, false);
+        View view = mLayoutInflater.inflate(R.layout.row_post_2, parent, false);
         ItemHolder holder = new ItemHolder(view);
         return holder;
     }
 
     @Override
     public void onBindViewHolder(final ItemHolder holder, final int position) {
-        CustomViewTarget target = new CustomViewTarget(holder.mPostView, position);
         Post post = getItem(position);
         holder.setUserName(post.getUserName());
         holder.setUpdatedTime(post.getUpdatedTime());
         holder.setMessage(post.getMessage());
         String uri = post.getPicture();
 
+        Point size = DisplayUtils.getPostImageSize(mContext);
         if (uri != null) {
             Glide.with(mContext)
                     .load(uri)
                     .asBitmap()
-                    .transform(new CropTransformation(mContext, holder.getPostPictureWidth(), holder.getPostPictureHeight()))
-                    .into(target);
+                    .transform(new CropTransformation(mContext, size.x, size.y))
+                    .into(holder.mPostPicture);
         } else {
-            Glide.clear(holder.mPostView);
-            holder.mPostView.setPostPicture(null);
+            Glide.clear(holder.itemView);
+            holder.mPostPicture.setImageBitmap(null);
         }
+    }
+
+    @Override
+    public void onViewRecycled(ItemHolder holder) {
+        super.onViewRecycled(holder);
+        holder.mTextMessage.setText("");
+        holder.mPostPicture.setImageBitmap(null);
     }
 
     @Override
@@ -90,49 +97,32 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
 
     public class ItemHolder extends RecyclerView.ViewHolder {
 
-        private PostView mPostView;
+        private TextView mTextName;
+        private TextView mTextTime;
+        private TextView mTextMessage;
+        private ImageView mPostPicture;
 
         public ItemHolder(View itemView) {
             super(itemView);
-            mPostView = (PostView) itemView.findViewById(R.id.post_view);
+            mTextName = (TextView) itemView.findViewById(R.id.text_name);
+            mTextTime = (TextView) itemView.findViewById(R.id.text_time);
+            mTextMessage = (TextView) itemView.findViewById(R.id.text_message);
+            mPostPicture = (ImageView) itemView.findViewById(R.id.post_picture);
         }
 
 
         public void setUserName(String userName) {
-            mPostView.setUserName(userName);
+            mTextName.setText(userName);
         }
 
         public void setUpdatedTime(long updatedTimeMillis) {
             long now = System.currentTimeMillis();
             String updatedTime = updatedTimeMillis > 0 ? (String) DateUtils.getRelativeTimeSpanString(updatedTimeMillis, now, DateUtils.SECOND_IN_MILLIS) : "NA";
-            mPostView.setUpdatedTime(updatedTime);
+            mTextTime.setText(updatedTime);
         }
 
         public void setMessage(String message) {
-            mPostView.setMessage(message);
-        }
-
-        public int getPostPictureWidth() {
-            return mPostView.getPostPictureWidth();
-        }
-
-        public int getPostPictureHeight() {
-            return mPostView.getPostPictureHeight();
-        }
-    }
-
-    public class CustomViewTarget extends ViewTarget<PostView, Bitmap> {
-
-        int position;
-
-        public CustomViewTarget(PostView view, int position) {
-            super(view);
-            this.position = position;
-        }
-
-        @Override
-        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-            view.setPostPicture(resource);
+            mTextMessage.setText(message);
         }
     }
 }

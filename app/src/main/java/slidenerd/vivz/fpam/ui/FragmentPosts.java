@@ -8,7 +8,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,6 +75,43 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     private ProgressDialog mProgressDialog;
     private Group mSelectedGroup;
     private RealmResults<Post> mResults;
+    private RecyclerView.AdapterDataObserver mObserver = new RecyclerView.AdapterDataObserver() {
+        @Override
+        public void onChanged() {
+            super.onChanged();
+            Log.d("VIVZ", "onChanged");
+        }
+
+        @Override
+        public void onItemRangeChanged(int positionStart, int itemCount) {
+            super.onItemRangeChanged(positionStart, itemCount);
+            Log.d("VIVZ", "onItemRangeChanged");
+        }
+
+        @Override
+        public void onItemRangeChanged(int positionStart, int itemCount, Object payload) {
+            super.onItemRangeChanged(positionStart, itemCount, payload);
+            Log.d("VIVZ", "onItemRangeChanged");
+        }
+
+        @Override
+        public void onItemRangeInserted(int positionStart, int itemCount) {
+            super.onItemRangeInserted(positionStart, itemCount);
+            Log.d("VIVZ", "onItemRangeRemoved");
+        }
+
+        @Override
+        public void onItemRangeRemoved(int positionStart, int itemCount) {
+            super.onItemRangeRemoved(positionStart, itemCount);
+            Log.d("VIVZ", "onItemRangeRemoved");
+        }
+
+        @Override
+        public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
+            super.onItemRangeMoved(fromPosition, toPosition, itemCount);
+            Log.d("VIVZ", "onItemRangeMoved");
+        }
+    };
 
     public FragmentPosts() {
         // Required empty public constructor
@@ -203,8 +242,8 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
                     if (info.getSuccess()) {
 
                         //Remove the post from Realm
-
                         realm.where(Post.class).equalTo("postId", info.getPost().getPostId()).findFirst().removeFromRealm();
+
                         numberOfPostsDeleted++;
 
                     } else {
@@ -213,6 +252,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
                 }
 
                 //update the number of spam posts made by this spammer and the timestamp which indicates when this post was deleted
+
 
                 realm.commitTransaction();
 
@@ -236,11 +276,20 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
 
     @UiThread
     void onItemsRemoved() {
-        mResults = DataStore.loadPosts(mRealm, mSelectedGroup);
-        mAdapter = new PostAdapter(getActivity(), mRealm, mResults);
-        mRecyclerPosts.setAdapter(mAdapter);
+        mAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mAdapter.registerAdapterDataObserver(mObserver);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mAdapter.unregisterAdapterDataObserver(mObserver);
+    }
 
     @UiThread
     void afterDelete(int position, boolean success) {

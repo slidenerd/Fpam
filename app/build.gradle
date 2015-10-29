@@ -48,6 +48,7 @@ dependencies {
     compile('com.afollestad.material-dialogs:core:0.8.3.0@aar') {
         transitive = true
     }
+    compile 'com.github.thorbenprimke:realm-recyclerview:0.9.1'
 }
 repositories {
     maven { url "https://jitpack.io" }
