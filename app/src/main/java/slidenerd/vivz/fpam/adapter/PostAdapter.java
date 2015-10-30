@@ -12,9 +12,17 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import difflib.Delta;
+import difflib.DiffUtils;
+import difflib.Patch;
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
+import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.ui.transform.CropTransformation;
 import slidenerd.vivz.fpam.util.CopyUtils;
@@ -23,32 +31,98 @@ import slidenerd.vivz.fpam.util.DisplayUtils;
 /**
  * Created by vivz on 29/08/15.
  */
-public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHolder> implements SwipeHelper.OnSwipeListener {
+public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> implements SwipeHelper.OnSwipeListener {
 
+    private static final List<Long> EMPTY_LIST = new ArrayList<>(0);
+    protected List ids;
+    private RealmChangeListener listener;
     private Context mContext;
+    private Realm mRealm;
+    private RealmResults<Post> mResults;
     private LayoutInflater mLayoutInflater;
     private DeleteListener mListener;
 
-
     public PostAdapter(Context context, Realm realm, RealmResults<Post> results) {
-        super(context, realm, results);
         mContext = context;
+        mRealm = realm;
+        listener = getRealmChangeListener();
         mLayoutInflater = LayoutInflater.from(context);
+        updateRealmResults(results);
+
+    }
+
+    private RealmChangeListener getRealmChangeListener() {
+        return new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                if (ids != null && !ids.isEmpty()) {
+                    List newIds = getIdsOfRealmResults();
+                    // If the list is now empty, just notify the recyclerView of the change.
+                    if (newIds.isEmpty()) {
+                        ids = newIds;
+                        notifyDataSetChanged();
+                        return;
+                    }
+                    Patch patch = DiffUtils.diff(ids, newIds);
+                    List<Delta> deltas = patch.getDeltas();
+                    ids = newIds;
+                    if (deltas.isEmpty()) {
+                        // Nothing has changed - most likely because the notification was for
+                        // a different object/table
+                    } else if (deltas.size() > 1) {
+                        notifyDataSetChanged();
+                    } else {
+                        Delta delta = deltas.get(0);
+                        if (delta.getType() == Delta.TYPE.INSERT) {
+                            if (delta.getRevised().size() == 1) {
+                                notifyItemInserted(delta.getRevised().getPosition());
+                            } else {
+                                notifyDataSetChanged();
+                            }
+                        } else if (delta.getType() == Delta.TYPE.DELETE) {
+                            if (delta.getOriginal().size() == 1) {
+                                notifyItemRemoved(delta.getOriginal().getPosition());
+                            } else {
+                                // Note: The position zero check is to hack around a indexOutOfBound
+                                // exception that happens when the zero position is animated out.
+                                if (delta.getOriginal().getPosition() == 0) {
+                                    notifyDataSetChanged();
+                                    return;
+                                } else {
+                                    notifyItemRangeRemoved(
+                                            delta.getOriginal().getPosition(),
+                                            delta.getOriginal().size());
+                                }
+                            }
+
+                            if (delta.getOriginal().getPosition() - 1 > 0) {
+                                notifyItemRangeChanged(
+                                        0,
+                                        delta.getOriginal().getPosition() - 1);
+                            }
+                            if (delta.getOriginal().getPosition() > 0 &&
+                                    newIds.size() > 0) {
+                                notifyItemRangeChanged(
+                                        delta.getOriginal().getPosition(),
+                                        newIds.size() - 1);
+                            }
+                        } else {
+                            notifyDataSetChanged();
+                        }
+                    }
+                } else {
+                    L.m("from adapter notify data set changed");
+                    notifyDataSetChanged();
+                    ids = getIdsOfRealmResults();
+                }
+            }
+        };
     }
 
     public void setDeleteListener(DeleteListener listener) {
         this.mListener = listener;
     }
 
-    @Override
-    public boolean hasHeader() {
-        return false;
-    }
-
-    @Override
-    public boolean hasFooter() {
-        return false;
-    }
 
     @Override
     public ItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -58,8 +132,8 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
     }
 
     @Override
-    public void onBindViewHolder(final ItemHolder holder, final int position) {
-        Post post = getItem(position);
+    public void onBindViewHolder(ItemHolder holder, int position) {
+        Post post = mResults.get(position);
         holder.setUserName(post.getUserName());
         holder.setUpdatedTime(post.getUpdatedTime());
         holder.setMessage(post.getMessage());
@@ -78,11 +152,42 @@ public class PostAdapter extends AbstractRealmAdapter<Post, PostAdapter.ItemHold
         }
     }
 
+    /**
+     * Update the RealmResults associated with the Adapter. Useful when the query has been changed.
+     * If the query does not change you might consider using the automaticUpdate feature.
+     *
+     * @param queryResults the new RealmResults coming from the new query.
+     */
+    public void updateRealmResults(RealmResults<Post> queryResults) {
+        if (listener != null) {
+            if (this.mResults != null) {
+                mResults.removeChangeListener(listener);
+            }
+        }
+        this.mResults = queryResults;
+        if (mResults != null && queryResults != null) {
+            mResults.addChangeListener(listener);
+        }
+        ids = getIdsOfRealmResults();
+        notifyDataSetChanged();
+    }
+
+    private List getIdsOfRealmResults() {
+        if (mResults == null || mResults.size() == 0) {
+            return EMPTY_LIST;
+        }
+        List ids = new ArrayList(mResults.size());
+        for (int i = 0; i < mResults.size(); i++) {
+            ids.add(mResults.get(i).getPostId());
+        }
+        return ids;
+
+    }
+
+
     @Override
-    public void onViewRecycled(ItemHolder holder) {
-        super.onViewRecycled(holder);
-        holder.mTextMessage.setText("");
-        holder.mPostPicture.setImageBitmap(null);
+    public int getItemCount() {
+        return mResults == null ? 0 : mResults.size();
     }
 
     @Override

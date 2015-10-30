@@ -67,9 +67,6 @@ public class DataStore {
         return src != null ? CopyUtils.duplicateAdmin(src) : null;
     }
 
-    public static RealmResults<Post> loadPosts(Realm realm, Group group) {
-        return realm.where(Post.class).beginsWith("postId", group.getId()).findAllSorted("updatedTime", false);
-    }
 
     public static void limitStoredPosts(Realm realm, Group group, int maximumPostsStored) {
         RealmResults<Post> results = realm.where(Post.class).beginsWith("postId", group.getId()).findAllSorted("updatedTime", false);

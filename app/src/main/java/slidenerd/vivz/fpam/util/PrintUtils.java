@@ -30,7 +30,11 @@ public class PrintUtils {
     public static String toString(List<Post> listPosts) {
         StringBuilder stringBuilder = new StringBuilder();
         for (Post post : listPosts) {
-            stringBuilder.append("\n").append(toString(post)).append("\n");
+            stringBuilder.append("\n")
+                    .append("id " + post.getPostId())
+                    .append("name " + post.getUserName())
+                    .append("message " + post.getMessage())
+                    .append(toString(post)).append("\n");
         }
         return stringBuilder.toString();
     }

@@ -18,6 +18,7 @@ import org.androidannotations.annotations.ViewById;
 import java.util.ArrayList;
 
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.database.DataStore;
@@ -40,6 +41,7 @@ public class ActivityCache extends AppCompatActivity {
     @InstanceState
     int groupSelected = -1;
     private Realm mRealm;
+    private RealmChangeListener mListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,12 +68,20 @@ public class ActivityCache extends AppCompatActivity {
         groupSelected = mSpinnerGroup.getSelectedItemPosition();
         String groupId = item.substring(item.indexOf(":") + 1, item.length());
         Group temp = new Group(groupId, "", "", 0, 0, false);
-        RealmResults<Post> results = DataStore.loadPosts(mRealm, temp);
-        StringBuffer text = new StringBuffer();
-        for (Post post : results) {
-            text.append(PrintUtils.toString(post));
-        }
-        mTextCache.setText(text);
+        final RealmResults<Post> results = mRealm.where(Post.class).beginsWith("postId", temp.getId()).findAllSortedAsync("updatedTime", false);
+        mListener = new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                if (results.isLoaded()) {
+                    StringBuffer text = new StringBuffer();
+                    for (Post post : results) {
+                        text.append(PrintUtils.toString(post));
+                    }
+                    mTextCache.setText(text);
+                }
+            }
+        };
+        results.addChangeListener(mListener);
     }
 
     @OptionsItem(R.id.action_clear_group)
@@ -84,6 +94,8 @@ public class ActivityCache extends AppCompatActivity {
             Group group = mRealm.where(Group.class).equalTo("id", groupId).findFirst();
             group.setTimestamp(0);
             mRealm.commitTransaction();
+            groupItemSelected(true, groupIdName);
+
         }
     }
 

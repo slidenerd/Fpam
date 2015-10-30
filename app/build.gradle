@@ -38,7 +38,7 @@ dependencies {
     compile 'com.facebook.android:facebook-android-sdk:4.7.0'
     compile 'com.android.support:design:23.1.0'
     compile 'com.google.code.gson:gson:2.4'
-    compile 'io.realm:realm-android:0.83.1'
+    compile 'io.realm:realm-android:0.84.1'
     compile 'org.parceler:parceler-api:1.0.3'
     apt "org.parceler:parceler:1.0.3"
     apt "org.androidannotations:androidannotations:3.3.2"

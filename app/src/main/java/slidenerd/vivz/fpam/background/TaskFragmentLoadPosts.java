@@ -29,6 +29,7 @@ import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.DateUtils;
 import slidenerd.vivz.fpam.util.FBUtils;
+import slidenerd.vivz.fpam.util.PrintUtils;
 
 /**
  * TODO handle the case where the delete fails or the person has deleted the post from Facebook directly instead of this app
@@ -132,6 +133,7 @@ public class TaskFragmentLoadPosts extends Fragment {
                     realmGroup.setTimestamp(System.currentTimeMillis());
                     realm.commitTransaction();
 
+                    L.m("posts loaded " + PrintUtils.toString(posts));
                     //Limit the number of entries stored in the database, based on the cache settings of the app, if the admin has set the cache to 25, if the number of posts loaded were 25 but the number of posts already present in the database were 15, then get rid of the oldest 15 posts and store the new 25 posts in the database.
 
                     DataStore.limitStoredPosts(realm, group, maximumPostsStored);

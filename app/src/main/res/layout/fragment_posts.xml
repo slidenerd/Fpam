@@ -5,15 +5,8 @@
     tools:context="slidenerd.vivz.fpam.ui.FragmentPosts">
 
     <!-- TODO: Update blank fragment layout -->
-    <slidenerd.vivz.fpam.widget.RecyclerViewEmptySupport
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_posts"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-    <TextView
-        android:id="@+id/text_empty_posts"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="@string/text_empty_posts" />
 </RelativeLayout>
