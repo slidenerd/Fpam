@@ -71,7 +71,7 @@ public class TaskLoadAdminAndGroups extends Fragment {
 
             RealmResults<Group> results = realm.where(Group.class).findAll();
 
-            //Copy their ids, timestamp and whether they are monitored in the background
+            //Copy their mIds, timestamp and whether they are monitored in the background
 
             String[] ids = new String[results.size()];
             long[] timestamps = new long[results.size()];

@@ -33,33 +33,62 @@
         android:text="2 mins ago"
         android:textColor="@color/colorTextSecondary"
         android:textSize="12sp" />
-
-    <TextView
-        android:id="@+id/text_message"
+    <!-- sample xml -->
+    <slidenerd.vivz.fpam.widget.ExpandableTextView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:expandableTextView="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/expand_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/text_time"
-        android:layout_marginBottom="10dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="28dp"
-        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum" />
+        expandableTextView:animDuration="200"
+        expandableTextView:maxCollapsedLines="4">
 
-    <TextView
-        android:id="@+id/text_handle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/text_message"
-        android:layout_below="@+id/text_message"
-        android:text="Read More"
-        android:textColor="@color/colorPrimary"
-        android:textSize="12sp" />
+        <TextView
+            android:id="@+id/text_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/text_handle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|bottom"
+            android:layout_marginTop="10dp"
+            android:background="@android:color/transparent"
+            android:textColor="@color/colorPrimary"
+            android:textSize="12sp" />
+    </slidenerd.vivz.fpam.widget.ExpandableTextView>
+    <!--<TextView-->
+    <!--android:id="@+id/text_message"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_below="@+id/text_time"-->
+    <!--android:layout_marginBottom="10dp"-->
+    <!--android:layout_marginLeft="16dp"-->
+    <!--android:layout_marginRight="16dp"-->
+    <!--android:layout_marginTop="28dp"-->
+    <!--android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum" />-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/text_handle"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignRight="@+id/text_message"-->
+    <!--android:layout_below="@+id/text_message"-->
+    <!--android:text="Read More"-->
+    <!--android:textColor="@color/colorPrimary"-->
+    <!--android:textSize="12sp" />-->
 
     <ImageView
         android:id="@+id/post_picture"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/text_handle"
+        android:layout_below="@+id/expand_text_view"
         android:layout_marginTop="10dp"
         android:src="#EEE" />
 </RelativeLayout>

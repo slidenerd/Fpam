@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.ui.transform.CropTransformation;
 import slidenerd.vivz.fpam.util.CopyUtils;
 import slidenerd.vivz.fpam.util.DisplayUtils;
+import slidenerd.vivz.fpam.widget.ExpandableTextView;
 
 /**
  * Created by vivz on 29/08/15.
@@ -34,20 +36,28 @@ import slidenerd.vivz.fpam.util.DisplayUtils;
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> implements SwipeHelper.OnSwipeListener {
 
     private static final List<Long> EMPTY_LIST = new ArrayList<>(0);
-    protected List ids;
-    private RealmChangeListener listener;
+    protected List mIds;
     private Context mContext;
     private Realm mRealm;
     private RealmResults<Post> mResults;
+    private RealmChangeListener listener;
     private LayoutInflater mLayoutInflater;
     private DeleteListener mListener;
+    private int mPostImageWidth;
+    private int mPostImageHeight;
+    private int expandedPosition = -1;
+    private SparseBooleanArray mStatePositions = new SparseBooleanArray();
 
     public PostAdapter(Context context, Realm realm, RealmResults<Post> results) {
         mContext = context;
+        Point dimensions = DisplayUtils.getPostImageSize(context);
+        mPostImageWidth = dimensions.x;
+        mPostImageHeight = dimensions.y;
         mRealm = realm;
         listener = getRealmChangeListener();
         mLayoutInflater = LayoutInflater.from(context);
         updateRealmResults(results);
+
 
     }
 
@@ -55,17 +65,17 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> im
         return new RealmChangeListener() {
             @Override
             public void onChange() {
-                if (ids != null && !ids.isEmpty()) {
+                if (mIds != null && !mIds.isEmpty()) {
                     List newIds = getIdsOfRealmResults();
                     // If the list is now empty, just notify the recyclerView of the change.
                     if (newIds.isEmpty()) {
-                        ids = newIds;
+                        mIds = newIds;
                         notifyDataSetChanged();
                         return;
                     }
-                    Patch patch = DiffUtils.diff(ids, newIds);
+                    Patch patch = DiffUtils.diff(mIds, newIds);
                     List<Delta> deltas = patch.getDeltas();
-                    ids = newIds;
+                    mIds = newIds;
                     if (deltas.isEmpty()) {
                         // Nothing has changed - most likely because the notification was for
                         // a different object/table
@@ -113,7 +123,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> im
                 } else {
                     L.m("from adapter notify data set changed");
                     notifyDataSetChanged();
-                    ids = getIdsOfRealmResults();
+                    mIds = getIdsOfRealmResults();
                 }
             }
         };
@@ -136,20 +146,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> im
         Post post = mResults.get(position);
         holder.setUserName(post.getUserName());
         holder.setUpdatedTime(post.getUpdatedTime());
-        holder.setMessage(post.getMessage());
-        String uri = post.getPicture();
+        holder.setMessage(post.getMessage(), mStatePositions, position);
+        holder.setPostPicture(post.getPicture());
+        // Check for an expanded view, collapse if you find one
 
-        Point size = DisplayUtils.getPostImageSize(mContext);
-        if (uri != null) {
-            Glide.with(mContext)
-                    .load(uri)
-                    .asBitmap()
-                    .transform(new CropTransformation(mContext, size.x, size.y))
-                    .into(holder.mPostPicture);
-        } else {
-            Glide.clear(holder.itemView);
-            holder.mPostPicture.setImageBitmap(null);
-        }
     }
 
     /**
@@ -168,7 +168,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> im
         if (mResults != null && queryResults != null) {
             mResults.addChangeListener(listener);
         }
-        ids = getIdsOfRealmResults();
+        mIds = getIdsOfRealmResults();
         notifyDataSetChanged();
     }
 
@@ -183,7 +183,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> im
         return ids;
 
     }
-
 
     @Override
     public int getItemCount() {
@@ -201,17 +200,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> im
     }
 
     public class ItemHolder extends RecyclerView.ViewHolder {
-
         private TextView mTextName;
         private TextView mTextTime;
-        private TextView mTextMessage;
+        private ExpandableTextView mTextMessage;
         private ImageView mPostPicture;
 
         public ItemHolder(View itemView) {
             super(itemView);
             mTextName = (TextView) itemView.findViewById(R.id.text_name);
             mTextTime = (TextView) itemView.findViewById(R.id.text_time);
-            mTextMessage = (TextView) itemView.findViewById(R.id.text_message);
+            mTextMessage = (ExpandableTextView) itemView.findViewById(R.id.expand_text_view);
             mPostPicture = (ImageView) itemView.findViewById(R.id.post_picture);
         }
 
@@ -226,8 +224,23 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> im
             mTextTime.setText(updatedTime);
         }
 
-        public void setMessage(String message) {
-            mTextMessage.setText(message);
+        public void setMessage(String message, SparseBooleanArray state, int position) {
+            mTextMessage.setText(message, state, position);
+        }
+
+        public void setPostPicture(String uri) {
+
+            //As per the solution discussed here http://stackoverflow.com/questions/32706246/recyclerview-adapter-and-glide-same-image-every-4-5-rows
+            if (uri != null) {
+                Glide.with(mContext)
+                        .load(uri)
+                        .asBitmap()
+                        .transform(new CropTransformation(mContext, mPostImageWidth, mPostImageHeight))
+                        .into(mPostPicture);
+            } else {
+                Glide.clear(mPostPicture);
+                mPostPicture.setImageDrawable(null);
+            }
         }
     }
 }

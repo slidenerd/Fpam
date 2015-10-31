@@ -48,7 +48,7 @@ dependencies {
     compile('com.afollestad.material-dialogs:core:0.8.3.0@aar') {
         transitive = true
     }
-    compile 'com.github.thorbenprimke:realm-recyclerview:0.9.1'
+    compile files('libs/diffutils-1.2.1.jar')
 }
 repositories {
     maven { url "https://jitpack.io" }
