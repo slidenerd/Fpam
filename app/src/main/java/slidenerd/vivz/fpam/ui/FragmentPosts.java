@@ -39,7 +39,6 @@ import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.NetworkSwipeHelper;
 import slidenerd.vivz.fpam.adapter.PostAdapter;
-import slidenerd.vivz.fpam.adapter.SwipeHelper;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;

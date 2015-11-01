@@ -225,13 +225,6 @@ public class FBUtils {
         return listPosts;
     }
 
-    public static boolean requestDeletePost(AccessToken token, String postId) throws JSONException {
-        GraphRequest graphRequest = new GraphRequest(token, postId, null, HttpMethod.DELETE);
-        GraphResponse response = graphRequest.executeAndWait();
-        JSONObject jsonObject = response.getJSONObject();
-        return jsonObject != null && jsonObject.has("success") && !jsonObject.isNull("success") && jsonObject.getBoolean("success");
-    }
-
     public static ArrayList<DeleteResponseInfo> requestDeletePosts(AccessToken token, ArrayList<DeleteRequestInfo> infos) throws JSONException {
         ArrayList<DeleteResponseInfo> responseInfos = new ArrayList<>();
         GraphRequestBatch requests = new GraphRequestBatch();
@@ -251,23 +244,4 @@ public class FBUtils {
         }
         return responseInfos;
     }
-
-//    public static ArrayList<DeleteResponseInfo> requestDeletePosts(AccessToken token, RealmResults<Post> posts) throws JSONException, FacebookException {
-//        ArrayList<DeleteResponseInfo> responseInfos = new ArrayList<>();
-//        GraphRequestBatch requests = new GraphRequestBatch();
-//        for (Post post : posts) {
-//            GraphRequest graphRequest = new GraphRequest(token, post.getPostId(), null, HttpMethod.DELETE);
-//            requests.add(graphRequest);
-//        }
-//        List<GraphResponse> responses = requests.executeAndWait();
-//        for (int i = 0; i < responses.size(); i++) {
-//            GraphResponse response = responses.get(i);
-//            Post post = posts.get(i);
-//            JSONObject jsonObject = response.getJSONObject();
-//            boolean success = (jsonObject != null && jsonObject.has("success") && !jsonObject.isNull("success") && jsonObject.getBoolean("success"));
-//            DeleteResponseInfo responseInfo = new DeleteResponseInfo(success, post);
-//            responseInfos.add(responseInfo);
-//        }
-//        return responseInfos;
-//    }
 }

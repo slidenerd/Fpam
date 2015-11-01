@@ -25,6 +25,7 @@ import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Post;
+import slidenerd.vivz.fpam.ui.transform.CropCircleTransform;
 import slidenerd.vivz.fpam.ui.transform.CropTransformation;
 import slidenerd.vivz.fpam.util.CopyUtils;
 import slidenerd.vivz.fpam.util.DisplayUtils;
@@ -155,6 +156,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> im
         holder.setUpdatedTime(post.getUpdatedTime());
         holder.setMessage(post.getMessage(), mState, position);
         holder.setPostPicture(post.getPicture());
+        holder.setProfilePicture(post.getUserPicture());
         // Check for an expanded view, collapse if you find one
 
     }
@@ -211,6 +213,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> im
         private TextView mTextTime;
         private ExpandableTextView mTextMessage;
         private ImageView mPostPicture;
+        private ImageView mProfilePicture;
 
         public ItemHolder(View itemView) {
             super(itemView);
@@ -218,6 +221,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> im
             mTextTime = (TextView) itemView.findViewById(R.id.text_time);
             mTextMessage = (ExpandableTextView) itemView.findViewById(R.id.expand_text_view);
             mPostPicture = (ImageView) itemView.findViewById(R.id.post_picture);
+            mProfilePicture = (ImageView) itemView.findViewById(R.id.profile_picture);
         }
 
 
@@ -233,6 +237,21 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> im
 
         public void setMessage(String message, SparseBooleanArray state, int position) {
             mTextMessage.setText(message, state, position);
+        }
+
+        public void setProfilePicture(String uri) {
+
+            //As per the solution discussed here http://stackoverflow.com/questions/32706246/recyclerview-adapter-and-glide-same-image-every-4-5-rows
+            if (uri != null) {
+                Glide.with(mContext)
+                        .load(uri)
+                        .asBitmap()
+                        .transform(new CropCircleTransform(mContext))
+                        .into(mProfilePicture);
+            } else {
+                Glide.clear(mProfilePicture);
+                mProfilePicture.setImageResource(R.drawable.com_facebook_profile_picture_blank_square);
+            }
         }
 
         public void setPostPicture(String uri) {

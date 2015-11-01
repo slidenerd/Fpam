@@ -23,6 +23,8 @@ public class Post extends RealmObject {
     //The name of the person making the post
     private String userName;
 
+    private String userPicture;
+
     //The message or content of the post if present, this is optional
     private String message;
 
@@ -196,5 +198,13 @@ public class Post extends RealmObject {
 
     public void setCreatedTime(long createdTime) {
         this.createdTime = createdTime;
+    }
+
+    public String getUserPicture() {
+        return userPicture;
+    }
+
+    public void setUserPicture(String userPicture) {
+        this.userPicture = userPicture;
     }
 }

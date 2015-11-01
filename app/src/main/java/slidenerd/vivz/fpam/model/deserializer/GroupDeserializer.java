@@ -1,4 +1,4 @@
-package slidenerd.vivz.fpam.model.gson;
+package slidenerd.vivz.fpam.model.deserializer;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

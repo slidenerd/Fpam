@@ -1,4 +1,4 @@
-package slidenerd.vivz.fpam.model.gson;
+package slidenerd.vivz.fpam.model.deserializer;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -61,6 +61,8 @@ public class PostDeserializer implements JsonDeserializer<Post> {
 
             final JsonElement userNameElement = fromObject.get(FeedFields.NAME);
 
+            final JsonElement userPictureElement = fromObject.get(FeedFields.PICTURE);
+
             if (userIdElement != null) {
                 final String userId = userIdElement.getAsString();
                 post.setUserId(userId);
@@ -68,6 +70,16 @@ public class PostDeserializer implements JsonDeserializer<Post> {
             if (userNameElement != null) {
                 final String userName = userNameElement.getAsString();
                 post.setUserName(userName);
+            }
+            if (userPictureElement != null) {
+                final JsonElement userPictureDataElement = userPictureElement.getAsJsonObject().get(FeedFields.DATA);
+                if (userPictureDataElement != null) {
+                    final JsonElement userPictureUrlElement = userPictureDataElement.getAsJsonObject().get(FeedFields.URL);
+                    if (userPictureUrlElement != null) {
+                        final String userPicture = userPictureUrlElement.getAsString();
+                        post.setUserPicture(userPicture);
+                    }
+                }
             }
         }
 
@@ -105,7 +117,7 @@ public class PostDeserializer implements JsonDeserializer<Post> {
 
         //Retrieve 'picture' from the root JSONObject which is optional and contains a url of an image if used in the post
 
-        final JsonElement pictureElement = root.get(FeedFields.PICTURE);
+        final JsonElement pictureElement = root.get(FeedFields.FULL_PICTURE);
         if (pictureElement != null) {
             final String picture = pictureElement.getAsString();
             post.setPicture(picture);
