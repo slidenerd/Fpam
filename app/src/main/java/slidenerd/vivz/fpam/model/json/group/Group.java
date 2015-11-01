@@ -11,17 +11,22 @@ import io.realm.annotations.PrimaryKey;
         analyze = {Group.class})
 public class Group extends RealmObject {
 
+    //The id of the group that uniquely identifies this group
     @PrimaryKey
     private String id;
 
+    //name of the group
     private String name;
 
+    //url for the group icon
     private String icon;
 
     private int unread;
 
+    //Time when the feed for this group was last loaded
     private long timestamp;
 
+    //Boolean indicating whether this group is actively monitored in the background from the Settings of the app
     private boolean monitored;
 
     public Group() {

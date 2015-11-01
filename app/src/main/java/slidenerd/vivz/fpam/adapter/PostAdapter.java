@@ -31,34 +31,41 @@ import slidenerd.vivz.fpam.util.DisplayUtils;
 import slidenerd.vivz.fpam.widget.ExpandableTextView;
 
 /**
+ * Refer https://github.com/thorbenprimke/realm-recyclerview/blob/master/library/src/main/java/io/realm/RealmBasedRecyclerViewAdapter.java for implementation details with respect to animation of changes in the data of the adapter.
  * Created by vivz on 29/08/15.
  */
-public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> implements SwipeHelper.OnSwipeListener {
+public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> implements NetworkSwipeHelper.OnSwipeListener {
 
     private static final List<Long> EMPTY_LIST = new ArrayList<>(0);
+
+    //Item Ids used to track which items were added, removed or modified when a change occurs to our Realm database corresponding to Posts table so that we can animate items accordingly.
     protected List mIds;
     private Context mContext;
     private Realm mRealm;
     private RealmResults<Post> mResults;
-    private RealmChangeListener listener;
+    private RealmChangeListener mChangeListener;
     private LayoutInflater mLayoutInflater;
-    private DeleteListener mListener;
+    private DeleteListener mDeleteListener;
+
+    //Width of the image found in the post if there is one
     private int mPostImageWidth;
+
+    //Height of the image found in the post if there is one
     private int mPostImageHeight;
-    private int expandedPosition = -1;
-    private SparseBooleanArray mStatePositions = new SparseBooleanArray();
+
+    //Keep track of whether an item at a given position is expanded or collapsed, the key is the position whereas the value is boolean indicating whether the item is expanded or collapsed.
+    private SparseBooleanArray mState = new SparseBooleanArray();
 
     public PostAdapter(Context context, Realm realm, RealmResults<Post> results) {
         mContext = context;
-        Point dimensions = DisplayUtils.getPostImageSize(context);
-        mPostImageWidth = dimensions.x;
-        mPostImageHeight = dimensions.y;
         mRealm = realm;
-        listener = getRealmChangeListener();
+        mChangeListener = getRealmChangeListener();
         mLayoutInflater = LayoutInflater.from(context);
+        //Initialize post image width and height
+        Point size = DisplayUtils.getPostImageSize(context);
+        mPostImageWidth = size.x;
+        mPostImageHeight = size.y;
         updateRealmResults(results);
-
-
     }
 
     private RealmChangeListener getRealmChangeListener() {
@@ -130,7 +137,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> im
     }
 
     public void setDeleteListener(DeleteListener listener) {
-        this.mListener = listener;
+        this.mDeleteListener = listener;
     }
 
 
@@ -146,7 +153,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> im
         Post post = mResults.get(position);
         holder.setUserName(post.getUserName());
         holder.setUpdatedTime(post.getUpdatedTime());
-        holder.setMessage(post.getMessage(), mStatePositions, position);
+        holder.setMessage(post.getMessage(), mState, position);
         holder.setPostPicture(post.getPicture());
         // Check for an expanded view, collapse if you find one
 
@@ -159,14 +166,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> im
      * @param queryResults the new RealmResults coming from the new query.
      */
     public void updateRealmResults(RealmResults<Post> queryResults) {
-        if (listener != null) {
+        if (mChangeListener != null) {
             if (this.mResults != null) {
-                mResults.removeChangeListener(listener);
+                mResults.removeChangeListener(mChangeListener);
             }
         }
         this.mResults = queryResults;
         if (mResults != null && queryResults != null) {
-            mResults.addChangeListener(listener);
+            mResults.addChangeListener(mChangeListener);
         }
         mIds = getIdsOfRealmResults();
         notifyDataSetChanged();
@@ -192,7 +199,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> im
     @Override
     public void onSwipe(int position) {
         Post post = mResults.get(position);
-        mListener.triggerDelete(position, CopyUtils.duplicatePost(post));
+        mDeleteListener.triggerDelete(position, CopyUtils.duplicatePost(post));
     }
 
     public interface DeleteListener {

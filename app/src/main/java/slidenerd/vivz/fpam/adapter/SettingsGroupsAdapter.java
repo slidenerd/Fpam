@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchUIUtil;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,10 @@ import slidenerd.vivz.fpam.util.VersionUtils;
 /**
  * Created by vivz on 05/10/15.
  */
-public class SettingsGroupsAdapter extends AbstractRealmAdapter<Group, RecyclerView.ViewHolder> {
+public class SettingsGroupsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    private Realm mRealm;
+    private RealmResults<Group> mResults;
     private LayoutInflater mInflater;
     private View mHeaderView;
 
@@ -32,10 +36,16 @@ public class SettingsGroupsAdapter extends AbstractRealmAdapter<Group, RecyclerV
 
 
     public SettingsGroupsAdapter(Context context, Realm realm, @NonNull RealmResults<Group> results) {
-        super(context, realm, results);
         mContext = context;
+        mRealm = realm;
+        mResults = results;
         mResources = context.getResources();
         mInflater = LayoutInflater.from(context);
+    }
+
+    @Override
+    public int getItemCount() {
+        return mResults.size() + 1;
     }
 
     public void setHeaderView(View headerView) {
@@ -51,18 +61,17 @@ public class SettingsGroupsAdapter extends AbstractRealmAdapter<Group, RecyclerV
     }
 
     @Override
-    public boolean hasHeader() {
-        return true;
+    public int getItemViewType(int position) {
+        if (position == 0) {
+            return ItemType.HEADER.ordinal();
+        } else {
+            return ItemType.ITEM.ordinal();
+        }
     }
 
     @Override
-    public boolean hasFooter() {
-        return false;
-    }
-
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == ItemType.HEADER.ordinal()) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int type) {
+        if (type == ItemType.HEADER.ordinal()) {
             if (mHeaderView == null) {
                 throw new IllegalArgumentException("Header View cannot be null for SettingsGroupsAdapter");
             }
@@ -79,10 +88,14 @@ public class SettingsGroupsAdapter extends AbstractRealmAdapter<Group, RecyclerV
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ItemHolder) {
             ItemHolder itemHolder = (ItemHolder) holder;
-            final Group group = getItem(position);
+            final Group group = mResults.get(position - 1);
             itemHolder.setGroupName(group.getName(), mEnabled);
             itemHolder.setMonitored(group.isMonitored(), mEnabled);
         }
+    }
+
+    public enum ItemType {
+        HEADER, ITEM;
     }
 
     public class HeaderHolder extends RecyclerView.ViewHolder {
@@ -129,7 +142,7 @@ public class SettingsGroupsAdapter extends AbstractRealmAdapter<Group, RecyclerV
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             mRealm.beginTransaction();
-            Group group = getItem(getAdapterPosition());
+            Group group = mResults.get(getAdapterPosition() - 1);
             group.setMonitored(isChecked);
             mRealm.commitTransaction();
         }

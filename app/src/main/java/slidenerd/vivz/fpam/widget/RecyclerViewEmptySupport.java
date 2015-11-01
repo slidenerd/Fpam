@@ -5,8 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
 
-import slidenerd.vivz.fpam.adapter.AbstractRealmAdapter;
-
 /**
  * Created by vivz on 24/09/15.
  */
@@ -40,9 +38,9 @@ public class RecyclerViewEmptySupport extends RecyclerView {
     }
 
     public void checkIfEmpty() {
-        AbstractRealmAdapter adapter = (AbstractRealmAdapter) getAdapter();
+        Adapter adapter = getAdapter();
         if (adapter != null) {
-            if (adapter.getCount() == 0 && mEmptyView != null) {
+            if (adapter.getItemCount() == 0 && mEmptyView != null) {
                 mEmptyView.setVisibility(View.VISIBLE);
             } else {
                 mEmptyView.setVisibility(View.GONE);

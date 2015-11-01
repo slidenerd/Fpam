@@ -13,29 +13,41 @@ import io.realm.annotations.PrimaryKey;
         analyze = {Post.class})
 public class Post extends RealmObject {
 
+    //The unqiue id of each post
     @PrimaryKey
     private String postId;
 
+    //The user id of the person making the post
     private String userId;
 
+    //The name of the person making the post
     private String userName;
 
+    //The message or content of the post if present, this is optional
     private String message;
 
+    //The name of the link if present, this is optional
     private String name;
 
+    //The caption of the link if present, this is optional
     private String caption;
 
+    //The description of the link if present, this is optional
     private String description;
 
+    //The picture if present in the post, this is optional
     private String picture;
 
+    //The type of this post
     private String type;
 
+    //The time this post was created
     private long createdTime;
 
+    //The time this post was updated or edited or modified
     private long updatedTime;
 
+    //The link if any present in this post, this is optional
     private String link;
 
     public Post() {

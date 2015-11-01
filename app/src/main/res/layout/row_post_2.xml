@@ -3,6 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/text_undo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F44536"
+        android:visibility="gone" />
+
     <ImageView
         android:id="@+id/profile_picture"
         android:layout_width="40dp"

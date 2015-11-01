@@ -37,6 +37,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
+import slidenerd.vivz.fpam.adapter.NetworkSwipeHelper;
 import slidenerd.vivz.fpam.adapter.PostAdapter;
 import slidenerd.vivz.fpam.adapter.SwipeHelper;
 import slidenerd.vivz.fpam.database.DataStore;
@@ -117,7 +118,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         mRecyclerPosts.setHasFixedSize(false);
         mAdapter = new PostAdapter(getActivity(), mRealm, mResults);
         mAdapter.setDeleteListener(this);
-        ItemTouchHelper.Callback callback = new SwipeHelper(mAdapter);
+        ItemTouchHelper.Callback callback = new NetworkSwipeHelper(mAdapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         mRecyclerPosts.setAdapter(mAdapter);
         touchHelper.attachToRecyclerView(mRecyclerPosts);

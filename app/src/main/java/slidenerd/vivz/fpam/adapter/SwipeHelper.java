@@ -48,4 +48,5 @@ public class SwipeHelper extends ItemTouchHelper.Callback {
         //Called when the user swipes an item from the RecyclerView at the given position
         void onSwipe(int position);
     }
+
 }
