@@ -156,6 +156,25 @@ Make the MVP of fpam capable of only blocking people in v1. This will ensure the
 	<li>Send data about spammers to the server fpam.io with the same information, [userid, username, list of group ids where the spammer is a member of and the number of spam posts he or she has made] corresponding to a user id or the person using the app fpam.</li>
 </ul>
 
+UPDATE 9, Nov 1, 2015 [12:50 pm]
+
+<h3> What finishes Fpam now? </h3>
+
+<ol>
+<li>Add the spam words screen</li>
+<li>Add the spammers screen</li>
+<li>Swipe to refresh at the top to refresh and add new posts</li>
+<li>Load more at the bottom to load old posts older than the one which is loaded</li>
+<li>Refresh option to completely erase all posts in a group and load fresh ones</li>
+<li>Optimize delete algorithm</li>
+<li>Background scan for lollipop and pre lollipop devices</li>
+<li>Generate analytics data appropriately</li>
+<li>Display analytics UI</li>
+<li>Transport anayltics data from app to backend and vice versa</li>
+<li>Allow import and export of data as needed</li>
+</ol>
+
+
 
 The Workflow
 
