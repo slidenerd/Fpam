@@ -20,6 +20,8 @@ import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.extras.MyPrefs_;
+import slidenerd.vivz.fpam.log.L;
+import slidenerd.vivz.fpam.util.NavUtils;
 
 /**
  * Created by vivz on 30/09/15.
@@ -151,6 +153,11 @@ public class SettingsFragmentGeneral extends Fragment {
     @CheckedChange(R.id.switch_delete)
     void onChangeDelete() {
         updateSummaryDelete();
+    }
+
+    @Click({R.id.text_keywords, R.id.text_summary_keywords, R.id.icon_keywords})
+    void onClickKeywords() {
+        NavUtils.startActivityKeywords(mContext);
     }
 
     void updateSummaryDelete() {

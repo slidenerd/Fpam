@@ -7,6 +7,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import org.parceler.Parcels;
 
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.settings.ActivityKeywords_;
 import slidenerd.vivz.fpam.settings.SettingsActivity_;
 import slidenerd.vivz.fpam.ui.ActivityCache_;
 import slidenerd.vivz.fpam.ui.ActivityLogin_;
@@ -41,4 +42,7 @@ public class NavUtils {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
+    public static void startActivityKeywords(Context context) {
+        ActivityKeywords_.intent(context).start();
+    }
 }

@@ -16,6 +16,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewStub;
 
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
 import com.facebook.login.LoginManager;
 
 import org.androidannotations.annotations.App;
@@ -49,6 +51,15 @@ public abstract class ActivityBase extends AppCompatActivity
     private FloatingActionButton mFab;
     private Group mSelectedGroup;
     private DrawerLayout mDrawerLayout;
+
+    private AccessTokenTracker mTracker = new AccessTokenTracker() {
+        @Override
+        protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
+            AccessToken.setCurrentAccessToken(currentAccessToken);
+            mApplication.setToken(currentAccessToken);
+            L.m("onCurrentAccessTokenChanged ");
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -227,6 +238,12 @@ public abstract class ActivityBase extends AppCompatActivity
         moveToLogin();
         LoginManager loginManager = LoginManager.getInstance();
         loginManager.logOut();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mTracker.stopTracking();
     }
 
     public abstract boolean hasDrawer();

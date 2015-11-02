@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/settings_container">
 
@@ -143,3 +144,4 @@
         android:layout_below="@+id/text_summary_keywords"
         android:layout_toRightOf="@+id/icon_cache" />
 </RelativeLayout>
+
