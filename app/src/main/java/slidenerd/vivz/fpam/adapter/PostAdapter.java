@@ -35,7 +35,7 @@ import slidenerd.vivz.fpam.widget.ExpandableTextView;
  * Refer https://github.com/thorbenprimke/realm-recyclerview/blob/master/library/src/main/java/io/realm/RealmBasedRecyclerViewAdapter.java for implementation details with respect to animation of changes in the data of the adapter.
  * Created by vivz on 29/08/15.
  */
-public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> implements NetworkSwipeHelper.OnSwipeListener {
+public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> implements PostSwipeHelper.OnSwipeListener {
 
     private static final List<Long> EMPTY_LIST = new ArrayList<>(0);
 

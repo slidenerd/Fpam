@@ -14,7 +14,7 @@ import slidenerd.vivz.fpam.model.parcel.KeywordGroupsConverter;
 public class Keyword extends RealmObject {
     @PrimaryKey
     private String keyword;
-    private RealmList<Group> groups;
+    private RealmList<Group> groups = new RealmList<>();
 
     public String getKeyword() {
         return keyword;

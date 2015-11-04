@@ -7,11 +7,11 @@ import android.view.View;
 
 import slidenerd.vivz.fpam.log.L;
 
-public class NetworkSwipeHelper extends ItemTouchHelper.Callback {
+public class PostSwipeHelper extends ItemTouchHelper.Callback {
 
     private final OnSwipeListener mOnSwipeListener;
 
-    public NetworkSwipeHelper(OnSwipeListener adapter) {
+    public PostSwipeHelper(OnSwipeListener adapter) {
         mOnSwipeListener = adapter;
     }
 
