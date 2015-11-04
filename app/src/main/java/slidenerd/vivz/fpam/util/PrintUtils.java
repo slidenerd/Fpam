@@ -41,11 +41,11 @@ public class PrintUtils {
 
     public static String toString(Spammer spammer) {
         if (spammer == null) return "\n";
-        return "\n" + spammer.getUserGroupCompositeId()
+        return "\n" + spammer.getCompositeUserGroupId()
                 + "\n" + spammer.getUserName()
                 + "\n" + spammer.getSpamCount()
-                + "\n" + spammer.getTimestamp()
-                + "\n" + spammer.isAllowed();
+                + "\n" + spammer.getLastActive()
+                + "\n" + spammer.isAuthorized();
     }
 
     public static String toString(Admin admin) {
@@ -61,11 +61,11 @@ public class PrintUtils {
 
     public static String toString(Group group) {
         if (group == null) return "";
-        return "\n" + group.getId()
-                + "\n" + group.getName()
-                + "\n" + group.getIcon()
+        return "\n" + group.getGroupId()
+                + "\n" + group.getGroupName()
+                + "\n" + group.getGroupIcon()
                 + "\n" + group.getUnread()
-                + "\n" + group.getTimestamp()
+                + "\n" + group.getLastLoaded()
                 + "\n" + group.isMonitored();
     }
 

@@ -53,7 +53,7 @@ public class KeywordGroupsAdapter extends RealmBaseAdapter<Group> {
     public void select(RealmList<Group> selectedItems) {
         for (int i = 0; i < selectedItems.size(); i++) {
             for (int j = 0; j < mResults.size(); j++) {
-                if (selectedItems.get(i).getId().equals(mResults.get(j).getId())) {
+                if (selectedItems.get(i).getGroupId().equals(mResults.get(j).getGroupId())) {
                     mChecked.put(j, true);
                     break;
                 }
@@ -82,7 +82,7 @@ public class KeywordGroupsAdapter extends RealmBaseAdapter<Group> {
         } else {
             holder = (ViewHolder) row.getTag();
         }
-        holder.mTextGroupName.setText(mResults.get(position).getName());
+        holder.mTextGroupName.setText(mResults.get(position).getGroupName());
         holder.mCheckGroup.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

@@ -2,6 +2,7 @@ package slidenerd.vivz.fpam.adapter;
 
 import android.content.Context;
 import android.graphics.Point;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.util.SparseBooleanArray;
@@ -196,6 +197,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> im
     @Override
     public int getItemCount() {
         return mResults == null ? 0 : mResults.size();
+    }
+
+    @Nullable
+    public Post getItem(int position) {
+        return mResults != null ? mResults.get(position) : null;
     }
 
     @Override

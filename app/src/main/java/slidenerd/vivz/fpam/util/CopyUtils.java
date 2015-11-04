@@ -11,7 +11,7 @@ public class CopyUtils {
     public static ArrayList<Group> duplicateGroups(RealmResults<Group> listSourceGroups) {
         ArrayList<Group> listDestinationGroups = new ArrayList<>();
         for (Group sourceGroup : listSourceGroups) {
-            Group destinationGroup = new Group(sourceGroup.getId(), sourceGroup.getName(), sourceGroup.getIcon(), sourceGroup.getUnread(), sourceGroup.getTimestamp(), sourceGroup.isMonitored());
+            Group destinationGroup = new Group(sourceGroup.getGroupId(), sourceGroup.getGroupName(), sourceGroup.getGroupIcon(), sourceGroup.getUnread(), sourceGroup.getLastLoaded(), sourceGroup.isMonitored());
             listDestinationGroups.add(destinationGroup);
         }
         return listDestinationGroups;

@@ -39,7 +39,7 @@ public class Filter {
 
         //find the group id to which this post belongs
 
-        String groupId = group.getId();
+        String groupId = group.getGroupId();
         ArrayList<DeleteRequestInfo> deletes = new ArrayList<>(posts.size());
         ArrayList<Spammer> spammers = new ArrayList<>(posts.size());
         int size = 0;
@@ -52,7 +52,7 @@ public class Filter {
             if (userId != null && !userId.trim().isEmpty()) {
                 //Is the user id of the person making this post in the list of spammmers regardless of the group where the spammer made the post?
 
-                Spammer spammer = realm.where(Spammer.class).beginsWith("userGroupCompositeId", userId).findFirst();
+                Spammer spammer = realm.where(Spammer.class).beginsWith("compositeUserGroupId", userId).findFirst();
 
                 //if the post was made by a spammer, add the post to the list of posts to be deleted
 
@@ -99,16 +99,16 @@ public class Filter {
 
                     //update the number of spam posts made by this spammer and the timestamp which indicates when this post was deleted
 
-                    String compositePrimaryKey = ModelUtils.getUserGroupCompositePrimaryKey(userId, groupId);
+                    String compositeUserGroupId = ModelUtils.getUserGroupCompositePrimaryKey(userId, groupId);
 
                     //if there is a spammer entry with the user id of the person making this post and the group id of this group
 
-                    if (compositePrimaryKey.contains(groupId)) {
+                    if (compositeUserGroupId.contains(groupId)) {
 
                         //this spammer has spammed in this group before, increment the number of spam posts made by this spammer and update the timestamp
 
                         spammer.setSpamCount(spammer.getSpamCount() + 1);
-                        spammer.setTimestamp(System.currentTimeMillis());
+                        spammer.setLastActive(System.currentTimeMillis());
 
                         L.m("updating existing spammer " + spammer.getUserName());
 
@@ -116,7 +116,7 @@ public class Filter {
 
                         //this spammer hasnt spammed in this group before
 
-                        Spammer newSpammer = new Spammer(compositePrimaryKey, spammer.getUserName(), 1, System.currentTimeMillis(), false);
+                        Spammer newSpammer = new Spammer(compositeUserGroupId, spammer.getUserName(), 1, System.currentTimeMillis(), false);
                         realm.copyToRealmOrUpdate(newSpammer);
                         L.m("adding new spammer " + spammer.getUserName());
                     }

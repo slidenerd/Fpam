@@ -11,20 +11,20 @@ import io.realm.annotations.PrimaryKey;
         analyze = {Group.class})
 public class Group extends RealmObject {
 
-    //The id of the group that uniquely identifies this group
+    //The groupId of the group that uniquely identifies this group
     @PrimaryKey
-    private String id;
+    private String groupId;
 
-    //name of the group
-    private String name;
+    //groupName of the group
+    private String groupName;
 
-    //url for the group icon
-    private String icon;
+    //url for the group groupIcon
+    private String groupIcon;
 
     private int unread;
 
     //Time when the feed for this group was last loaded
-    private long timestamp;
+    private long lastLoaded;
 
     //Boolean indicating whether this group is actively monitored in the background from the Settings of the app
     private boolean monitored;
@@ -33,56 +33,56 @@ public class Group extends RealmObject {
 
     }
 
-    public Group(String id, String name, String icon, int unread, long timestamp, boolean monitored) {
-        this.id = id;
-        this.name = name;
-        this.icon = icon;
+    public Group(String groupId, String groupName, String groupIcon, int unread, long lastLoaded, boolean monitored) {
+        this.groupId = groupId;
+        this.groupName = groupName;
+        this.groupIcon = groupIcon;
         this.unread = unread;
-        this.timestamp = timestamp;
+        this.lastLoaded = lastLoaded;
         this.monitored = monitored;
     }
 
 
     /**
-     * @return The name
+     * @return The groupName
      */
-    public String getName() {
-        return name;
+    public String getGroupName() {
+        return groupName;
     }
 
     /**
-     * @param name The name
+     * @param groupName The groupName
      */
-    public void setName(String name) {
-        this.name = name;
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
     /**
-     * @return The id
+     * @return The groupId
      */
-    public String getId() {
-        return id;
+    public String getGroupId() {
+        return groupId;
     }
 
     /**
-     * @param id The id
+     * @param groupId The groupId
      */
-    public void setId(String id) {
-        this.id = id;
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 
     /**
-     * @return The icon
+     * @return The groupIcon
      */
-    public String getIcon() {
-        return icon;
+    public String getGroupIcon() {
+        return groupIcon;
     }
 
     /**
-     * @param icon The icon
+     * @param groupIcon The groupIcon
      */
-    public void setIcon(String icon) {
-        this.icon = icon;
+    public void setGroupIcon(String groupIcon) {
+        this.groupIcon = groupIcon;
     }
 
     /**
@@ -99,12 +99,12 @@ public class Group extends RealmObject {
         this.unread = unread;
     }
 
-    public long getTimestamp() {
-        return timestamp;
+    public long getLastLoaded() {
+        return lastLoaded;
     }
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+    public void setLastLoaded(long lastLoaded) {
+        this.lastLoaded = lastLoaded;
     }
 
     public boolean isMonitored() {

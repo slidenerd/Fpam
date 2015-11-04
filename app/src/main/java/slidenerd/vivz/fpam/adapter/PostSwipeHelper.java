@@ -1,18 +1,28 @@
 package slidenerd.vivz.fpam.adapter;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 
+import org.parceler.Parcels;
+
 import slidenerd.vivz.fpam.log.L;
+import slidenerd.vivz.fpam.model.json.feed.Post;
+
+import static slidenerd.vivz.fpam.extras.Constants.ACTION_DELETE_POST;
 
 public class PostSwipeHelper extends ItemTouchHelper.Callback {
 
-    private final OnSwipeListener mOnSwipeListener;
+    private final PostAdapter mAdapter;
+    private Context mContext;
 
-    public PostSwipeHelper(OnSwipeListener adapter) {
-        mOnSwipeListener = adapter;
+    public PostSwipeHelper(Context context, PostAdapter adapter) {
+        mContext = context;
+        mAdapter = adapter;
     }
 
     /**
@@ -46,7 +56,13 @@ public class PostSwipeHelper extends ItemTouchHelper.Callback {
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-        mOnSwipeListener.onSwipe(viewHolder.getAdapterPosition());
+        int position = viewHolder.getAdapterPosition();
+        Post post = mAdapter.getItem(position);
+        Intent intent = new Intent(ACTION_DELETE_POST);
+        intent.putExtra("position", position);
+        intent.putExtra("post", Parcels.wrap(Post.class, post));
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+//        mAdapter.onSwipe(position);
     }
 
     @Override

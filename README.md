@@ -151,9 +151,9 @@ Make the MVP of fpam capable of only blocking people in v1. This will ensure the
 	<li>Process only spammers in v1.0</li>
 	<li>let admin decide which groups to scan</li>
 	<li>If a postId is deleted, mark the person as a spammer and block all further posts from that person for all groups.</li>
-	<li>A spammer is a member of usually more than one group and as such, keep a track of the user id, user name of the spammer, list of group ids where he is a member of and the number of times he or she has spammed.</li>
+	<li>A spammer is a member of usually more than one group and as such, keep a track of the user groupId, user groupName of the spammer, list of group ids where he is a member of and the number of times he or she has spammed.</li>
 	<li>Enable spam filtering for both posts and comments {show the dual pane with posts and comments} and delete the postId or comment on swipe and add the person to the blacklist if he/she is not already a member</li>
-	<li>Send data about spammers to the server fpam.io with the same information, [userid, username, list of group ids where the spammer is a member of and the number of spam posts he or she has made] corresponding to a user id or the person using the app fpam.</li>
+	<li>Send data about spammers to the server fpam.io with the same information, [userid, username, list of group ids where the spammer is a member of and the number of spam posts he or she has made] corresponding to a user groupId or the person using the app fpam.</li>
 </ul>
 
 UPDATE 9, Nov 1, 2015 [12:50 pm]
@@ -192,7 +192,7 @@ The 4 pieces of information that we need to analyze are : the person who posted,
 Analytics [Overall for each postId]
 
 <ul>
-    <li>Which group is this postId read from? Track the group id</li>
+    <li>Which group is this postId read from? Track the group groupId</li>
     <li>How many posts have been read so far? Increment the number of posts read so far.</li>
     <li>What are the properties of this postId?
         <ul>
@@ -215,7 +215,7 @@ Analytics [Overall for each postId]
 <ul>
 	<dl>
 		<dt>CONTENT</dt>
-		<dd>A postId contains several optional fields such as name, message, caption, description, link and the person who posted it (person is optional as well) which will be referred to henceforth as CONTENT</dd>
+		<dd>A postId contains several optional fields such as groupName, message, caption, description, link and the person who posted it (person is optional as well) which will be referred to henceforth as CONTENT</dd>
 		<dt>MESSAGE</dt>
 		<dd>A postId may or may not contain data for the json tag message which will be referred to henceforth as MESSAGE</dd>
 		<dt>LINK_CONTENT</dt>
@@ -235,8 +235,8 @@ Analytics [Overall for each postId]
 			<li>If PERSON not available,
 			<ol>
 				<li>Delete the postId</li>
-				<li>Find the group id where this postId was made.</li>
-				<li>Increment the number of posts made by NON EXISTING USER for that group id</li>
+				<li>Find the group groupId where this postId was made.</li>
+				<li>Increment the number of posts made by NON EXISTING USER for that group groupId</li>
 				<li>Skip FURTHER PROCESSING</li>
 			</ol>
 			</li>
@@ -248,28 +248,28 @@ Analytics [Overall for each postId]
 			<li>Is the person in the SPAMMERS database?
 			<ol>
 				<li>Delete the postId</li>
-				<li>Note the group id where this postId was made</li>
-				<li>Increment the number of spam posts made by this person under that group id</li>
+				<li>Note the group groupId where this postId was made</li>
+				<li>Increment the number of spam posts made by this person under that group groupId</li>
 				<li>Note the created time of this postId [analytics]</li>
 				<li>Note the updated time of this postId [analytics]</li>
 				<li>Note whether created time and updated time are same or different? [analytics]</li>
 				<li>Skip FURTHER PROCESSING</li>
 			</ol>
 			</li>
-			<li>If the person is NOT present in the SPAMMERS database, process that element first on the basis of which we can instantly classify this as a SPAM postId or GOOD postId. The postId can be eliminated very quickly as SPAM if PICTURES are not allowed by the admin or LINK_SET is not allowed by the admin. The postId will require significant amount of processing to check for spam words and even more processing if has to check LINK_SET since it requires admin approval. Jump to CHECK FOR PICTURE</li>
+			<li>If the person is NOT present in the SPAMMERS database, process that element first on the basis of which we can instantly classify this as a SPAM postId or GOOD postId. The postId can be eliminated very quickly as SPAM if PICTURES are not authorized by the admin or LINK_SET is not authorized by the admin. The postId will require significant amount of processing to check for spam words and even more processing if has to check LINK_SET since it requires admin approval. Jump to CHECK FOR PICTURE</li>
 		</ul>
 		</li>
 		<li>CHECK FOR PICTURE, does the postId contain a picture?
 			<ul>
 				<li>If NO PICTURE is found, jump to PROCESS THE CONTENT</li>
-				<li>If PICTURE is found, has the admin allowed posts to be made that contain a PICTURE?
+				<li>If PICTURE is found, has the admin authorized posts to be made that contain a PICTURE?
 				<ul>
 					<li>If NOT ALLOWED,
 					<ol>
 						<li>Delete the postId</li>
-						<li>Note the group id where this postId was made</li>
+						<li>Note the group groupId where this postId was made</li>
 						<li>Add this person to the SPAMMERS database</li>
-						<li>Increment the number of spam posts made by this person under that group id</li>
+						<li>Increment the number of spam posts made by this person under that group groupId</li>
 						<li>Note the created time of this postId [analytics]</li>
 						<li>Note the updated time of this postId [analytics]</li>
 						<li>Note whether created time and updated time are same or different [analytics]</li>
@@ -284,13 +284,13 @@ Analytics [Overall for each postId]
 		<li>PROCESS THE CONTENT, What type of content is it? There are 4 types of posts 
 		<dl>
 			<dt>MESSAGE_EMPTY</dt>
-			<dd>A postId with no message tag data but may contain data in the other fields such as name, caption, description which will referred to henceforth as MESSAGE_EMPTY</dd>
+			<dd>A postId with no message tag data but may contain data in the other fields such as groupName, caption, description which will referred to henceforth as MESSAGE_EMPTY</dd>
 			<dl>MESSAGE_ONLY_LINK</dl>
-			<dd>A postId with message tag that has only a link in it also known as LINK_CONTENT and may contain data in the other fields such as name, caption, description which will be referred to henceforth as MESSAGE_ONLY_LINK</dd>
+			<dd>A postId with message tag that has only a link in it also known as LINK_CONTENT and may contain data in the other fields such as groupName, caption, description which will be referred to henceforth as MESSAGE_ONLY_LINK</dd>
 			<dl>MESSAGE_TEXT</dl>
-			<dd>A postId with message tag that has only text and may contain data in the other fields such as name, caption, description which will be referred to henceforth as MESSAGE_TEXT</dd>
+			<dd>A postId with message tag that has only text and may contain data in the other fields such as groupName, caption, description which will be referred to henceforth as MESSAGE_TEXT</dd>
 			<dl>MESSAGE_TEXT_AND_LINK</dl>
-			<dd>A postId with message that that has text and LINK_CONTENT and may contain data in the other fields such as name, caption, description which will be referred to henceforth as MESSAGE_TEXT_AND_LINK</dd>
+			<dd>A postId with message that that has text and LINK_CONTENT and may contain data in the other fields such as groupName, caption, description which will be referred to henceforth as MESSAGE_TEXT_AND_LINK</dd>
 		</dl>
 		<ol>
 			<li>For a postId of type MESSAGE_EMPTY
@@ -300,16 +300,16 @@ Analytics [Overall for each postId]
 						<li>If no which implies that postId is empty and the admin doesnt allow it,
 						<ol>
 							<li>Delete the postId</li>
-							<li>Note the group id where this postId was made</li>
+							<li>Note the group groupId where this postId was made</li>
 							<li>Add this person to the SPAMMERS database</li>
-							<li>Increment the number of spam posts made by this person under that group id</li>
+							<li>Increment the number of spam posts made by this person under that group groupId</li>
 							<li>Note the created time of this postId [analytics]</li>
 							<li>Note the updated time of this postId [analytics]</li>
 							<li>Note whether created time and updated time are same or different [analytics]</li>
 							<li>Skip FURTHER PROCESSING</li>
 						</ol> 
 						</li>
-						<li>If yes which implies that the postId has a message which is empty and the admin allows it, but we need to process the other elements  such as {name, caption, description}, does this postId contain OPTIONAL elements?
+						<li>If yes which implies that the postId has a message which is empty and the admin allows it, but we need to process the other elements  such as {groupName, caption, description}, does this postId contain OPTIONAL elements?
 						<ul>
 							<li>When the postId contains only OPTIONAL elements, PROCESS OPTIONAL ELEMENTS</li>
 							<li>When the postId contains only LINK_SET, PROCESS LINK SET</li>
@@ -334,9 +334,9 @@ Analytics [Overall for each postId]
 				<li>If one or more matches are found, 
 				<ol>
 					<li>Delete the postId</li>
-					<li>Note the group id where this postId was made</li>
+					<li>Note the group groupId where this postId was made</li>
 					<li>Add this person to the SPAMMERS database</li>
-					<li>Increment the number of spam posts made by this person under that group id</li>
+					<li>Increment the number of spam posts made by this person under that group groupId</li>
 					<li>Increment the counter of each spam word that was a match [analytics]</li>
 					<li>Note the created time of this postId [analytics]</li>
 					<li>Note the updated time of this postId [analytics]</li>
@@ -346,7 +346,7 @@ Analytics [Overall for each postId]
 				</li>
 			</ul>
 			</li>
-			<li>For a postId of type MESSAGE_ONLY_LINK, our job is to classify a postId as spam as fast as possible with minimal user input. Since the postId has only a LINK_CONTENT and optional elements, the LINK_CONTENT will require manual admin approval but the optional elements such as caption, name or description can be used to indicate if a postId must be classfied as spam or not
+			<li>For a postId of type MESSAGE_ONLY_LINK, our job is to classify a postId as spam as fast as possible with minimal user input. Since the postId has only a LINK_CONTENT and optional elements, the LINK_CONTENT will require manual admin approval but the optional elements such as caption, groupName or description can be used to indicate if a postId must be classfied as spam or not
 			<ul>
 				<li>When the postId contains only OPTIONAL elements, PROCESS OPTIONAL ELEMENTS</li>
 				<li>When the postId contains only LINK_SET, PROCESS LINK SET</li>
@@ -369,9 +369,9 @@ Analytics [Overall for each postId]
 					<li>If one or more matches are found, 
 					<ol>
 						<li>Delete the postId</li>
-						<li>Note the group id where this postId was made</li>
+						<li>Note the group groupId where this postId was made</li>
 						<li>Add this person to the SPAMMERS database</li>
-						<li>Increment the number of spam posts made by this person under that group id</li>
+						<li>Increment the number of spam posts made by this person under that group groupId</li>
 						<li>Increment the counter of each spam word that was a match [analytics]</li>
 						<li>Note the created time of this postId [analytics]</li>
 						<li>Note the updated time of this postId [analytics]</li>
@@ -387,15 +387,15 @@ Analytics [Overall for each postId]
 		</li>
 		<li>PROCESS OPTIONAL ELEMENTS
 		<ul>
-			<li>Does the combination of the optional elements name, description, caption contain words or phrases that match with one or more words or phrases from the spam database?
+			<li>Does the combination of the optional elements groupName, description, caption contain words or phrases that match with one or more words or phrases from the spam database?
 			<ul>
 				<li>If NO MATCH found, then jump to PROCESS LINK SET</li>
 				<li>If one or more matches are found, 
 				<ol>
 					<li>Delete the postId</li>
-					<li>Note the group id where this postId was made</li>
+					<li>Note the group groupId where this postId was made</li>
 					<li>Add this person to the SPAMMERS database</li>
-					<li>Increment the number of spam posts made by this person under that group id</li>
+					<li>Increment the number of spam posts made by this person under that group groupId</li>
 					<li>Increment the counter of each spam word that was a match [analytics]</li>
 					<li>Note the created time of this postId [analytics]</li>
 					<li>Note the updated time of this postId [analytics]</li>
@@ -412,10 +412,10 @@ Analytics [Overall for each postId]
 			<li>Is the link present in the blacklist?
 			<ol>
 				<li>Delete the postId</li>
-				<li>Note the group id where this postId was made</li>
+				<li>Note the group groupId where this postId was made</li>
 				<li>Add this person to the SPAMMERS database</li>
-				<li>Increment the number of spam posts made by this person under that group id</li>
-				<li>Increment the number of times this link was found in the blacklist for that group id</li>
+				<li>Increment the number of spam posts made by this person under that group groupId</li>
+				<li>Increment the number of times this link was found in the blacklist for that group groupId</li>
 				<li>Note the created time of this postId [analytics]</li>
 				<li>Note the updated time of this postId [analytics]</li>
 				<li>Note whether created time and updated time are same or different [analytics]</li>
@@ -425,7 +425,7 @@ Analytics [Overall for each postId]
 			<li>Is the link present in the whitelist?
 			<ol>
 				<li>Approve the postId</li>
-				<li>Note the group id where this postId was made</li>
+				<li>Note the group groupId where this postId was made</li>
 				<li>Increment the number of total posts made</li>
 			</ol>
 			</li>
@@ -433,7 +433,7 @@ Analytics [Overall for each postId]
 			<ol>
 				<li>Extract the base url of this link</li>
 				<li>Add this base url to the unique set of urls that need approval</li>
-				<li>Associate this postId id along with the set of other postId ids that rely on the approval of the admin for this url</li>
+				<li>Associate this postId groupId along with the set of other postId ids that rely on the approval of the admin for this url</li>
 			</ol>
 			</li>
 		</ol>

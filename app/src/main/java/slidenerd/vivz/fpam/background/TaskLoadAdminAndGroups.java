@@ -78,8 +78,8 @@ public class TaskLoadAdminAndGroups extends Fragment {
             boolean[] monitored = new boolean[results.size()];
             for (int i = 0; i < results.size(); i++) {
                 Group group = results.get(i);
-                ids[i] = group.getId();
-                timestamps[i] = group.getTimestamp();
+                ids[i] = group.getGroupId();
+                timestamps[i] = group.getLastLoaded();
                 monitored[i] = group.isMonitored();
             }
 
@@ -91,9 +91,9 @@ public class TaskLoadAdminAndGroups extends Fragment {
 
             for (Group group : groups) {
                 for (int j = 0; j < results.size(); j++) {
-                    if (group.getId().equals(ids[j])) {
+                    if (group.getGroupId().equals(ids[j])) {
                         group.setMonitored(monitored[j]);
-                        group.setTimestamp(timestamps[j]);
+                        group.setLastLoaded(timestamps[j]);
                     }
                 }
             }

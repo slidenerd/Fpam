@@ -203,7 +203,7 @@ public abstract class ActivityBase extends AppCompatActivity
         int id = item.getItemId();
         mSelectedGroup = mDrawer.getSelectedGroup(id);
         if (mSelectedGroup != null) {
-            setTitle(mSelectedGroup.getName());
+            setTitle(mSelectedGroup.getGroupName());
             L.m("token " + mApplication.getToken());
             mTask.triggerLoadPosts(mSelectedGroup, mApplication.getToken());
         }

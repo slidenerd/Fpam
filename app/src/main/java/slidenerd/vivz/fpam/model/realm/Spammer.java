@@ -13,26 +13,25 @@ import io.realm.annotations.PrimaryKey;
         value = Parcel.Serialization.BEAN,
         analyze = {Spammer.class})
 public class Spammer extends RealmObject {
-
-    public static Spammer NONE = new Spammer("NONE", "anonymous", 0, 0, false);
     //This is a combination of the user id followed by the group id separated by a colon
     @PrimaryKey
-    private String userGroupCompositeId;
+    private String compositeUserGroupId;
     private String userName;
     private int spamCount;
-    private long timestamp;
-    private boolean allowed;
+    private long lastActive;
+    private boolean authorized;
 
     public Spammer() {
 
     }
 
-    public Spammer(String userGroupCompositeId, String userName, int spamCount, long timestamp, boolean allowed) {
-        this.userGroupCompositeId = userGroupCompositeId;
+    public Spammer(String compositeUserGroupId, String userName, int spamCount, long lastActive, boolean authorized) {
+        this.compositeUserGroupId = compositeUserGroupId;
+
         this.userName = userName;
         this.spamCount = spamCount;
-        this.timestamp = timestamp;
-        this.allowed = allowed;
+        this.lastActive = lastActive;
+        this.authorized = authorized;
     }
 
     public String getUserName() {
@@ -43,12 +42,12 @@ public class Spammer extends RealmObject {
         this.userName = userName;
     }
 
-    public String getUserGroupCompositeId() {
-        return userGroupCompositeId;
+    public String getCompositeUserGroupId() {
+        return compositeUserGroupId;
     }
 
-    public void setUserGroupCompositeId(String userGroupCompositeId) {
-        this.userGroupCompositeId = userGroupCompositeId;
+    public void setCompositeUserGroupId(String compositeUserGroupId) {
+        this.compositeUserGroupId = compositeUserGroupId;
     }
 
     public int getSpamCount() {
@@ -59,19 +58,19 @@ public class Spammer extends RealmObject {
         this.spamCount = spamCount;
     }
 
-    public long getTimestamp() {
-        return timestamp;
+    public long getLastActive() {
+        return lastActive;
     }
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+    public void setLastActive(long lastActive) {
+        this.lastActive = lastActive;
     }
 
-    public boolean isAllowed() {
-        return allowed;
+    public boolean isAuthorized() {
+        return authorized;
     }
 
-    public void setAllowed(boolean allowed) {
-        this.allowed = allowed;
+    public void setAuthorized(boolean authorized) {
+        this.authorized = authorized;
     }
 }

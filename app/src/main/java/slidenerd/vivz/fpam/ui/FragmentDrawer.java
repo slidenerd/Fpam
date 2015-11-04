@@ -135,7 +135,7 @@ public class FragmentDrawer extends Fragment {
         } else {
             int i = Constants.MENU_START_ID;
             for (Group group : list) {
-                final MenuItem item = menu.add(100, i, i, group.getName());
+                final MenuItem item = menu.add(100, i, i, group.getGroupName());
                 item.setIcon(R.drawable.ic_group_black);
                 i++;
             }

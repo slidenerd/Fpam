@@ -38,9 +38,9 @@ public class GroupDeserializer implements JsonDeserializer<Group> {
 
         final int unread = root.getAsJsonPrimitive(GroupFields.UNREAD).getAsInt();
         final Group group = new Group();
-        group.setId(id);
-        group.setName(name);
-        group.setIcon(icon);
+        group.setGroupId(id);
+        group.setGroupName(name);
+        group.setGroupIcon(icon);
         group.setUnread(unread);
         return group;
     }

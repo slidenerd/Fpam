@@ -5,6 +5,8 @@ package slidenerd.vivz.fpam.extras;
  */
 public interface Constants {
 
+    String ACTION_LOAD_FEED = "load_feed";
+    String ACTION_DELETE_POST = "delete_post";
     String PERMISSION_EMAIL = "email";
     String PERMISSION_GROUPS = "user_managed_groups";
     String[] READ_PERMISSIONS = new String[]{PERMISSION_EMAIL, PERMISSION_GROUPS};

@@ -38,8 +38,8 @@ import io.realm.RealmResults;
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.Divider;
-import slidenerd.vivz.fpam.adapter.PostSwipeHelper;
 import slidenerd.vivz.fpam.adapter.PostAdapter;
+import slidenerd.vivz.fpam.adapter.PostSwipeHelper;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
@@ -119,7 +119,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         mRecyclerPosts.addItemDecoration(new Divider(getActivity(), LinearLayoutManager.VERTICAL));
         mAdapter = new PostAdapter(getActivity(), mRealm, mResults);
         mAdapter.setDeleteListener(this);
-        ItemTouchHelper.Callback callback = new PostSwipeHelper(mAdapter);
+        ItemTouchHelper.Callback callback = new PostSwipeHelper(getActivity(), mAdapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         mRecyclerPosts.setAdapter(mAdapter);
         touchHelper.attachToRecyclerView(mRecyclerPosts);
@@ -175,7 +175,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         Realm realm = null;
         try {
             realm = Realm.getDefaultInstance();
-            RealmResults<Post> results = realm.where(Post.class).beginsWith("postId", group.getId()).findAllSorted("updatedTime", false);
+            RealmResults<Post> results = realm.where(Post.class).beginsWith("postId", group.getGroupId()).findAllSorted("updatedTime", false);
             //realm.where(Post.class).equalTo("userId", post.getUserId()).findAll();
             ArrayList<DeleteRequestInfo> deletes = new ArrayList<>();
             for (int i = 0; i < results.size(); i++) {
@@ -188,7 +188,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
             if (!deletes.isEmpty()) {
                 ArrayList<DeleteResponseInfo> infos = FBUtils.requestDeletePosts(token, deletes);
 
-                String compositePrimaryKey = ModelUtils.getUserGroupCompositePrimaryKey(post.getUserId(), group.getId());
+                String compositePrimaryKey = ModelUtils.getUserGroupCompositePrimaryKey(post.getUserId(), group.getGroupId());
 
                 realm.beginTransaction();
                 int numberOfPostsDeleted = 0;
@@ -217,7 +217,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
 
                 if (numberOfPostsDeleted > 0) {
                     L.m("Delete successful by " + post.getUserName());
-                    DataStore.storeOrUpdateSpammer(realm, compositePrimaryKey, post.getUserName(), numberOfPostsDeleted);
+                    DataStore.storeOrUpdateSpammer(realm, compositePrimaryKey, post.getUserId(), group.getGroupId(), post.getUserName(), numberOfPostsDeleted);
                 }
             }
             afterDelete(position, true);
@@ -242,10 +242,10 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     }
 
 
-    @Receiver(actions = NavUtils.ACTION_LOAD_FEED, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
+    @Receiver(actions = Constants.ACTION_LOAD_FEED, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
     public void onBroadcastSelectedGroup(Context context, Intent intent) {
         mSelectedGroup = Parcels.unwrap(intent.getExtras().getParcelable(NavUtils.EXTRA_SELECTED_GROUP));
-        mResults = mRealm.where(Post.class).beginsWith("postId", mSelectedGroup.getId()).findAllSortedAsync("updatedTime", false);
+        mResults = mRealm.where(Post.class).beginsWith("postId", mSelectedGroup.getGroupId()).findAllSortedAsync("updatedTime", false);
         mAdapter.updateRealmResults(mResults);
         if (!mResults.isEmpty())
             mRecyclerPosts.smoothScrollToPosition(0);

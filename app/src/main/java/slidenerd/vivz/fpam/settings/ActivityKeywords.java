@@ -63,6 +63,7 @@ public class ActivityKeywords extends AppCompatActivity implements KeywordAdapte
         mRecyclerKeywords.setAdapter(mAdapter);
         touchHelper.attachToRecyclerView(mRecyclerKeywords);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
     }
 
 
@@ -81,8 +82,9 @@ public class ActivityKeywords extends AppCompatActivity implements KeywordAdapte
 
     @Override
     public void onClickIcon(int position, final Keyword keyword) {
+
         mSelectedKeyword = keyword;
-        mGroups = mRealm.where(Group.class).findAllSortedAsync("name");
+        mGroups = mRealm.where(Group.class).findAllSortedAsync("groupName");
         mGroups.addChangeListener(this);
     }
 

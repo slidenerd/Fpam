@@ -13,11 +13,13 @@ import slidenerd.vivz.fpam.ui.ActivityCache_;
 import slidenerd.vivz.fpam.ui.ActivityLogin_;
 import slidenerd.vivz.fpam.ui.ActivityMain_;
 
+import static slidenerd.vivz.fpam.extras.Constants.ACTION_LOAD_FEED;
+
 /**
  * Created by vivz on 28/07/15.
  */
 public class NavUtils {
-    public static final String ACTION_LOAD_FEED = "load_feed";
+
     public static final String EXTRA_SELECTED_GROUP = "selected_group";
 
     public static void startActivityLogin(Context context) {

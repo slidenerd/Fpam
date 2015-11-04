@@ -56,7 +56,7 @@ public class ActivityCache extends AppCompatActivity {
         ArrayList<Group> groups = DataStore.copyLoadGroups(mRealm);
         ArrayList<String> groupIdNames = new ArrayList<>(groups.size());
         for (Group group : groups) {
-            groupIdNames.add(group.getName() + ":" + group.getId());
+            groupIdNames.add(group.getGroupName() + ":" + group.getGroupId());
         }
         mSpinnerDatabase.setAdapter(arrayAdapter);
         mSpinnerGroup.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, groupIdNames));
@@ -68,7 +68,7 @@ public class ActivityCache extends AppCompatActivity {
         groupSelected = mSpinnerGroup.getSelectedItemPosition();
         String groupId = item.substring(item.indexOf(":") + 1, item.length());
         Group temp = new Group(groupId, "", "", 0, 0, false);
-        final RealmResults<Post> results = mRealm.where(Post.class).beginsWith("postId", temp.getId()).findAllSortedAsync("updatedTime", false);
+        final RealmResults<Post> results = mRealm.where(Post.class).beginsWith("postId", temp.getGroupId()).findAllSortedAsync("updatedTime", false);
         mListener = new RealmChangeListener() {
             @Override
             public void onChange() {
@@ -92,7 +92,7 @@ public class ActivityCache extends AppCompatActivity {
             mRealm.beginTransaction();
             mRealm.where(Post.class).beginsWith("postId", groupId).findAllSorted("updatedTime", false).clear();
             Group group = mRealm.where(Group.class).equalTo("id", groupId).findFirst();
-            group.setTimestamp(0);
+            group.setLastLoaded(0);
             mRealm.commitTransaction();
             groupItemSelected(true, groupIdName);
 

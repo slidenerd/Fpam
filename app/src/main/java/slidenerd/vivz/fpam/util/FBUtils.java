@@ -151,7 +151,7 @@ public class FBUtils {
         };
         Bundle parameters = new Bundle();
         parameters.putString("fields", "from{name,id,picture},message,caption,comments{from,message},description,name,full_picture,type,updated_time,attachments{type},link,created_time");
-        GraphRequest request = new GraphRequest(token, "/" + group.getId() + "/feed");
+        GraphRequest request = new GraphRequest(token, "/" + group.getGroupId() + "/feed");
         request.setParameters(parameters);
         GraphResponse response = request.executeAndWait();
         JSONObject root = response.getJSONObject();
@@ -181,7 +181,7 @@ public class FBUtils {
         Bundle parametersSubsequent = new Bundle();
         parametersSubsequent.putString("fields", "from{name,id,picture},message,caption,comments{from,message},description,name,full_picture,type,updated_time,attachments{type},link,created_time");
         boolean hasMoreData = false;
-        GraphRequest request = new GraphRequest(token, "/" + group.getId() + "/feed");
+        GraphRequest request = new GraphRequest(token, "/" + group.getGroupId() + "/feed");
         request.setParameters(parameters);
         GraphResponse response = request.executeAndWait();
         int numberOfPostsRetrieved = 0;

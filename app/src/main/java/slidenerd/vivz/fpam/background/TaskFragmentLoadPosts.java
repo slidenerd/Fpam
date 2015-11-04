@@ -68,7 +68,7 @@ public class TaskFragmentLoadPosts extends Fragment {
 
     public void triggerLoadPosts(@NonNull Group group, AccessToken accessToken) {
         if (mCallback != null) {
-            mCallback.beforePostsLoaded("Loading posts for the group " + group.getName());
+            mCallback.beforePostsLoaded("Loading posts for the group " + group.getGroupName());
         } else {
             L.m("Callback was null");
         }
@@ -97,21 +97,21 @@ public class TaskFragmentLoadPosts extends Fragment {
 
                 //Get the time stamp of when this group was last loaded and convert that timestamp to UTC format
 
-                long lastLoadedTimestamp = DateUtils.getUTCTimestamp(DataStore.getLastLoadedTimestamp(realm, group.getId()));
+                long lastLoadedTimestamp = DateUtils.getUTCTimestamp(DataStore.getLastLoadedTimestamp(realm, group.getGroupId()));
                 ArrayList<Post> posts;
 
                 //If the group was loaded before as indicated by a valid timestamp, then fetch all posts made since that timestamp or maximum number of posts as per the cache size from the app settings whichever is greater
 
                 if (lastLoadedTimestamp > 0) {
                     posts = FBUtils.requestFeedSince(token, Fpam.getGson(), group, maximumPostsStored, lastLoadedTimestamp);
-                    onProgressUpdate("Loaded", posts.size() + " posts from " + group.getName());
+                    onProgressUpdate("Loaded", posts.size() + " posts from " + group.getGroupName());
                 }
 
                 //If the group was never loaded before, load it for the first time
 
                 else {
                     posts = FBUtils.requestFeedFirstTime(token, Fpam.getGson(), group);
-                    onProgressUpdate("Loaded", posts.size() + " posts from " + group.getName());
+                    onProgressUpdate("Loaded", posts.size() + " posts from " + group.getGroupName());
                 }
                 originalLoadCount = posts.size();
 
@@ -127,10 +127,10 @@ public class TaskFragmentLoadPosts extends Fragment {
 
                     //Get this group object from realm in order to update its timestamp
 
-                    Group realmGroup = realm.where(Group.class).equalTo("id", group.getId()).findFirst();
+                    Group realmGroup = realm.where(Group.class).equalTo("groupId", group.getGroupId()).findFirst();
                     realm.beginTransaction();
                     realm.copyToRealmOrUpdate(posts);
-                    realmGroup.setTimestamp(System.currentTimeMillis());
+                    realmGroup.setLastLoaded(System.currentTimeMillis());
                     realm.commitTransaction();
 
                     L.m("posts loaded " + PrintUtils.toString(posts));
@@ -143,10 +143,10 @@ public class TaskFragmentLoadPosts extends Fragment {
 
                 String message = null;
                 if (originalLoadCount > 0) {
-                    message = originalLoadCount + " New Posts Loaded For " + group.getName() + (originalLoadCount - filteredLoadCount > 0 ? " And " + (originalLoadCount - filteredLoadCount) + " spam posts removed" : "");
+                    message = originalLoadCount + " New Posts Loaded For " + group.getGroupName() + (originalLoadCount - filteredLoadCount > 0 ? " And " + (originalLoadCount - filteredLoadCount) + " spam posts removed" : "");
 
                 } else {
-                    message = "No New Posts Loaded For " + group.getName();
+                    message = "No New Posts Loaded For " + group.getGroupName();
                 }
                 onPostsLoaded(message, group);
             } catch (JSONException e) {
