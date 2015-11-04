@@ -83,7 +83,7 @@ public abstract class ActivityBase extends AppCompatActivity
 
         //Initialize our Drawer Fragment that contains the navigation view and adds admin information and groups information
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         if (hasDrawer()) {
             initNavigationDrawer(toolbar);

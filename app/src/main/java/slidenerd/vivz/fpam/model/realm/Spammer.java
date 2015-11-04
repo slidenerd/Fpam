@@ -13,6 +13,8 @@ import io.realm.annotations.PrimaryKey;
         value = Parcel.Serialization.BEAN,
         analyze = {Spammer.class})
 public class Spammer extends RealmObject {
+
+    public static Spammer NONE = new Spammer("NONE", "anonymous", 0, 0, false);
     //This is a combination of the user id followed by the group id separated by a colon
     @PrimaryKey
     private String userGroupCompositeId;

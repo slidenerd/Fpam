@@ -9,11 +9,11 @@ import android.util.DisplayMetrics;
  * Created by Windows on 01-03-2015.
  */
 public class DisplayUtils {
-    public static int getWidthPixels(Context context) {
+    public static int getWidth(Context context) {
         return context.getApplicationContext().getResources().getDisplayMetrics().widthPixels;
     }
 
-    public static int getHeightPixels(Context context) {
+    public static int getHeight(Context context) {
         return context.getApplicationContext().getResources().getDisplayMetrics().heightPixels;
     }
 

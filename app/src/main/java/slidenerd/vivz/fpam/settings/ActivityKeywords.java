@@ -3,7 +3,6 @@ package slidenerd.vivz.fpam.settings;
 //TODO use a baseadapter for material dialog display of groups with a checkbox
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,6 +16,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
@@ -32,8 +32,10 @@ import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.model.realm.Keyword;
 
 @EActivity(R.layout.activity_keywords)
-public class ActivityKeywords extends AppCompatActivity implements View.OnClickListener, KeywordAdapter.IconClickListener, RealmChangeListener {
+public class ActivityKeywords extends AppCompatActivity implements KeywordAdapter.IconClickListener, RealmChangeListener {
 
+    @ViewById(R.id.app_bar)
+    Toolbar mToolbar;
     @ViewById(R.id.input_keyword)
     EditText mInputKeyword;
     @ViewById(R.id.recycler_keywords)
@@ -51,8 +53,7 @@ public class ActivityKeywords extends AppCompatActivity implements View.OnClickL
 
     @AfterViews
     void onCreateView() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(mToolbar);
         RealmResults<Keyword> results = mRealm.where(Keyword.class).findAllSortedAsync("keyword");
         mRecyclerKeywords.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new KeywordAdapter(this, mRealm, results);
@@ -61,20 +62,12 @@ public class ActivityKeywords extends AppCompatActivity implements View.OnClickL
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         mRecyclerKeywords.setAdapter(mAdapter);
         touchHelper.attachToRecyclerView(mRecyclerKeywords);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(this);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mRealm.close();
-    }
 
-    @Override
-    public void onClick(View view) {
+    @Click(R.id.fab)
+    public void onClickAdd(View view) {
         if (mInputKeyword != null
                 && mInputKeyword.getText() != null
                 && mInputKeyword.getText().toString() != null
@@ -88,7 +81,6 @@ public class ActivityKeywords extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClickIcon(int position, final Keyword keyword) {
-
         mSelectedKeyword = keyword;
         mGroups = mRealm.where(Group.class).findAllSortedAsync("name");
         mGroups.addChangeListener(this);
@@ -121,6 +113,12 @@ public class ActivityKeywords extends AppCompatActivity implements View.OnClickL
                 })
                 .build()
                 .show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mRealm.close();
     }
 }
 

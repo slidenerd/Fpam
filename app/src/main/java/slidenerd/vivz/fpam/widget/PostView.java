@@ -126,7 +126,7 @@ public class PostView extends View {
         mSpace3 = TypedValue.applyDimension(TO_DP, 20.0F, metrics);
 
         //Get the width of our device
-        mWidth = DisplayUtils.getWidthPixels(mContext);
+        mWidth = DisplayUtils.getWidth(mContext);
 
         //set a default height of 96dp which will be changed again inside onMeasure
         mHeight = (int) DisplayUtils.dpToPx(HEIGHT, context);
