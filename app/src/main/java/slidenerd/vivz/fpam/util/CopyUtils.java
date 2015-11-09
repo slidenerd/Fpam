@@ -25,6 +25,7 @@ public class CopyUtils {
     public static Post duplicatePost(Post originalPost) {
         Post post = new Post();
         post.setPostId(originalPost.getPostId());
+        post.setRowId(originalPost.getRowId());
         post.setUserId(originalPost.getUserId());
         post.setUserName(originalPost.getUserName());
         post.setMessage(originalPost.getMessage());

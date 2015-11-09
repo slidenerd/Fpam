@@ -23,9 +23,11 @@
                 android:id="@+id/input_keyword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_keyword"
                 android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp" />
+                android:layout_marginRight="16dp"
+                android:hint="@string/hint_keyword"
+                android:imeOptions="actionDone"
+                android:singleLine="true" />
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>

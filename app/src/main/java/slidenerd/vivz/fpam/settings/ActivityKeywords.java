@@ -8,10 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -19,6 +17,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.EditorAction;
 import org.androidannotations.annotations.ViewById;
 
 import io.realm.Realm;
@@ -28,7 +27,6 @@ import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.KeywordAdapter;
 import slidenerd.vivz.fpam.adapter.KeywordGroupsAdapter;
-import slidenerd.vivz.fpam.adapter.KeywordSwipehelper;
 import slidenerd.vivz.fpam.adapter.OnItemClickListener;
 import slidenerd.vivz.fpam.adapter.RecyclerViewAdapter;
 import slidenerd.vivz.fpam.adapter.SwipeToDismissTouchListener;
@@ -109,16 +107,21 @@ public class ActivityKeywords extends AppCompatActivity implements RealmChangeLi
 
 
     @Click(R.id.fab)
-    public void onClickAdd(View view) {
+    public void onClickAdd() {
         if (mInputKeyword != null
                 && mInputKeyword.getText() != null
                 && mInputKeyword.getText().toString() != null
                 && mInputKeyword.getText().toString().trim().length() > 0) {
-            Snackbar.make(view, "Added " + mInputKeyword.getText().toString().trim().toLowerCase(), Snackbar.LENGTH_LONG)
+            Snackbar.make(mInputKeyword, "Added " + mInputKeyword.getText().toString().trim().toLowerCase(), Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             mAdapter.add(mInputKeyword.getText().toString().trim().toLowerCase());
             mInputKeyword.getEditableText().clear();
         }
+    }
+
+    @EditorAction(R.id.input_keyword)
+    void onActionDone() {
+        onClickAdd();
     }
 
     @Override

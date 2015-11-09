@@ -19,16 +19,16 @@ import android.widget.ListView;
  * It is given special treatment because by default it handles touches for its list items...
  * i.e. it's in charge of drawing the pressed state (the list selector), handling list item
  * clicks, etc.
- *
+ * <p/>
  * <p>After creating the listener, the caller should also call
  * {@link android.widget.ListView#setOnScrollListener(android.widget.AbsListView.OnScrollListener)},
  * passing in the scroll listener returned by {@link #makeScrollListener()}. If a scroll listener is
  * already assigned, the caller should still pass scroll changes through to this listener. This will
  * ensure that this {@link SwipeToDismissTouchListener} is paused during list view
  * scrolling.</p>
- *
+ * <p/>
  * <p>Example usage:</p>
- *
+ * <p/>
  * <pre>
  * SwipeDismissRecyclerViewTouchListener touchListener =
  *         new SwipeDismissRecyclerViewTouchListener(
@@ -44,7 +44,7 @@ import android.widget.ListView;
  * recyclerView.setOnTouchListener(touchListener);
  * recyclerView.setOnScrollListener(touchListener.makeScrollListener());
  * </pre>
- *
+ * <p/>
  * <p>This class Requires API level 12 or later due to use of {@link
  * android.view.ViewPropertyAnimator}.</p>
  */
@@ -73,52 +73,12 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends ViewAdapter>
     private RowContainer mRowContainer;
     private boolean mPaused;
 
-    public class RowContainer {
-
-        final View container;
-        final View dataContainer;
-        final View undoContainer;
-        boolean dataContainerHasBeenDismissed;
-
-        public RowContainer(ViewGroup container) {
-            this.container = container;
-            dataContainer = container.getChildAt(0);
-            undoContainer = container.getChildAt(1);
-            dataContainerHasBeenDismissed = false;
-        }
-
-        View getCurrentSwipingView() {
-            return dataContainerHasBeenDismissed ? undoContainer: dataContainer;
-        }
-
-    }
-
-    /**
-     * The callback interface used by {@link SwipeToDismissTouchListener} to inform its client
-     * about a successful dismissal of one or more list item positions.
-     */
-    public interface DismissCallbacks<SomeCollectionView extends ViewAdapter> {
-        /**
-         * Called to determine whether the given position can be dismissed.
-         */
-        boolean canDismiss(int position);
-
-        /**
-         * Called when the user has indicated they she would like to dismiss one or more list item
-         * positions.
-         *
-         * @param recyclerView The originating {@link android.support.v7.widget.RecyclerView}.
-         * @param position The position of the dismissed item.
-         */
-        void onDismiss(SomeCollectionView recyclerView, int position);
-    }
-
     /**
      * Constructs a new swipe-to-dismiss touch listener for the given list view.
      *
-     * @param recyclerView  The list view whose items should be dismissable.
-     * @param callbacks The callback to trigger when the user has indicated that she would like to
-     *                  dismiss one or more list items.
+     * @param recyclerView The list view whose items should be dismissable.
+     * @param callbacks    The callback to trigger when the user has indicated that she would like to
+     *                     dismiss one or more list items.
      */
     public SwipeToDismissTouchListener(SomeCollectionView recyclerView,
                                        DismissCallbacks<SomeCollectionView> callbacks) {
@@ -127,7 +87,7 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends ViewAdapter>
         mMinFlingVelocity = vc.getScaledMinimumFlingVelocity() * 16;
         mMaxFlingVelocity = vc.getScaledMaximumFlingVelocity();
         mAnimationTime = recyclerView.getContext().getResources().getInteger(
-                android.R.integer.config_shortAnimTime);
+                android.R.integer.config_longAnimTime);
         mRecyclerView = recyclerView;
         mCallbacks = callbacks;
     }
@@ -190,7 +150,7 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends ViewAdapter>
                     child = mRecyclerView.getChildAt(i);
                     child.getHitRect(rect);
                     if (rect.contains(x, y)) {
-                        assert(child instanceof ViewGroup &&
+                        assert (child instanceof ViewGroup &&
                                 ((ViewGroup) child).getChildCount() == 2) :
                                 "Each child needs to extend from ViewGroup and have two children";
 
@@ -331,29 +291,13 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends ViewAdapter>
         return false;
     }
 
-    class PendingDismissData implements Comparable<PendingDismissData> {
-        public int position;
-        public RowContainer rowContainer;
-
-        public PendingDismissData(int position, RowContainer rowContainer) {
-            this.position = position;
-            this.rowContainer= rowContainer;
-        }
-
-        @Override
-        public int compareTo(@NonNull PendingDismissData other) {
-            // Sort by descending position
-            return other.position - position;
-        }
-    }
-
     private void performDismiss(RowContainer dismissView, int dismissPosition) {
         // Animate the dismissed list item to zero-height and fire the dismiss callback when
         // all dismissed list item animations have completed. This triggers layout on each animation
         // frame; in the future we may want to do something smarter and more performant.
         if (mPendingDismiss != null) {
             boolean dismissingDifferentRow = mPendingDismiss.position != dismissPosition;
-            int newPosition = mPendingDismiss.position < dismissPosition ? dismissPosition-1 : dismissPosition;
+            int newPosition = mPendingDismiss.position < dismissPosition ? dismissPosition - 1 : dismissPosition;
             processPendingDismisses();
             if (dismissingDifferentRow) {
                 addPendingDismiss(dismissView, newPosition);
@@ -372,6 +316,7 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends ViewAdapter>
     /**
      * If a view was dismissed and the undo container is showing it will proceed with the final
      * dismiss of the item.
+     *
      * @return whether there were any pending rows to be dismissed.
      */
     public boolean processPendingDismisses() {
@@ -382,6 +327,7 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends ViewAdapter>
 
     /**
      * Whether a row has been dismissed and is waiting for confirmation
+     *
      * @return whether there are any pending rows to be dismissed.
      */
     public boolean existPendingDismisses() {
@@ -391,6 +337,7 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends ViewAdapter>
     /**
      * If a view was dismissed and the undo container is showing it will undo and make the data
      * container reappear.
+     *
      * @return whether there were any pending rows to be dismissed.
      */
     public boolean undoPendingDismiss() {
@@ -445,5 +392,61 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends ViewAdapter>
         });
 
         animator.start();
+    }
+
+    /**
+     * The callback interface used by {@link SwipeToDismissTouchListener} to inform its client
+     * about a successful dismissal of one or more list item positions.
+     */
+    public interface DismissCallbacks<SomeCollectionView extends ViewAdapter> {
+        /**
+         * Called to determine whether the given position can be dismissed.
+         */
+        boolean canDismiss(int position);
+
+        /**
+         * Called when the user has indicated they she would like to dismiss one or more list item
+         * positions.
+         *
+         * @param recyclerView The originating {@link android.support.v7.widget.RecyclerView}.
+         * @param position     The position of the dismissed item.
+         */
+        void onDismiss(SomeCollectionView recyclerView, int position);
+    }
+
+    public class RowContainer {
+
+        final View container;
+        final View dataContainer;
+        final View undoContainer;
+        boolean dataContainerHasBeenDismissed;
+
+        public RowContainer(ViewGroup container) {
+            this.container = container;
+            dataContainer = container.getChildAt(0);
+            undoContainer = container.getChildAt(1);
+            dataContainerHasBeenDismissed = false;
+        }
+
+        View getCurrentSwipingView() {
+            return dataContainerHasBeenDismissed ? undoContainer : dataContainer;
+        }
+
+    }
+
+    class PendingDismissData implements Comparable<PendingDismissData> {
+        public int position;
+        public RowContainer rowContainer;
+
+        public PendingDismissData(int position, RowContainer rowContainer) {
+            this.position = position;
+            this.rowContainer = rowContainer;
+        }
+
+        @Override
+        public int compareTo(@NonNull PendingDismissData other) {
+            // Sort by descending position
+            return other.position - position;
+        }
     }
 }

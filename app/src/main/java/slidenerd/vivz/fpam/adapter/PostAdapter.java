@@ -10,23 +10,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import difflib.Delta;
-import difflib.DiffUtils;
-import difflib.Patch;
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.ui.transform.CropCircleTransform;
 import slidenerd.vivz.fpam.ui.transform.CropTransformation;
@@ -38,18 +28,11 @@ import slidenerd.vivz.fpam.widget.ExpandableTextView;
  * Refer https://github.com/thorbenprimke/realm-recyclerview/blob/master/library/src/main/java/io/realm/RealmBasedRecyclerViewAdapter.java for implementation details with respect to animation of changes in the data of the adapter.
  * Created by vivz on 29/08/15.
  */
-public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> implements PostSwipeHelper.OnSwipeListener {
+public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> {
 
-    private static final List<Long> EMPTY_LIST = new ArrayList<>(0);
-
-    //Item Ids used to track which items were added, removed or modified when a change occurs to our Realm database corresponding to Posts table so that we can animate items accordingly.
-    protected List mIds;
     private Context mContext;
-    private Realm mRealm;
     private RealmResults<Post> mResults;
-    private RealmChangeListener mChangeListener;
     private LayoutInflater mLayoutInflater;
-    private DeleteListener mDeleteListener;
 
     //Width of the image found in the post if there is one
     private int mPostImageWidth;
@@ -62,86 +45,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> im
 
     public PostAdapter(Context context, Realm realm, RealmResults<Post> results) {
         mContext = context;
-        mRealm = realm;
-        mChangeListener = getRealmChangeListener();
         mLayoutInflater = LayoutInflater.from(context);
+
         //Initialize post image width and height
         Point size = DisplayUtils.getPostImageSize(context);
         mPostImageWidth = size.x;
         mPostImageHeight = size.y;
         updateRealmResults(results);
-    }
-
-    private RealmChangeListener getRealmChangeListener() {
-        return new RealmChangeListener() {
-            @Override
-            public void onChange() {
-                if (mIds != null && !mIds.isEmpty()) {
-                    List newIds = getIdsOfRealmResults();
-                    // If the list is now empty, just notify the recyclerView of the change.
-                    if (newIds.isEmpty()) {
-                        mIds = newIds;
-                        notifyDataSetChanged();
-                        return;
-                    }
-                    Patch patch = DiffUtils.diff(mIds, newIds);
-                    List<Delta> deltas = patch.getDeltas();
-                    mIds = newIds;
-                    if (deltas.isEmpty()) {
-                        // Nothing has changed - most likely because the notification was for
-                        // a different object/table
-                    } else if (deltas.size() > 1) {
-                        notifyDataSetChanged();
-                    } else {
-                        Delta delta = deltas.get(0);
-                        if (delta.getType() == Delta.TYPE.INSERT) {
-                            if (delta.getRevised().size() == 1) {
-                                notifyItemInserted(delta.getRevised().getPosition());
-                            } else {
-                                notifyDataSetChanged();
-                            }
-                        } else if (delta.getType() == Delta.TYPE.DELETE) {
-                            if (delta.getOriginal().size() == 1) {
-                                notifyItemRemoved(delta.getOriginal().getPosition());
-                            } else {
-                                // Note: The position zero check is to hack around a indexOutOfBound
-                                // exception that happens when the zero position is animated out.
-                                if (delta.getOriginal().getPosition() == 0) {
-                                    notifyDataSetChanged();
-                                    return;
-                                } else {
-                                    notifyItemRangeRemoved(
-                                            delta.getOriginal().getPosition(),
-                                            delta.getOriginal().size());
-                                }
-                            }
-
-                            if (delta.getOriginal().getPosition() - 1 > 0) {
-                                notifyItemRangeChanged(
-                                        0,
-                                        delta.getOriginal().getPosition() - 1);
-                            }
-                            if (delta.getOriginal().getPosition() > 0 &&
-                                    newIds.size() > 0) {
-                                notifyItemRangeChanged(
-                                        delta.getOriginal().getPosition(),
-                                        newIds.size() - 1);
-                            }
-                        } else {
-                            notifyDataSetChanged();
-                        }
-                    }
-                } else {
-                    L.m("from adapter notify data set changed");
-                    notifyDataSetChanged();
-                    mIds = getIdsOfRealmResults();
-                }
-            }
-        };
-    }
-
-    public void setDeleteListener(DeleteListener listener) {
-        this.mDeleteListener = listener;
     }
 
 
@@ -171,49 +81,23 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> im
      * @param queryResults the new RealmResults coming from the new query.
      */
     public void updateRealmResults(RealmResults<Post> queryResults) {
-        if (mChangeListener != null) {
-            if (this.mResults != null) {
-                mResults.removeChangeListener(mChangeListener);
-            }
-        }
-        this.mResults = queryResults;
-        if (mResults != null && queryResults != null) {
-            mResults.addChangeListener(mChangeListener);
-        }
-        mIds = getIdsOfRealmResults();
+        mResults = queryResults;
         notifyDataSetChanged();
     }
 
-    private List getIdsOfRealmResults() {
-        if (mResults == null || mResults.size() == 0) {
-            return EMPTY_LIST;
-        }
-        List ids = new ArrayList(mResults.size());
-        for (int i = 0; i < mResults.size(); i++) {
-            ids.add(mResults.get(i).getPostId());
-        }
-        return ids;
-
+    @Override
+    public long getItemId(int position) {
+        return mResults.get(position).getRowId();
     }
 
     @Override
     public int getItemCount() {
-        return mResults == null ? 0 : mResults.size();
+        return mResults.size();
     }
 
     @Nullable
     public Post getItem(int position) {
-        return mResults != null ? mResults.get(position) : null;
-    }
-
-    @Override
-    public void onSwipe(int position) {
-        Post post = mResults.get(position);
-        mDeleteListener.triggerDelete(position, CopyUtils.duplicatePost(post));
-    }
-
-    public interface DeleteListener {
-        void triggerDelete(int position, Post post);
+        return CopyUtils.duplicatePost(mResults.get(position));
     }
 
     public class ItemHolder extends RecyclerView.ViewHolder {

@@ -2,11 +2,6 @@ package slidenerd.vivz.fpam.util;
 
 import android.support.v7.widget.RecyclerView;
 
-import java.util.ArrayList;
-
-import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.feed.Post;
-
 /**
  * Created by vivz on 06/10/15.
  */
@@ -14,6 +9,24 @@ public class ModelUtils {
 
     public static String getUserGroupCompositePrimaryKey(String userId, String groupId) {
         return userId + ":" + groupId;
+    }
+
+    public static long computeRowId(String postId) {
+        long rowId = RecyclerView.NO_ID;
+        if (postId != null && !postId.trim().isEmpty()) {
+            int underscore = postId.indexOf("_");
+            if (underscore > -1) {
+                String suffix = postId.substring(underscore + 1, postId.length());
+                if (!suffix.trim().isEmpty()) {
+                    try {
+                        rowId = Long.parseLong(suffix);
+                    } catch (ArithmeticException ignore) {
+
+                    }
+                }
+            }
+        }
+        return rowId;
     }
 
 }

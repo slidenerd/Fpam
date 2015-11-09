@@ -17,6 +17,8 @@ public class Post extends RealmObject {
     @PrimaryKey
     private String postId;
 
+    private long rowId;
+
     //The user id of the person making the post
     private String userId;
 
@@ -206,5 +208,13 @@ public class Post extends RealmObject {
 
     public void setUserPicture(String userPicture) {
         this.userPicture = userPicture;
+    }
+
+    public long getRowId() {
+        return rowId;
+    }
+
+    public void setRowId(long rowId) {
+        this.rowId = rowId;
     }
 }

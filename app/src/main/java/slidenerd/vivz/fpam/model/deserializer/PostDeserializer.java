@@ -11,6 +11,7 @@ import java.lang.reflect.Type;
 import slidenerd.vivz.fpam.extras.FeedFields;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.util.DateUtils;
+import slidenerd.vivz.fpam.util.ModelUtils;
 
 /**
  * Created by vivz on 01/10/15.
@@ -29,6 +30,8 @@ public class PostDeserializer implements JsonDeserializer<Post> {
 
         final String postId = root.get(FeedFields.ID).getAsString();
 
+        final long rowId = ModelUtils.computeRowId(postId);
+
         //Retrieve 'created_time' that contains time in the form of dd:MM:yyyy'T'hh:mm:ssZ
 
         final String createdTimeString = root.get(FeedFields.CREATED_TIME).getAsString();
@@ -44,6 +47,7 @@ public class PostDeserializer implements JsonDeserializer<Post> {
         //Convert the time to milliseconds as per the local time zone and store them
 
         post.setPostId(postId);
+        post.setRowId(rowId);
         post.setCreatedTime(DateUtils.getFBFormattedTime(createdTimeString));
         post.setUpdatedTime(DateUtils.getFBFormattedTime(updatedTimeString));
         post.setType(type);

@@ -3,23 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/layout_undo"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#FF4536"
-        android:orientation="horizontal"
-        android:paddingLeft="24dp"
-        android:paddingRight="24dp"
-        android:visibility="gone">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_delete_grey"
-            android:tint="@color/flat_white" />
-    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/layout_post"
@@ -103,5 +86,37 @@
             android:background="@color/flat_gray" />
     </RelativeLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#667788"
+        android:orientation="horizontal"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:visibility="gone"
+        android:weightSum="3">
+
+        <TextView
+            android:id="@+id/txt_delete"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:clickable="false"
+            android:gravity="center_vertical"
+            android:hapticFeedbackEnabled="true"
+            android:text="Delete"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/txt_undo"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="false"
+            android:gravity="center"
+            android:text="Undo"
+            android:textColor="@color/flat_yellow" />
+
+    </LinearLayout>
 
 </FrameLayout>

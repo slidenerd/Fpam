@@ -1,7 +1,6 @@
 package slidenerd.vivz.fpam.ui;
 
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,12 +32,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.adapter.Divider;
+import slidenerd.vivz.fpam.adapter.OnItemClickListener;
 import slidenerd.vivz.fpam.adapter.PostAdapter;
-import slidenerd.vivz.fpam.adapter.PostSwipeHelper;
+import slidenerd.vivz.fpam.adapter.RecyclerViewAdapter;
+import slidenerd.vivz.fpam.adapter.SwipeToDismissTouchListener;
+import slidenerd.vivz.fpam.adapter.SwipeableItemClickListener;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
@@ -57,7 +58,7 @@ import slidenerd.vivz.fpam.util.NavUtils;
  * A simple {@link Fragment} subclass.
  */
 @EFragment
-public class FragmentPosts extends Fragment implements FacebookCallback<LoginResult>, PostAdapter.DeleteListener {
+public class FragmentPosts extends Fragment implements FacebookCallback<LoginResult> {
 
     private static final String STATE_SELECTED_GROUP = "group";
     @App
@@ -69,7 +70,6 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     private Realm mRealm;
     private CallbackManager mCallbackManager;
     private LoginManager mLoginManager;
-    private ProgressDialog mProgressDialog;
     private Group mSelectedGroup;
     private RealmResults<Post> mResults;
 
@@ -94,7 +94,6 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         if (savedInstanceState != null) {
             mSelectedGroup = Parcels.unwrap(savedInstanceState.getParcelable(STATE_SELECTED_GROUP));
         }
-        mProgressDialog = new ProgressDialog(getActivity());
     }
 
 
@@ -113,15 +112,44 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mResults = mRealm.where(Post.class).equalTo("postId", "NONE").findAll();
         mRecyclerPosts = (RecyclerView) view.findViewById(R.id.recycler_posts);
         mRecyclerPosts.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerPosts.setHasFixedSize(false);
         mAdapter = new PostAdapter(getActivity(), mRealm, mResults);
-        mAdapter.setDeleteListener(this);
-        ItemTouchHelper.Callback callback = new PostSwipeHelper(getActivity(), mAdapter);
-        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        mAdapter.setHasStableIds(true);
         mRecyclerPosts.setAdapter(mAdapter);
-        touchHelper.attachToRecyclerView(mRecyclerPosts);
+        final SwipeToDismissTouchListener<RecyclerViewAdapter> touchListener =
+                new SwipeToDismissTouchListener<>(
+                        new RecyclerViewAdapter(mRecyclerPosts),
+                        new SwipeToDismissTouchListener.DismissCallbacks<RecyclerViewAdapter>() {
+                            @Override
+                            public boolean canDismiss(int position) {
+                                return true;
+                            }
+
+                            @Override
+                            public void onDismiss(RecyclerViewAdapter view, int position) {
+                                triggerDelete(position, mAdapter.getItem(position));
+                            }
+                        });
+
+        mRecyclerPosts.setOnTouchListener(touchListener);
+        // Setting this scroll listener is required to ensure that during ListView scrolling,
+        // we don't look for swipes.
+        mRecyclerPosts.addOnScrollListener((RecyclerView.OnScrollListener) touchListener.makeScrollListener());
+        mRecyclerPosts.addOnItemTouchListener(new SwipeableItemClickListener(getActivity(),
+                new OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        if (view.getId() == R.id.txt_delete) {
+                            touchListener.processPendingDismisses();
+                        } else if (view.getId() == R.id.txt_undo) {
+                            touchListener.undoPendingDismiss();
+                        } else { // R.id.txt_data
+                            L.t(getActivity(), "item clicked at position " + position);
+                        }
+                    }
+                }));
     }
 
 
@@ -160,12 +188,8 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override
     public void triggerDelete(int position, Post post) {
-        mProgressDialog.setTitle("Deleting post");
-        mProgressDialog.setMessage("Post was made by " + post.getUserName());
-        mProgressDialog.setIndeterminate(true);
-        mProgressDialog.show();
+
         onDelete(mApplication.getToken(), position, mSelectedGroup, post);
     }
 
@@ -184,13 +208,14 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
                     deletes.add(info);
                 }
             }
+            int numberOfPostsDeleted = 0;
             if (!deletes.isEmpty()) {
                 ArrayList<DeleteResponseInfo> infos = FBUtils.requestDeletePosts(token, deletes);
 
                 String compositePrimaryKey = ModelUtils.getUserGroupCompositePrimaryKey(post.getUserId(), group.getGroupId());
 
                 realm.beginTransaction();
-                int numberOfPostsDeleted = 0;
+
                 for (DeleteResponseInfo info : infos) {
 
                     //If the post was removed successfully from the Facebook Graph API, remove the corresponding post from realm as well
@@ -219,7 +244,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
                     DataStore.storeOrUpdateSpammer(realm, compositePrimaryKey, post.getUserId(), group.getGroupId(), post.getUserName(), numberOfPostsDeleted);
                 }
             }
-            afterDelete(position, true);
+            afterDelete(position, numberOfPostsDeleted > 0);
         } catch (JSONException e) {
             L.m(e + "");
         } finally {
@@ -231,7 +256,9 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
 
     @UiThread
     void afterDelete(int position, boolean success) {
-        mProgressDialog.dismiss();
+        if (success) {
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -245,9 +272,13 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     public void onBroadcastSelectedGroup(Context context, Intent intent) {
         mSelectedGroup = Parcels.unwrap(intent.getExtras().getParcelable(NavUtils.EXTRA_SELECTED_GROUP));
         mResults = mRealm.where(Post.class).beginsWith("postId", mSelectedGroup.getGroupId()).findAllSortedAsync("updatedTime", false);
-        mAdapter.updateRealmResults(mResults);
-        if (!mResults.isEmpty())
-            mRecyclerPosts.smoothScrollToPosition(0);
+        mResults.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                mAdapter.updateRealmResults(mResults);
+            }
+        });
+
 
     }
 }
