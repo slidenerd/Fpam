@@ -18,13 +18,13 @@ import slidenerd.vivz.fpam.model.json.group.Group;
 /**
  * Created by vivz on 03/11/15.
  */
-public class KeywordGroupsAdapter extends RealmBaseAdapter<Group> {
+public class AdapterKeywordGroups extends RealmBaseAdapter<Group> {
 
     private LayoutInflater mInflater;
     private RealmResults<Group> mResults;
     private SparseBooleanArray mChecked = new SparseBooleanArray();
 
-    public KeywordGroupsAdapter(Context context, RealmResults<Group> realmResults, boolean automaticUpdate) {
+    public AdapterKeywordGroups(Context context, RealmResults<Group> realmResults, boolean automaticUpdate) {
         super(context, realmResults, automaticUpdate);
         mResults = realmResults;
         mInflater = LayoutInflater.from(context);

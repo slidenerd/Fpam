@@ -34,11 +34,12 @@ import java.util.Arrays;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
+import jp.wasabeef.recyclerview.animators.FlipInLeftYAnimator;
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
+import slidenerd.vivz.fpam.adapter.AdapterPost;
 import slidenerd.vivz.fpam.adapter.OnItemClickListener;
-import slidenerd.vivz.fpam.adapter.PostAdapter;
-import slidenerd.vivz.fpam.adapter.RecyclerViewAdapter;
+import slidenerd.vivz.fpam.adapter.RecyclerConfigImpl;
 import slidenerd.vivz.fpam.adapter.SwipeToDismissTouchListener;
 import slidenerd.vivz.fpam.adapter.SwipeableItemClickListener;
 import slidenerd.vivz.fpam.database.DataStore;
@@ -66,7 +67,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     @InstanceState
     String mGroupId = Constants.GROUP_ID_NONE;
     private RecyclerView mRecyclerPosts;
-    private PostAdapter mAdapter;
+    private AdapterPost mAdapter;
     private Realm mRealm;
     private CallbackManager mCallbackManager;
     private LoginManager mLoginManager;
@@ -115,23 +116,26 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         mResults = mRealm.where(Post.class).equalTo("postId", "NONE").findAll();
         mRecyclerPosts = (RecyclerView) view.findViewById(R.id.recycler_posts);
         mRecyclerPosts.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mAdapter = new PostAdapter(getActivity(), mRealm, mResults);
+        FlipInLeftYAnimator animator = new FlipInLeftYAnimator();
+        mRecyclerPosts.setItemAnimator(animator);
+        mAdapter = new AdapterPost(getActivity(), mRealm, mResults);
         mAdapter.setHasStableIds(true);
         mRecyclerPosts.setAdapter(mAdapter);
-        final SwipeToDismissTouchListener<RecyclerViewAdapter> touchListener =
+        final SwipeToDismissTouchListener<RecyclerConfigImpl> touchListener =
                 new SwipeToDismissTouchListener<>(
-                        new RecyclerViewAdapter(mRecyclerPosts),
-                        new SwipeToDismissTouchListener.DismissCallbacks<RecyclerViewAdapter>() {
+                        new RecyclerConfigImpl(mRecyclerPosts),
+                        new SwipeToDismissTouchListener.DismissCallbacks<RecyclerConfigImpl>() {
                             @Override
                             public boolean canDismiss(int position) {
                                 return true;
                             }
 
                             @Override
-                            public void onDismiss(RecyclerViewAdapter view, int position) {
+                            public void onDismiss(RecyclerConfigImpl view, int position) {
                                 triggerDelete(position, mAdapter.getItem(position));
                             }
                         });
+
 
         mRecyclerPosts.setOnTouchListener(touchListener);
         // Setting this scroll listener is required to ensure that during ListView scrolling,
@@ -146,7 +150,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
                         } else if (view.getId() == R.id.txt_undo) {
                             touchListener.undoPendingDismiss();
                         } else { // R.id.txt_data
-                            L.t(getActivity(), "item clicked at position " + position);
+
                         }
                     }
                 }));
@@ -278,7 +282,5 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
                 mAdapter.updateRealmResults(mResults);
             }
         });
-
-
     }
 }

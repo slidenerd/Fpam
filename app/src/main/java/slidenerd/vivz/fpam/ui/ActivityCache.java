@@ -91,7 +91,7 @@ public class ActivityCache extends AppCompatActivity {
             String groupId = groupIdName.substring(groupIdName.indexOf(":") + 1, groupIdName.length());
             mRealm.beginTransaction();
             mRealm.where(Post.class).beginsWith("postId", groupId).findAllSorted("updatedTime", false).clear();
-            Group group = mRealm.where(Group.class).equalTo("id", groupId).findFirst();
+            Group group = mRealm.where(Group.class).equalTo("groupId", groupId).findFirst();
             group.setLastLoaded(0);
             mRealm.commitTransaction();
             groupItemSelected(true, groupIdName);

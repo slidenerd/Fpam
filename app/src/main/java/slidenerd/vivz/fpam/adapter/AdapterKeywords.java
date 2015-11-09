@@ -7,14 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import difflib.Delta;
-import difflib.DiffUtils;
-import difflib.Patch;
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.model.realm.Keyword;
@@ -22,13 +15,13 @@ import slidenerd.vivz.fpam.model.realm.Keyword;
 /**
  * Created by vivz on 29/08/15.
  */
-public class KeywordAdapter extends RecyclerView.Adapter<KeywordAdapter.KeywordHolder> {
+public class AdapterKeywords extends RecyclerView.Adapter<AdapterKeywords.KeywordHolder> {
 
     private Realm mRealm;
     private RealmResults<Keyword> mResults;
     private LayoutInflater mLayoutInflater;
 
-    public KeywordAdapter(Context context, Realm realm, RealmResults<Keyword> results) {
+    public AdapterKeywords(Context context, Realm realm, RealmResults<Keyword> results) {
         mLayoutInflater = LayoutInflater.from(context);
         mRealm = realm;
         updateRealmResults(results);

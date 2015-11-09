@@ -1,112 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/settings_container">
-
-    <TextView
-        android:id="@+id/text_common"
-        style="@style/settings_general_common"
-        android:text="@string/pref_section_common" />
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/settings_container"
+    android:fillViewport="true"
+    android:scrollbarStyle="outsideOverlay">
 
 
-    <ImageView
-        android:id="@+id/icon_cache"
-        style="@style/settings_general_icon"
-        android:layout_alignBottom="@+id/text_summary_cache"
-        android:layout_alignTop="@+id/text_cache"
-        android:layout_below="@+id/text_common"
-        android:src="@drawable/ic_file_grey" />
-
-    <TextView
-        android:id="@+id/text_cache"
-        style="@style/settings_general_title"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_below="@+id/text_common"
-        android:layout_toRightOf="@+id/icon_cache"
-        android:text="@string/pref_cache" />
+        android:layout_height="1000dp">
 
-    <TextView
-        android:id="@+id/text_summary_cache"
-        style="@style/settings_general_summary"
-        android:layout_width="match_parent"
-        android:layout_below="@+id/text_cache"
-        android:layout_toRightOf="@+id/icon_cache"
-        android:text="@string/pref_summary_cache" />
-
-    <View
-        android:id="@+id/separator_1"
-        style="@style/settings_general_separator"
-        android:layout_alignLeft="@+id/text_cache"
-        android:layout_below="@+id/text_summary_cache"
-        android:layout_toRightOf="@+id/icon_cache" />
+        <TextView
+            android:id="@+id/text_common"
+            style="@style/settings_general_common"
+            android:text="@string/pref_section_common" />
 
 
-    <TextView
-        android:id="@+id/text_spam"
-        style="@style/settings_general_spam"
-        android:text="@string/pref_section_spam" />
+        <ImageView
+            android:id="@+id/icon_cache"
+            style="@style/settings_general_icon"
+            android:layout_alignBottom="@+id/text_summary_cache"
+            android:layout_alignTop="@+id/text_cache"
+            android:layout_below="@+id/text_common"
+            android:src="@drawable/ic_file_grey" />
+
+        <TextView
+            android:id="@+id/text_cache"
+            style="@style/settings_general_title"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/text_common"
+            android:layout_toRightOf="@+id/icon_cache"
+            android:text="@string/pref_cache" />
+
+        <TextView
+            android:id="@+id/text_summary_cache"
+            style="@style/settings_general_summary"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/text_cache"
+            android:layout_toRightOf="@+id/icon_cache"
+            android:text="@string/pref_summary_cache" />
+
+        <View
+            android:id="@+id/separator_1"
+            style="@style/settings_general_separator"
+            android:layout_alignLeft="@+id/text_cache"
+            android:layout_below="@+id/text_summary_cache"
+            android:layout_toRightOf="@+id/icon_cache" />
+
+        <CheckBox
+            android:id="@+id/cbx_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/text_delete"
+            android:layout_alignLeft="@+id/icon_cache"
+            android:layout_alignRight="@+id/icon_cache"
+            android:layout_alignTop="@+id/text_delete"
+            android:layout_below="@+id/separator_1" />
+
+        <TextView
+            android:id="@+id/text_delete"
+            style="@style/settings_general_title"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/separator_1"
+            android:layout_toRightOf="@+id/cbx_delete"
+            android:text="@string/pref_delete" />
+
+        <View
+            android:id="@+id/separator_2"
+            style="@style/settings_general_separator"
+            android:layout_alignLeft="@+id/text_cache"
+            android:layout_below="@+id/text_delete"
+            android:layout_toRightOf="@+id/icon_cache" />
+
+        <TextView
+            android:id="@+id/text_spam"
+            style="@style/settings_general_spam"
+            android:text="@string/pref_section_spam" />
+
+        <ImageView
+            android:id="@+id/icon_spammers"
+            style="@style/settings_general_icon"
+            android:layout_alignBottom="@+id/text_summary_spammers"
+            android:layout_alignTop="@+id/text_spammers"
+            android:layout_below="@id/text_spam"
+            android:src="@drawable/ic_account_circle_grey" />
+
+        <TextView
+            android:id="@+id/text_spammers"
+            style="@style/settings_general_title"
+            android:layout_width="match_parent"
+            android:layout_below="@id/text_spam"
+            android:layout_toRightOf="@+id/icon_spammers"
+            android:text="@string/pref_spammers" />
+
+        <TextView
+            android:id="@+id/text_summary_spammers"
+            style="@style/settings_general_summary"
+            android:layout_width="match_parent"
+            android:layout_below="@id/text_spammers"
+            android:layout_toRightOf="@+id/icon_spammers"
+            android:text="@string/pref_summary_spammers" />
+
+        <View
+            android:id="@+id/separator_3"
+            style="@style/settings_general_separator"
+            android:layout_alignLeft="@+id/text_spammers"
+            android:layout_below="@+id/text_summary_spammers"
+            android:layout_toRightOf="@+id/icon_cache" />
+
+        <ImageView
+            android:id="@+id/icon_keywords"
+            style="@style/settings_general_icon"
+            android:layout_alignBottom="@+id/text_summary_keywords"
+            android:layout_alignTop="@+id/text_keywords"
+            android:layout_below="@id/separator_3"
+            android:src="@drawable/ic_format_list_bulleted_grey" />
+
+        <TextView
+            android:id="@+id/text_keywords"
+            style="@style/settings_general_title"
+            android:layout_width="match_parent"
+            android:layout_below="@id/separator_3"
+            android:layout_toRightOf="@+id/icon_keywords"
+            android:text="@string/pref_keywords" />
+
+        <TextView
+            android:id="@+id/text_summary_keywords"
+            style="@style/settings_general_summary"
+            android:layout_width="match_parent"
+            android:layout_below="@id/text_keywords"
+            android:layout_toRightOf="@+id/icon_keywords"
+            android:text="@string/text_summary_keywords" />
+
+        <View
+            android:id="@+id/separator_4"
+            style="@style/settings_general_separator"
+            android:layout_alignLeft="@+id/text_keywords"
+            android:layout_below="@+id/text_summary_keywords"
+            android:layout_toRightOf="@+id/icon_cache" />
+    </RelativeLayout>
 
 
-    <ImageView
-        android:id="@+id/icon_spammers"
-        style="@style/settings_general_icon"
-        android:layout_alignBottom="@+id/text_summary_spammers"
-        android:layout_alignTop="@+id/text_spammers"
-        android:layout_below="@id/text_spam"
-        android:src="@drawable/ic_account_circle_grey" />
+</ScrollView>
 
-    <TextView
-        android:id="@+id/text_spammers"
-        style="@style/settings_general_title"
-        android:layout_width="match_parent"
-        android:layout_below="@id/text_spam"
-        android:layout_toRightOf="@+id/icon_spammers"
-        android:text="@string/pref_spammers" />
 
-    <TextView
-        android:id="@+id/text_summary_spammers"
-        style="@style/settings_general_summary"
-        android:layout_width="match_parent"
-        android:layout_below="@id/text_spammers"
-        android:layout_toRightOf="@+id/icon_spammers"
-        android:text="@string/pref_summary_spammers" />
-
-    <View
-        android:id="@+id/separator_3"
-        style="@style/settings_general_separator"
-        android:layout_alignLeft="@+id/text_spammers"
-        android:layout_below="@+id/text_summary_spammers"
-        android:layout_toRightOf="@+id/icon_cache" />
-
-    <ImageView
-        android:id="@+id/icon_keywords"
-        style="@style/settings_general_icon"
-        android:layout_alignBottom="@+id/text_summary_keywords"
-        android:layout_alignTop="@+id/text_keywords"
-        android:layout_below="@id/separator_3"
-        android:src="@drawable/ic_format_list_bulleted_grey" />
-
-    <TextView
-        android:id="@+id/text_keywords"
-        style="@style/settings_general_title"
-        android:layout_width="match_parent"
-        android:layout_below="@id/separator_3"
-        android:layout_toRightOf="@+id/icon_keywords"
-        android:text="@string/pref_keywords" />
-
-    <TextView
-        android:id="@+id/text_summary_keywords"
-        style="@style/settings_general_summary"
-        android:layout_width="match_parent"
-        android:layout_below="@id/text_keywords"
-        android:layout_toRightOf="@+id/icon_keywords"
-        android:text="@string/text_summary_keywords" />
-
-    <View
-        android:id="@+id/separator_4"
-        style="@style/settings_general_separator"
-        android:layout_alignLeft="@+id/text_keywords"
-        android:layout_below="@+id/text_summary_keywords"
-        android:layout_toRightOf="@+id/icon_cache" />
-</RelativeLayout>
 

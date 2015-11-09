@@ -4,7 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.view.View;
-import android.widget.Switch;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -15,12 +16,10 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.StringArrayRes;
-import org.androidannotations.annotations.res.StringRes;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.extras.MyPrefs_;
-import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.util.NavUtils;
 
 /**
@@ -38,6 +37,8 @@ public class SettingsFragmentGeneral extends Fragment {
 
     //The textview controlling the summary to be displayed when the user has selected the number of posts to be stored in the database
 
+    @ViewById(R.id.cbx_delete)
+    CheckBox mCbxDelete;
     @ViewById(R.id.text_summary_cache)
     TextView mTextSummaryCache;
 
@@ -60,7 +61,7 @@ public class SettingsFragmentGeneral extends Fragment {
 
         //Load the value of the setting that indicates whether the user should delete posts on swipe
 
-        boolean shouldDelete = mPref.swipeToDelete().get();
+        boolean deleteMultiple = mPref.deleteMultiple().get();
 
         //Load the number of posts to be stored in the database for each group
 
@@ -68,7 +69,9 @@ public class SettingsFragmentGeneral extends Fragment {
 
         //Initialize views based on setting values
 
+        mCbxDelete.setChecked(deleteMultiple);
         mTextSummaryCache.setText(getString(R.string.pref_summary_cache, cacheSize + ""));
+
     }
 
     /**
@@ -114,6 +117,11 @@ public class SettingsFragmentGeneral extends Fragment {
                 })
                 .build()
                 .show();
+    }
+
+    @CheckedChange(R.id.cbx_delete)
+    void onCheckDeleteMultiple(CompoundButton delete, boolean isChecked) {
+        mPref.deleteMultiple().put(isChecked);
     }
 
     @Click({R.id.text_keywords, R.id.text_summary_keywords, R.id.icon_keywords})

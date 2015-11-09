@@ -27,8 +27,8 @@
     </integer-array>
 
     <string-array name="pref_cache_sizes">
-        <item>25</item>
         <item>50</item>
+        <item>75</item>
         <item>100</item>
     </string-array>
     <!--The second setting that lets you choose the GroupFields you want to monitor in the background-->
@@ -46,5 +46,6 @@
     <string name="pref_spammers">List Of Spammers</string>
     <string name="pref_summary_spammers">List of people spamming your groups</string>
     <string name="pref_keywords">Spam Keywords</string>
-    <string name="key_swipe_to_delete">key_swipe_to_delete</string>
+    <string name="key_delete_multiple">key_swipe_to_delete</string>
+    <string name="pref_delete">When I Delete A Post, Delete Others Posted By The Same User</string>
 </resources>

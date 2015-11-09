@@ -68,7 +68,7 @@ public class TaskFragmentLoadPosts extends Fragment {
 
     public void triggerLoadPosts(@NonNull Group group, AccessToken accessToken) {
         if (mCallback != null) {
-            mCallback.beforePostsLoaded("Loading posts for the group " + group.getGroupName());
+            mCallback.beforePostsLoaded("");
         } else {
             L.m("Callback was null");
         }
@@ -138,12 +138,11 @@ public class TaskFragmentLoadPosts extends Fragment {
 
                     DataStore.limitStoredPosts(realm, group, maximumPostsStored);
 
-
                 }
 
                 String message = null;
                 if (originalLoadCount > 0) {
-                    message = originalLoadCount + " New Posts Loaded For " + group.getGroupName() + (originalLoadCount - filteredLoadCount > 0 ? " And " + (originalLoadCount - filteredLoadCount) + " spam posts removed" : "");
+                    message = originalLoadCount + (originalLoadCount - filteredLoadCount > 0 ? " Posts Loaded And " + (originalLoadCount - filteredLoadCount) + " spam posts removed" : "");
 
                 } else {
                     message = "No New Posts Loaded For " + group.getGroupName();

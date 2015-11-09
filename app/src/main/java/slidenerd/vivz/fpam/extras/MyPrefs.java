@@ -18,8 +18,8 @@ public interface MyPrefs {
     @DefaultInt(value = -1, keyRes = R.string.key_scan_frequency)
     int scanFrequency();
 
-    @DefaultBoolean(value = false, keyRes = R.string.key_swipe_to_delete)
-    boolean swipeToDelete();
+    @DefaultBoolean(value = false, keyRes = R.string.key_delete_multiple)
+    boolean deleteMultiple();
 
     String monitoredGroups();
 }

@@ -5,12 +5,12 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.ListView;
 
 /**
@@ -32,7 +32,7 @@ import android.widget.ListView;
  * <pre>
  * SwipeDismissRecyclerViewTouchListener touchListener =
  *         new SwipeDismissRecyclerViewTouchListener(
- *                 new RecyclerViewAdapter(recyclerView),
+ *                 new RecyclerConfigImpl(recyclerView),
  *                 new SwipeDismissRecyclerViewTouchListener.OnDismissCallback() {
  *                     public void onDismiss(ListView listView, int[] reverseSortedPositions) {
  *                         for (int position : reverseSortedPositions) {
@@ -48,7 +48,7 @@ import android.widget.ListView;
  * <p>This class Requires API level 12 or later due to use of {@link
  * android.view.ViewPropertyAnimator}.</p>
  */
-public class SwipeToDismissTouchListener<SomeCollectionView extends ViewAdapter> implements
+public class SwipeToDismissTouchListener<SomeCollectionView extends RecyclerConfig> implements
         View.OnTouchListener {
 
     // Cached ViewConfiguration and system-wide constant values
@@ -111,15 +111,13 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends ViewAdapter>
      * @see SwipeToDismissTouchListener
      */
     public Object makeScrollListener() {
-        return mRecyclerView.makeScrollListener(new AbsListView.OnScrollListener() {
+        return mRecyclerView.makeScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrollStateChanged(AbsListView absListView, int scrollState) {
-                processPendingDismisses();
-                setEnabled(scrollState != AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL);
-            }
+            public void onScrollStateChanged(RecyclerView absListView, int scrollState) {
 
-            @Override
-            public void onScroll(AbsListView absListView, int i, int i1, int i2) {
+                //After swiping a post and showing the undo layout, if a person scrolls up or down, cancel the pending delete and show the layout of the post once again.
+                undoPendingDismiss();
+                setEnabled(scrollState == RecyclerView.SCROLL_STATE_IDLE);
             }
         });
     }
@@ -398,7 +396,7 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends ViewAdapter>
      * The callback interface used by {@link SwipeToDismissTouchListener} to inform its client
      * about a successful dismissal of one or more list item positions.
      */
-    public interface DismissCallbacks<SomeCollectionView extends ViewAdapter> {
+    public interface DismissCallbacks<SomeCollectionView extends RecyclerConfig> {
         /**
          * Called to determine whether the given position can be dismissed.
          */

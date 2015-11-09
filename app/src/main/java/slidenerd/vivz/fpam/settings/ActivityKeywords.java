@@ -25,10 +25,10 @@ import io.realm.RealmChangeListener;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.adapter.KeywordAdapter;
-import slidenerd.vivz.fpam.adapter.KeywordGroupsAdapter;
+import slidenerd.vivz.fpam.adapter.AdapterKeywordGroups;
+import slidenerd.vivz.fpam.adapter.AdapterKeywords;
 import slidenerd.vivz.fpam.adapter.OnItemClickListener;
-import slidenerd.vivz.fpam.adapter.RecyclerViewAdapter;
+import slidenerd.vivz.fpam.adapter.RecyclerConfigImpl;
 import slidenerd.vivz.fpam.adapter.SwipeToDismissTouchListener;
 import slidenerd.vivz.fpam.adapter.SwipeableItemClickListener;
 import slidenerd.vivz.fpam.model.json.group.Group;
@@ -46,7 +46,7 @@ public class ActivityKeywords extends AppCompatActivity implements RealmChangeLi
     private Realm mRealm;
     private RealmResults<Group> mGroups;
     private Keyword mSelectedKeyword;
-    private KeywordAdapter mAdapter;
+    private AdapterKeywords mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +60,8 @@ public class ActivityKeywords extends AppCompatActivity implements RealmChangeLi
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         RealmResults<Keyword> results = mRealm.where(Keyword.class).findAllSortedAsync("keyword");
         mRecyclerKeywords.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new KeywordAdapter(this, mRealm, results);
+        mAdapter = new AdapterKeywords(this, mRealm, results);
+        mRealm.addChangeListener(this);
         mAdapter.setHasStableIds(true);
         results.addChangeListener(new RealmChangeListener() {
             @Override
@@ -69,17 +70,17 @@ public class ActivityKeywords extends AppCompatActivity implements RealmChangeLi
             }
         });
         mRecyclerKeywords.setAdapter(mAdapter);
-        final SwipeToDismissTouchListener<RecyclerViewAdapter> touchListener =
+        final SwipeToDismissTouchListener<RecyclerConfigImpl> touchListener =
                 new SwipeToDismissTouchListener<>(
-                        new RecyclerViewAdapter(mRecyclerKeywords),
-                        new SwipeToDismissTouchListener.DismissCallbacks<RecyclerViewAdapter>() {
+                        new RecyclerConfigImpl(mRecyclerKeywords),
+                        new SwipeToDismissTouchListener.DismissCallbacks<RecyclerConfigImpl>() {
                             @Override
                             public boolean canDismiss(int position) {
                                 return true;
                             }
 
                             @Override
-                            public void onDismiss(RecyclerViewAdapter view, int position) {
+                            public void onDismiss(RecyclerConfigImpl view, int position) {
                                 mAdapter.remove(position);
                             }
                         });
@@ -99,7 +100,6 @@ public class ActivityKeywords extends AppCompatActivity implements RealmChangeLi
                         } else { // R.id.txt_data
                             mSelectedKeyword = mAdapter.getItem(position);
                             mGroups = mRealm.where(Group.class).findAllSortedAsync("groupName");
-                            mGroups.addChangeListener(ActivityKeywords.this);
                         }
                     }
                 }));
@@ -126,36 +126,39 @@ public class ActivityKeywords extends AppCompatActivity implements RealmChangeLi
 
     @Override
     public void onChange() {
-        final KeywordGroupsAdapter adapter = new KeywordGroupsAdapter(this, mGroups, true);
-        RealmList<Group> selectedGroups = mSelectedKeyword.getGroups();
-        if (selectedGroups.isEmpty()) {
-            adapter.selectAll();
-        } else {
-            adapter.select(selectedGroups);
-        }
-        new MaterialDialog.Builder(ActivityKeywords.this)
-                .title("Groups where \"" + mSelectedKeyword.getKeyword() + "\" is applicable")
-                .adapter(adapter, null)
-                .positiveText("OK")
-                .negativeText("Cancel")
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
-                        if (!adapter.allSelected()) {
-                            RealmList<Group> groups = adapter.getSelected();
-                            mRealm.beginTransaction();
-                            mSelectedKeyword.setGroups(groups);
-                            mRealm.commitTransaction();
+        if (mSelectedKeyword != null) {
+            final AdapterKeywordGroups adapter = new AdapterKeywordGroups(this, mGroups, true);
+            RealmList<Group> selectedGroups = mSelectedKeyword.getGroups();
+            if (selectedGroups.isEmpty()) {
+                adapter.selectAll();
+            } else {
+                adapter.select(selectedGroups);
+            }
+            new MaterialDialog.Builder(ActivityKeywords.this)
+                    .title("Groups where \"" + mSelectedKeyword.getKeyword() + "\" is applicable")
+                    .adapter(adapter, null)
+                    .positiveText("OK")
+                    .negativeText("Cancel")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
+                            if (!adapter.allSelected()) {
+                                RealmList<Group> groups = adapter.getSelected();
+                                mRealm.beginTransaction();
+                                mSelectedKeyword.setGroups(groups);
+                                mRealm.commitTransaction();
+                            }
                         }
-                    }
-                })
-                .build()
-                .show();
+                    })
+                    .build()
+                    .show();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mRealm.removeAllChangeListeners();
         mRealm.close();
     }
 }
