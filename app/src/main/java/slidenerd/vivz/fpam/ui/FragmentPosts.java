@@ -116,7 +116,6 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         mRecyclerPosts = (RecyclerView) view.findViewById(R.id.recycler_posts);
         mRecyclerPosts.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerPosts.setHasFixedSize(false);
-        mRecyclerPosts.addItemDecoration(new Divider(getActivity(), LinearLayoutManager.VERTICAL));
         mAdapter = new PostAdapter(getActivity(), mRealm, mResults);
         mAdapter.setDeleteListener(this);
         ItemTouchHelper.Callback callback = new PostSwipeHelper(getActivity(), mAdapter);

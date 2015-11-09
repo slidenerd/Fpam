@@ -25,9 +25,4 @@ public class DateUtils {
         }
         return timeMillis;
     }
-
-    public static final String getDurationHHMMSS(long duration) {
-        String message = (String.format("%d hr %d min, %d sec", duration / (1000 * 60 * 60), (duration % (1000 * 60 * 60)) / (1000 * 60), ((duration % (1000 * 60 * 60)) % (1000 * 60)) / 1000));
-        return message;
-    }
 }

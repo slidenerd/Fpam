@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -28,11 +29,15 @@ import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.KeywordAdapter;
 import slidenerd.vivz.fpam.adapter.KeywordGroupsAdapter;
 import slidenerd.vivz.fpam.adapter.KeywordSwipehelper;
+import slidenerd.vivz.fpam.adapter.OnItemClickListener;
+import slidenerd.vivz.fpam.adapter.RecyclerViewAdapter;
+import slidenerd.vivz.fpam.adapter.SwipeToDismissTouchListener;
+import slidenerd.vivz.fpam.adapter.SwipeableItemClickListener;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.model.realm.Keyword;
 
 @EActivity(R.layout.activity_keywords)
-public class ActivityKeywords extends AppCompatActivity implements KeywordAdapter.IconClickListener, RealmChangeListener {
+public class ActivityKeywords extends AppCompatActivity implements RealmChangeListener {
 
     @ViewById(R.id.app_bar)
     Toolbar mToolbar;
@@ -54,16 +59,52 @@ public class ActivityKeywords extends AppCompatActivity implements KeywordAdapte
     @AfterViews
     void onCreateView() {
         setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         RealmResults<Keyword> results = mRealm.where(Keyword.class).findAllSortedAsync("keyword");
         mRecyclerKeywords.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new KeywordAdapter(this, mRealm, results);
-        mAdapter.setIconClickListener(this);
-        ItemTouchHelper.Callback callback = new KeywordSwipehelper(mAdapter);
-        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        mAdapter.setHasStableIds(true);
+        results.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                mAdapter.notifyDataSetChanged();
+            }
+        });
         mRecyclerKeywords.setAdapter(mAdapter);
-        touchHelper.attachToRecyclerView(mRecyclerKeywords);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        final SwipeToDismissTouchListener<RecyclerViewAdapter> touchListener =
+                new SwipeToDismissTouchListener<>(
+                        new RecyclerViewAdapter(mRecyclerKeywords),
+                        new SwipeToDismissTouchListener.DismissCallbacks<RecyclerViewAdapter>() {
+                            @Override
+                            public boolean canDismiss(int position) {
+                                return true;
+                            }
 
+                            @Override
+                            public void onDismiss(RecyclerViewAdapter view, int position) {
+                                mAdapter.remove(position);
+                            }
+                        });
+
+        mRecyclerKeywords.setOnTouchListener(touchListener);
+        // Setting this scroll listener is required to ensure that during ListView scrolling,
+        // we don't look for swipes.
+        mRecyclerKeywords.addOnScrollListener((RecyclerView.OnScrollListener) touchListener.makeScrollListener());
+        mRecyclerKeywords.addOnItemTouchListener(new SwipeableItemClickListener(this,
+                new OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        if (view.getId() == R.id.txt_delete) {
+                            touchListener.processPendingDismisses();
+                        } else if (view.getId() == R.id.txt_undo) {
+                            touchListener.undoPendingDismiss();
+                        } else { // R.id.txt_data
+                            mSelectedKeyword = mAdapter.getItem(position);
+                            mGroups = mRealm.where(Group.class).findAllSortedAsync("groupName");
+                            mGroups.addChangeListener(ActivityKeywords.this);
+                        }
+                    }
+                }));
     }
 
 
@@ -78,14 +119,6 @@ public class ActivityKeywords extends AppCompatActivity implements KeywordAdapte
             mAdapter.add(mInputKeyword.getText().toString().trim().toLowerCase());
             mInputKeyword.getEditableText().clear();
         }
-    }
-
-    @Override
-    public void onClickIcon(int position, final Keyword keyword) {
-
-        mSelectedKeyword = keyword;
-        mGroups = mRealm.where(Group.class).findAllSortedAsync("groupName");
-        mGroups.addChangeListener(this);
     }
 
     @Override

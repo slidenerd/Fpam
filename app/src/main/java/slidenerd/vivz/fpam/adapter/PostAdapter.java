@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -145,7 +147,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemHolder> im
 
     @Override
     public ItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = mLayoutInflater.inflate(R.layout.row_post_2, parent, false);
+        View view = mLayoutInflater.inflate(R.layout.row_post, parent, false);
         ItemHolder holder = new ItemHolder(view);
         return holder;
     }

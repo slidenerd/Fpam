@@ -38,13 +38,4 @@ public class CopyUtils {
         post.setLink(originalPost.getLink());
         return post;
     }
-
-    public static ArrayList<Post> clonePosts(ArrayList<Post> posts) {
-        ArrayList<Post> clones = new ArrayList<>(posts.size());
-        for (Post post : posts) {
-            Post clone = CopyUtils.duplicatePost(post);
-            clones.add(clone);
-        }
-        return clones;
-    }
 }

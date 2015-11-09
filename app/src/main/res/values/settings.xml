@@ -40,7 +40,6 @@
     <string name="pref_summary_groups">All groups are monitored by default</string>
     <string name="pref_section_common">Common</string>
     <string name="pref_summary_cache">%1$s posts</string>
-    <string name="pref_delete">Swipe To Delete</string>
     <string name="pref_delete_off">Ask me everytime when I swipe</string>
     <string name="pref_delete_on">Delete posts when I swipe them</string>
     <string name="pref_section_spam">Spam</string>

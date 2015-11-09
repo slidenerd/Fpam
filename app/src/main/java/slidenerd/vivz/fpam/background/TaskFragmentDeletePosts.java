@@ -94,7 +94,7 @@ public class TaskFragmentDeletePosts extends Fragment {
                         numberOfPostsDeleted++;
 
                     } else {
-                        L.m("Delete failed for " + info.getPost().getPostId() + " made by " + info.getPost().getUserName());
+                        L.m("Delete failed ");
                     }
                 }
 

@@ -31,16 +31,6 @@ public class SettingsFragmentGeneral extends Fragment {
     @Pref
     MyPrefs_ mPref;
 
-    //The summary to be displayed when the user has enabled swipe to delete posts
-
-    @StringRes(R.string.pref_delete_on)
-    String mStringDeleteOn;
-
-    //The summary to be displayed when the user has disabled swipe to delete posts
-
-    @StringRes(R.string.pref_delete_off)
-    String mStringDeleteOff;
-
     //The number of posts to be stored in the database for offline access for each group
 
     @StringArrayRes(R.array.pref_cache_sizes)
@@ -51,13 +41,6 @@ public class SettingsFragmentGeneral extends Fragment {
     @ViewById(R.id.text_summary_cache)
     TextView mTextSummaryCache;
 
-    //The textview controlling the summary to be displayed when the user has enabled or disabled swipe to delete posts
-
-    @ViewById(R.id.text_summary_delete)
-    TextView mTextSummaryDelete;
-
-    @ViewById(R.id.switch_delete)
-    Switch mSwitchDelete;
     private Context mContext;
 
     @Override
@@ -86,8 +69,6 @@ public class SettingsFragmentGeneral extends Fragment {
         //Initialize views based on setting values
 
         mTextSummaryCache.setText(getString(R.string.pref_summary_cache, cacheSize + ""));
-        mSwitchDelete.setChecked(shouldDelete);
-        mTextSummaryDelete.setText(shouldDelete ? mStringDeleteOn : mStringDeleteOff);
     }
 
     /**
@@ -135,44 +116,10 @@ public class SettingsFragmentGeneral extends Fragment {
                 .show();
     }
 
-    /**
-     * Called when you click anywhere, the icon or title or summary related to swipe to delete posts
-     */
-    @Click({R.id.text_delete, R.id.text_summary_delete, R.id.icon_delete})
-    void onClickDelete() {
-
-        //if the option was disabled, enable it, else disable it
-
-        mSwitchDelete.toggle();
-
-        //update summary based on the new state
-
-        updateSummaryDelete();
-    }
-
-    @CheckedChange(R.id.switch_delete)
-    void onChangeDelete() {
-        updateSummaryDelete();
-    }
-
     @Click({R.id.text_keywords, R.id.text_summary_keywords, R.id.icon_keywords})
     void onClickKeywords() {
         NavUtils.startActivityKeywords(mContext);
     }
 
-    void updateSummaryDelete() {
-
-        //check if the option to delete posts on swipe is enabled or disabled
-
-        boolean shouldDelete = mSwitchDelete.isChecked();
-
-        //update the SharedPreferences accordingly
-
-        mPref.swipeToDelete().put(shouldDelete);
-
-        //update the summary to be displayed accordingly
-
-        mTextSummaryDelete.setText(shouldDelete ? mStringDeleteOn : mStringDeleteOff);
-    }
 
 }

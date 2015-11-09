@@ -48,9 +48,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.ActivityPost_"
-            android:label="@string/title_activity_post" />
-        <activity
             android:name=".settings.ActivityKeywords_"
             android:label="@string/title_activity_activity_keywords"
             android:parentActivityName=".settings.SettingsActivity_"

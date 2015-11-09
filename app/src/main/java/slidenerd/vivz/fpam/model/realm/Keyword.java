@@ -14,6 +14,7 @@ import slidenerd.vivz.fpam.model.parcel.KeywordGroupsConverter;
 public class Keyword extends RealmObject {
     @PrimaryKey
     private String keyword;
+    private long timestamp;
     private RealmList<Group> groups = new RealmList<>();
 
     public String getKeyword() {
@@ -31,5 +32,13 @@ public class Keyword extends RealmObject {
     @ParcelPropertyConverter(KeywordGroupsConverter.class)
     public void setGroups(RealmList<Group> groups) {
         this.groups = groups;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }

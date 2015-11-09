@@ -10,6 +10,7 @@ import android.view.View;
 
 import org.parceler.Parcels;
 
+import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 
@@ -17,6 +18,7 @@ import static slidenerd.vivz.fpam.extras.Constants.ACTION_DELETE_POST;
 
 public class PostSwipeHelper extends ItemTouchHelper.Callback {
 
+    //TODO fix the error where the onChildDraw and onChildDrawOver are not reset because the item was deleted at position 0
     private final PostAdapter mAdapter;
     private Context mContext;
 
@@ -70,11 +72,15 @@ public class PostSwipeHelper extends ItemTouchHelper.Callback {
                             RecyclerView.ViewHolder viewHolder, float dX, float dY,
                             int actionState, boolean isCurrentlyActive) {
 
+        L.m("onChildDraw " + dX + " position " + viewHolder.getAdapterPosition());
+        View itemView = viewHolder.itemView;
+        View layoutPost = itemView.findViewById(R.id.layout_post);
+        View layoutUndo = itemView.findViewById(R.id.layout_undo);
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
             float width = (float) viewHolder.itemView.getWidth();
-            float alpha = 1.0f - Math.abs(dX) / width;
-            viewHolder.itemView.setAlpha(alpha);
-            viewHolder.itemView.setTranslationX(dX);
+
+            layoutPost.setTranslationX(dX);
+            layoutUndo.setVisibility(View.VISIBLE);
         } else {
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY,
                     actionState, isCurrentlyActive);
@@ -84,12 +90,14 @@ public class PostSwipeHelper extends ItemTouchHelper.Callback {
     @Override
     public void onChildDrawOver(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
         // Get RecyclerView item from the ViewHolder
+        L.m("onChildDrawOver " + dX + " position " + viewHolder.getAdapterPosition());
         View itemView = viewHolder.itemView;
+        View layoutUndo = itemView.findViewById(R.id.layout_undo);
+        View layoutPost = itemView.findViewById(R.id.layout_post);
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
             float width = (float) itemView.getWidth();
-            float alpha = 1.0f - Math.abs(dX) / width;
-            itemView.setAlpha(alpha);
-            itemView.setTranslationX(dX);
+            layoutPost.setTranslationX(dX);
+            layoutUndo.setVisibility(View.VISIBLE);
             /* Set your color for positive displacement */
 
         } else {
@@ -101,7 +109,9 @@ public class PostSwipeHelper extends ItemTouchHelper.Callback {
     public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
         super.clearView(recyclerView, viewHolder);
         L.m("clearView called");
-        viewHolder.itemView.setAlpha(1.0F);
+        viewHolder.itemView.findViewById(R.id.layout_undo).setVisibility(View.GONE);
+        viewHolder.itemView.findViewById(R.id.layout_post).setTranslationX(0.0F);
+
     }
 
     public interface OnSwipeListener {
