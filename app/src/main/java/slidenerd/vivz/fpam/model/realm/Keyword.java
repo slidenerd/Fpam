@@ -2,6 +2,8 @@ package slidenerd.vivz.fpam.model.realm;
 
 import org.parceler.ParcelPropertyConverter;
 
+import java.util.List;
+
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
@@ -16,6 +18,18 @@ public class Keyword extends RealmObject {
     private String keyword;
     private long timestamp;
     private RealmList<Group> groups = new RealmList<>();
+
+    public static String toString(List<Keyword> keywords) {
+        StringBuffer buffer = new StringBuffer();
+        for (Keyword keyword : keywords) {
+            buffer.append(keyword.getKeyword()).append("\n").append(keyword.getTimestamp()).append("\n");
+            List<Group> groups = keyword.getGroups();
+            for (Group group : groups) {
+                buffer.append(group.getGroupId()).append("\n").append(group.getGroupName()).append("\n");
+            }
+        }
+        return buffer.toString();
+    }
 
     public String getKeyword() {
         return keyword;

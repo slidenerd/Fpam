@@ -30,10 +30,8 @@
     <style name="settings_container">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
-        <item name="android:paddingBottom">@dimen/activity_vertical_margin</item>
         <item name="android:paddingLeft">24dp</item>
         <item name="android:paddingRight">24dp</item>
-        <item name="android:paddingTop">@dimen/activity_vertical_margin</item>
     </style>
 
     <!--The first tab of the Settings screen known as 'General' has a header called 'Common' that uses this style-->
@@ -49,7 +47,6 @@
     <style name="settings_general_spam">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_below">@id/text_delete</item>
         <item name="android:layout_marginBottom">20dp</item>
         <item name="android:layout_marginTop">20dp</item>
         <item name="android:textColor">@color/colorTextPrimary</item>
@@ -57,13 +54,13 @@
     <!--The first tab of the Settings screen known as 'General' with titles, icons, summaries and separators where each groupIcon uses this style -->
     <style name="settings_general_icon">
         <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
         <item name="android:paddingRight">24dp</item>
     </style>
 
     <!--The first tab of the Settings screen known as 'General' with titles, icons, summaries and separators where each summary uses this style-->
     <style name="settings_general_summary">
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
         <item name="android:paddingBottom">4dp</item>
         <item name="android:paddingTop">4dp</item>
         <item name="android:textColor">@color/colorTextSecondary</item>
@@ -81,22 +78,11 @@
 
     <!--The first tab of the Settings screen known as 'General' with titles, icons, summaries and separators where each title uses this style-->
     <style name="settings_general_title">
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
         <item name="android:paddingBottom">2dp</item>
         <item name="android:paddingTop">8dp</item>
         <item name="android:textColor">@color/colorTextPrimary</item>
         <item name="android:textSize">16sp</item>
-    </style>
-
-    <!--The first tab of the Settings screen known as 'General' with a switch to select 'delete on swipe' where this style is used-->
-    <style name="settings_general_switch">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_alignBottom">@+id/text_summary_delete</item>
-        <item name="android:layout_alignParentRight">true</item>
-        <item name="android:layout_alignTop">@+id/text_delete</item>
-        <item name="android:layout_below">@+id/separator_1</item>
-        <item name="android:layout_toRightOf">@+id/text_summary_delete</item>
     </style>
 
 </resources>

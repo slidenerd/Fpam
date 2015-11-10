@@ -124,6 +124,13 @@ public class SettingsFragmentGeneral extends Fragment {
         mPref.deleteMultiple().put(isChecked);
     }
 
+    @Click(R.id.text_delete)
+    void onClickDeleteMultiple() {
+        boolean checked = mCbxDelete.isChecked();
+        mCbxDelete.setChecked(!checked);
+        mPref.deleteMultiple().put(!checked);
+    }
+
     @Click({R.id.text_keywords, R.id.text_summary_keywords, R.id.icon_keywords})
     void onClickKeywords() {
         NavUtils.startActivityKeywords(mContext);

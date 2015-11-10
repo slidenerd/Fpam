@@ -26,7 +26,7 @@ public class SwipeableItemClickListener implements RecyclerView.OnItemTouchListe
     @Override
     public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent e) {
         View childView = view.findChildViewUnder(e.getX(), e.getY());
-        int position = view.getChildPosition(childView);
+        int position = view.getChildAdapterPosition(childView);
         if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
             mListener.onItemClick(findChildViewLeaf(childView, e), position);
         }

@@ -11,7 +11,6 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 /**
  * A {@link android.view.View.OnTouchListener} that makes the list items in a collection view
@@ -194,7 +193,7 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends RecyclerConf
                 mDownX = 0;
                 mDownY = 0;
                 mRowContainer = null;
-                mDownPosition = ListView.INVALID_POSITION;
+                mDownPosition = RecyclerView.NO_POSITION;
                 mSwiping = false;
                 break;
             }
@@ -221,7 +220,7 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends RecyclerConf
                     dismiss = (velocityX < 0) == (deltaX < 0);
                     dismissRight = mVelocityTracker.getXVelocity() > 0;
                 }
-                if (dismiss && mDownPosition != ListView.INVALID_POSITION) {
+                if (dismiss && mDownPosition != RecyclerView.NO_POSITION) {
                     // dismiss
                     final RowContainer downView = mRowContainer; // mDownView gets null'd before animation ends
                     final int downPosition = mDownPosition;
@@ -250,7 +249,7 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends RecyclerConf
                 mDownX = 0;
                 mDownY = 0;
                 mRowContainer = null;
-                mDownPosition = ListView.INVALID_POSITION;
+                mDownPosition = RecyclerView.NO_POSITION;
                 mSwiping = false;
                 break;
             }
@@ -268,7 +267,7 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends RecyclerConf
                     mSwipingSlop = (deltaX > 0 ? mSlop : -mSlop);
                     mRecyclerView.requestDisallowInterceptTouchEvent(true);
 
-                    // Cancel ListView's touch (un-highlighting the item)
+                    // Cancel ListViewListView's touch (un-highlighting the item)
                     MotionEvent cancelEvent = MotionEvent.obtain(motionEvent);
                     cancelEvent.setAction(MotionEvent.ACTION_CANCEL |
                             (motionEvent.getActionIndex()

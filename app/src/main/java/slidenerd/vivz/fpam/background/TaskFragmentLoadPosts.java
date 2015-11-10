@@ -29,7 +29,6 @@ import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.util.DateUtils;
 import slidenerd.vivz.fpam.util.FBUtils;
-import slidenerd.vivz.fpam.util.PrintUtils;
 
 /**
  * TODO handle the case where the delete fails or the person has deleted the post from Facebook directly instead of this app
@@ -85,7 +84,7 @@ public class TaskFragmentLoadPosts extends Fragment {
     void loadPostsAsync(@NonNull Group group, AccessToken token) {
         if (FBUtils.isValid(token)) {
             Realm realm = null;
-            int originalLoadCount = 0;
+            int originalLoadCount;
             int filteredLoadCount = 0;
 
             try {
@@ -104,15 +103,13 @@ public class TaskFragmentLoadPosts extends Fragment {
 
                 if (lastLoadedTimestamp > 0) {
                     posts = FBUtils.requestFeedSince(token, Fpam.getGson(), group, maximumPostsStored, lastLoadedTimestamp);
-                    onProgressUpdate("Loaded", posts.size() + " posts from " + group.getGroupName());
                 }
 
                 //If the group was never loaded before, load it for the first time
-
                 else {
                     posts = FBUtils.requestFeedFirstTime(token, Fpam.getGson(), group);
-                    onProgressUpdate("Loaded", posts.size() + " posts from " + group.getGroupName());
                 }
+                onProgressUpdate("Loaded", posts.size() + " posts from " + group.getGroupName());
                 originalLoadCount = posts.size();
 
                 //If we did retrieve posts, update the timestamp of when the group was loaded
@@ -132,8 +129,6 @@ public class TaskFragmentLoadPosts extends Fragment {
                     realm.copyToRealmOrUpdate(posts);
                     realmGroup.setLastLoaded(System.currentTimeMillis());
                     realm.commitTransaction();
-
-                    L.m("posts loaded " + PrintUtils.toString(posts));
                     //Limit the number of entries stored in the database, based on the cache settings of the app, if the admin has set the cache to 25, if the number of posts loaded were 25 but the number of posts already present in the database were 15, then get rid of the oldest 15 posts and store the new 25 posts in the database.
 
                     DataStore.limitStoredPosts(realm, group, maximumPostsStored);
@@ -142,7 +137,7 @@ public class TaskFragmentLoadPosts extends Fragment {
 
                 String message = null;
                 if (originalLoadCount > 0) {
-                    message = originalLoadCount + (originalLoadCount - filteredLoadCount > 0 ? " Posts Loaded And " + (originalLoadCount - filteredLoadCount) + " spam posts removed" : "");
+                    message = originalLoadCount + ((originalLoadCount - filteredLoadCount > 0) ? " Posts Loaded And " + (originalLoadCount - filteredLoadCount) + " spam posts removed" : "");
 
                 } else {
                     message = "No New Posts Loaded For " + group.getGroupName();

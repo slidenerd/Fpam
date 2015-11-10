@@ -42,6 +42,7 @@ import slidenerd.vivz.fpam.adapter.OnItemClickListener;
 import slidenerd.vivz.fpam.adapter.RecyclerConfigImpl;
 import slidenerd.vivz.fpam.adapter.SwipeToDismissTouchListener;
 import slidenerd.vivz.fpam.adapter.SwipeableItemClickListener;
+import slidenerd.vivz.fpam.core.Core;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
@@ -49,6 +50,7 @@ import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.model.pojo.DeleteRequestInfo;
 import slidenerd.vivz.fpam.model.pojo.DeleteResponseInfo;
+import slidenerd.vivz.fpam.model.realm.Keyword;
 import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.ModelUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
@@ -193,7 +195,6 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     }
 
     public void triggerDelete(int position, Post post) {
-
         onDelete(mApplication.getToken(), position, mSelectedGroup, post);
     }
 
@@ -275,6 +276,9 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     @Receiver(actions = Constants.ACTION_LOAD_FEED, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
     public void onBroadcastSelectedGroup(Context context, Intent intent) {
         mSelectedGroup = Parcels.unwrap(intent.getExtras().getParcelable(NavUtils.EXTRA_SELECTED_GROUP));
+        Core core = new Core();
+        String deletes = Keyword.toString(core.getRelevantKeywords(mRealm, mSelectedGroup.getGroupId()));
+        L.m(deletes);
         mResults = mRealm.where(Post.class).beginsWith("postId", mSelectedGroup.getGroupId()).findAllSortedAsync("updatedTime", false);
         mResults.addChangeListener(new RealmChangeListener() {
             @Override

@@ -6,6 +6,7 @@ import io.realm.RealmResults;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.realm.Keyword;
 
 public class CopyUtils {
     public static ArrayList<Group> duplicateGroups(RealmResults<Group> listSourceGroups) {
@@ -38,5 +39,13 @@ public class CopyUtils {
         post.setPicture(originalPost.getPicture());
         post.setLink(originalPost.getLink());
         return post;
+    }
+
+    public static Keyword duplicateKeyword(Keyword original) {
+        Keyword keyword = new Keyword();
+        keyword.setTimestamp(original.getTimestamp());
+        keyword.setKeyword(original.getKeyword());
+        keyword.setGroups(original.getGroups());
+        return keyword;
     }
 }
