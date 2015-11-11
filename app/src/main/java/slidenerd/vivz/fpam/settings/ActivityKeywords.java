@@ -28,7 +28,7 @@ import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.AdapterKeywordGroups;
 import slidenerd.vivz.fpam.adapter.AdapterKeywords;
 import slidenerd.vivz.fpam.adapter.OnItemClickListener;
-import slidenerd.vivz.fpam.adapter.RecyclerConfigImpl;
+import slidenerd.vivz.fpam.adapter.RecyclerViewHelperImpl;
 import slidenerd.vivz.fpam.adapter.SwipeToDismissTouchListener;
 import slidenerd.vivz.fpam.adapter.SwipeableItemClickListener;
 import slidenerd.vivz.fpam.model.json.group.Group;
@@ -67,17 +67,17 @@ public class ActivityKeywords extends AppCompatActivity {
             }
         });
         mRecyclerKeywords.setAdapter(mAdapter);
-        final SwipeToDismissTouchListener<RecyclerConfigImpl> touchListener =
+        final SwipeToDismissTouchListener<RecyclerViewHelperImpl> touchListener =
                 new SwipeToDismissTouchListener<>(
-                        new RecyclerConfigImpl(mRecyclerKeywords),
-                        new SwipeToDismissTouchListener.DismissCallbacks<RecyclerConfigImpl>() {
+                        new RecyclerViewHelperImpl(mRecyclerKeywords),
+                        new SwipeToDismissTouchListener.DismissCallbacks<RecyclerViewHelperImpl>() {
                             @Override
                             public boolean canDismiss(int position) {
                                 return true;
                             }
 
                             @Override
-                            public void onDismiss(RecyclerConfigImpl view, int position) {
+                            public void onDismiss(RecyclerViewHelperImpl view, int position) {
                                 mAdapter.remove(position);
                             }
                         });

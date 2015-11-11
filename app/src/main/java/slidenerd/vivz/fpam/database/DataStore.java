@@ -49,7 +49,7 @@ public class DataStore {
      * @param admin the person using this app as an admin whose details you want to store in the backend.
      */
     public static void storeAdmin(Realm realm, Admin admin) {
-        //The Picture and PictureData classes don't have a primary key , so if we try to update AdminFields directly from JSON, a new entry is created for both of them each time, and hence we first remove all existing entries for each class first and then add a new entry
+        //The Picture and PictureData classes don't have a primary key , so if we try to update Fields directly from JSON, a new entry is created for both of them each time, and hence we first remove all existing entries for each class first and then add a new entry
         realm.beginTransaction();
         realm.copyToRealmOrUpdate(admin);
         realm.commitTransaction();

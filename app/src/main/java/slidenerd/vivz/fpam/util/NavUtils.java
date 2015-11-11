@@ -6,6 +6,8 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import org.parceler.Parcels;
 
+import slidenerd.vivz.fpam.extras.Constants;
+import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
 import slidenerd.vivz.fpam.settings.ActivityKeywords_;
 import slidenerd.vivz.fpam.settings.SettingsActivity_;
@@ -41,6 +43,13 @@ public class NavUtils {
     public static void broadcastSelectedGroup(Context context, Group group, boolean filterPosts) {
         Intent intent = new Intent(ACTION_LOAD_FEED);
         intent.putExtra(EXTRA_SELECTED_GROUP, Parcels.wrap(Group.class, group));
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    public static void broadcastDeletePost(Context context, int position, Post post) {
+        Intent intent = new Intent(Constants.ACTION_DELETE_POST);
+        intent.putExtra("position", position);
+        intent.putExtra("post", Parcels.wrap(Post.class, post));
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 

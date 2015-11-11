@@ -78,7 +78,7 @@ public class TaskFragmentDeletePosts extends Fragment {
             if (!deletes.isEmpty()) {
                 ArrayList<DeleteResponseInfo> infos = FBUtils.requestDeletePosts(token, deletes);
 
-                String compositePrimaryKey = ModelUtils.getUserGroupCompositePrimaryKey(post.getUserId(), group.getGroupId());
+                String compositePrimaryKey = ModelUtils.computeSpammerId(post.getUserId(), group.getGroupId());
 
                 realm.beginTransaction();
                 int numberOfPostsDeleted = 0;

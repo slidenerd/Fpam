@@ -20,6 +20,7 @@ public class Admin extends RealmObject {
     private boolean isSilhouette;
     private String url;
 
+    //Must have default constructor if a custom constructor is included
     public Admin() {
     }
 

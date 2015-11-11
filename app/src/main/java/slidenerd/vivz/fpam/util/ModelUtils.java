@@ -7,7 +7,7 @@ import android.support.v7.widget.RecyclerView;
  */
 public class ModelUtils {
 
-    public static String getUserGroupCompositePrimaryKey(String userId, String groupId) {
+    public static String computeSpammerId(String userId, String groupId) {
         return userId + ":" + groupId;
     }
 

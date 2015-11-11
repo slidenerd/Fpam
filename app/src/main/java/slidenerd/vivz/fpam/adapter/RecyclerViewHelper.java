@@ -10,7 +10,7 @@ import android.widget.AbsListView;
  * Interface for a given UI element to help extend the swipe-to-dismiss-undo pattern to other
  * elements.
  */
-public interface RecyclerConfig {
+public interface RecyclerViewHelper {
     Context getContext();
     int getWidth();
     int getChildCount();

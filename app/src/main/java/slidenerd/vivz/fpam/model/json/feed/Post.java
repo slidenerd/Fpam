@@ -54,8 +54,26 @@ public class Post extends RealmObject {
     //The link if any present in this post, this is optional
     private String link;
 
+    //Must have default constructor if a custom constructor is included
     public Post() {
 
+    }
+
+    public Post(String postId, long rowId, String userId, String userName, String userPicture, String message, String name, String caption, String description, String picture, String type, long createdTime, long updatedTime, String link) {
+        this.postId = postId;
+        this.rowId = rowId;
+        this.userId = userId;
+        this.userName = userName;
+        this.userPicture = userPicture;
+        this.message = message;
+        this.name = name;
+        this.caption = caption;
+        this.description = description;
+        this.picture = picture;
+        this.type = type;
+        this.createdTime = createdTime;
+        this.updatedTime = updatedTime;
+        this.link = link;
     }
 
     /**

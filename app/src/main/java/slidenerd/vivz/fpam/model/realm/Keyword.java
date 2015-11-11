@@ -19,6 +19,21 @@ public class Keyword extends RealmObject {
     private long timestamp;
     private RealmList<Group> groups = new RealmList<>();
 
+    //Must have default constructor if a custom constructor is included
+    public Keyword() {
+
+    }
+
+    public Keyword(String keyword, long timestamp) {
+        this(keyword, timestamp, null);
+    }
+
+    public Keyword(String keyword, long timestamp, RealmList<Group> groups) {
+        this.keyword = keyword;
+        this.timestamp = timestamp;
+        this.groups = (groups != null ? groups : new RealmList<Group>());
+    }
+
     public static String toString(List<Keyword> keywords) {
         StringBuffer buffer = new StringBuffer();
         for (Keyword keyword : keywords) {

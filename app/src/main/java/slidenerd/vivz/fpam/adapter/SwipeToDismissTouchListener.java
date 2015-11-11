@@ -31,7 +31,7 @@ import android.view.ViewGroup;
  * <pre>
  * SwipeDismissRecyclerViewTouchListener touchListener =
  *         new SwipeDismissRecyclerViewTouchListener(
- *                 new RecyclerConfigImpl(recyclerView),
+ *                 new RecyclerViewHelperImpl(recyclerView),
  *                 new SwipeDismissRecyclerViewTouchListener.OnDismissCallback() {
  *                     public void onDismiss(ListView listView, int[] reverseSortedPositions) {
  *                         for (int position : reverseSortedPositions) {
@@ -47,7 +47,7 @@ import android.view.ViewGroup;
  * <p>This class Requires API level 12 or later due to use of {@link
  * android.view.ViewPropertyAnimator}.</p>
  */
-public class SwipeToDismissTouchListener<SomeCollectionView extends RecyclerConfig> implements
+public class SwipeToDismissTouchListener<SomeCollectionView extends RecyclerViewHelper> implements
         View.OnTouchListener {
 
     // Cached ViewConfiguration and system-wide constant values
@@ -395,7 +395,7 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends RecyclerConf
      * The callback interface used by {@link SwipeToDismissTouchListener} to inform its client
      * about a successful dismissal of one or more list item positions.
      */
-    public interface DismissCallbacks<SomeCollectionView extends RecyclerConfig> {
+    public interface DismissCallbacks<SomeCollectionView extends RecyclerViewHelper> {
         /**
          * Called to determine whether the given position can be dismissed.
          */

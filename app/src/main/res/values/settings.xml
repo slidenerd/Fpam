@@ -31,7 +31,7 @@
         <item>75</item>
         <item>100</item>
     </string-array>
-    <!--The second setting that lets you choose the GroupFields you want to monitor in the background-->
+    <!--The second setting that lets you choose the Fields you want to monitor in the background-->
     <string name="pref_groups">Which groups do you want to monitor?</string>
     <string name="text_groups_none">No groups found.</string>
     <string name="pref_cache">Cache Size</string>

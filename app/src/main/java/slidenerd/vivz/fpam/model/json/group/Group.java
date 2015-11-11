@@ -29,6 +29,7 @@ public class Group extends RealmObject {
     //Boolean indicating whether this group is actively monitored in the background from the Settings of the app
     private boolean monitored;
 
+    //Default constructor must be declared if a custom constructor is included
     public Group() {
 
     }

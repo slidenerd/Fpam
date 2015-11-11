@@ -21,8 +21,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import slidenerd.vivz.fpam.extras.Constants;
-import slidenerd.vivz.fpam.extras.FeedFields;
-import slidenerd.vivz.fpam.extras.GroupFields;
 import slidenerd.vivz.fpam.model.json.admin.Admin;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.model.json.group.Group;
@@ -31,6 +29,11 @@ import slidenerd.vivz.fpam.model.pojo.DeleteResponseInfo;
 
 import static slidenerd.vivz.fpam.extras.Constants.PUBLISH_ACTIONS;
 import static slidenerd.vivz.fpam.extras.Constants.READ_PERMISSIONS;
+import static slidenerd.vivz.fpam.extras.Fields.AFTER;
+import static slidenerd.vivz.fpam.extras.Fields.CURSORS;
+import static slidenerd.vivz.fpam.extras.Fields.DATA;
+import static slidenerd.vivz.fpam.extras.Fields.NEXT;
+import static slidenerd.vivz.fpam.extras.Fields.PAGING;
 
 public class FBUtils {
 
@@ -96,10 +99,10 @@ public class FBUtils {
 
                 //Check if our root contains a json array called 'data' that has all the group objects inside it
 
-                if (root.has(GroupFields.DATA) && !root.isNull(GroupFields.DATA)) {
+                if (root.has(DATA) && !root.isNull(DATA)) {
 
                     //retrieve our json array with group objects
-                    JSONArray dataArray = root.getJSONArray(GroupFields.DATA);
+                    JSONArray dataArray = root.getJSONArray(DATA);
 
                     //For each iteration, we fetch the list of groups and append all of them to what we have so far
 
@@ -109,33 +112,33 @@ public class FBUtils {
 
                 //Check if our root contains a json object called 'paging'
 
-                if (root.has(GroupFields.PAGING) && !root.isNull(GroupFields.PAGING)) {
+                if (root.has(PAGING) && !root.isNull(PAGING)) {
 
                     //retrieve the json object called 'paging'
 
-                    JSONObject paging = root.getJSONObject(GroupFields.PAGING);
+                    JSONObject paging = root.getJSONObject(PAGING);
 
                     //check if our 'paging' object has a json object called 'cursors'
 
-                    if (paging != null && paging.has(GroupFields.CURSORS) && !paging.isNull(GroupFields.CURSORS)) {
+                    if (paging != null && paging.has(CURSORS) && !paging.isNull(CURSORS)) {
 
                         //retrieve the json object called 'cursors'
 
-                        JSONObject cursors = paging.getJSONObject(GroupFields.CURSORS);
+                        JSONObject cursors = paging.getJSONObject(CURSORS);
 
                         //check if the cursors object has a field called 'after'
 
-                        if (cursors != null && cursors.has(GroupFields.AFTER) && !cursors.isNull(GroupFields.AFTER)) {
+                        if (cursors != null && cursors.has(AFTER) && !cursors.isNull(AFTER)) {
 
                             //retrieve the field 'after' from our 'cursors'
 
-                            cursorAfter = cursors.getString(GroupFields.AFTER);
+                            cursorAfter = cursors.getString(AFTER);
                         }
                     }
 
                     //if our 'paging' object contains a field called 'next' we have more pages to process, else we stop
 
-                    hasMorePages = (paging != null && paging.has(GroupFields.NEXT) && !paging.isNull(GroupFields.NEXT));
+                    hasMorePages = (paging != null && paging.has(NEXT) && !paging.isNull(NEXT));
                 }
             } else {
                 //if we did not get a valid response, we have no more pages to process
@@ -157,10 +160,10 @@ public class FBUtils {
         JSONObject root = response.getJSONObject();
         if (root != null) {
             //Check if our root contains a json array called 'data' that has all the group objects inside it
-            if (root.has(FeedFields.DATA) && !root.isNull(FeedFields.DATA)) {
+            if (root.has(DATA) && !root.isNull(DATA)) {
 
                 //retrieve our json array with group objects
-                JSONArray dataArray = root.getJSONArray(GroupFields.DATA);
+                JSONArray dataArray = root.getJSONArray(DATA);
 
                 //For each iteration, we fetch the list of groups and append all of them to what we have so far
 
@@ -193,11 +196,11 @@ public class FBUtils {
 
                 //Check if our root contains a json array called 'data' that has all the group objects inside it
 
-                if (root.has(FeedFields.DATA) && !root.isNull(FeedFields.DATA)) {
+                if (root.has(DATA) && !root.isNull(DATA)) {
 
                     //retrieve our json array with group objects
 
-                    dataArray = root.getJSONArray(GroupFields.DATA);
+                    dataArray = root.getJSONArray(DATA);
 
                     //For each iteration, we fetch the list of groups and append all of them to what we have so far
 
@@ -243,5 +246,12 @@ public class FBUtils {
             responseInfos.add(responseInfo);
         }
         return responseInfos;
+    }
+
+    public static boolean requestDeletePost(AccessToken token, Post post) throws JSONException {
+        GraphRequest request = new GraphRequest(token, post.getPostId(), null, HttpMethod.DELETE);
+        GraphResponse response = request.executeAndWait();
+        JSONObject object = response.getJSONObject();
+        return object != null && object.has("success") && !object.isNull("success") && object.getBoolean("success");
     }
 }

@@ -4,13 +4,12 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AbsListView;
 
-public class RecyclerConfigImpl implements RecyclerConfig {
+public class RecyclerViewHelperImpl implements RecyclerViewHelper {
 
     private final RecyclerView mRecyclerView;
 
-    public RecyclerConfigImpl(RecyclerView recyclerView) {
+    public RecyclerViewHelperImpl(RecyclerView recyclerView) {
         mRecyclerView = recyclerView;
     }
 

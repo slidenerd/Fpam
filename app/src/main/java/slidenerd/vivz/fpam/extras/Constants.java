@@ -5,6 +5,7 @@ package slidenerd.vivz.fpam.extras;
  */
 public interface Constants {
 
+    int TOP_ENTRIES_COUNT = 10;
     String ACTION_LOAD_FEED = "load_feed";
     String ACTION_DELETE_POST = "delete_post";
     String PERMISSION_EMAIL = "email";

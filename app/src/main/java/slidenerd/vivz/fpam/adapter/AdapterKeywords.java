@@ -34,13 +34,11 @@ public class AdapterKeywords extends RecyclerView.Adapter<AdapterKeywords.Keywor
     }
 
     public void add(String keywordString) {
-        Keyword keyword = new Keyword();
-        keyword.setKeyword(keywordString);
-        keyword.setTimestamp(System.currentTimeMillis());
+        Keyword keyword = new Keyword(keywordString, System.currentTimeMillis());
         mRealm.beginTransaction();
         mRealm.copyToRealmOrUpdate(keyword);
         mRealm.commitTransaction();
-        notifyItemRangeChanged(0, getItemCount());
+        notifyDataSetChanged();
     }
 
     @Override

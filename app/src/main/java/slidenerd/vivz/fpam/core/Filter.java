@@ -99,7 +99,7 @@ public class Filter {
 
                     //update the number of spam posts made by this spammer and the timestamp which indicates when this post was deleted
 
-                    String compositeUserGroupId = ModelUtils.getUserGroupCompositePrimaryKey(userId, groupId);
+                    String compositeUserGroupId = ModelUtils.computeSpammerId(userId, groupId);
 
                     //if there is a spammer entry with the user id of the person making this post and the group id of this group
 

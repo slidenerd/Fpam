@@ -21,6 +21,7 @@ public class Spammer extends RealmObject {
     private long lastActive;
     private boolean authorized;
 
+    //Default constructor must be declared if a custom constructor is included
     public Spammer() {
 
     }
