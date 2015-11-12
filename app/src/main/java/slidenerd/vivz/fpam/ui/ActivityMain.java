@@ -23,6 +23,9 @@ import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.feed.Post;
 import slidenerd.vivz.fpam.util.CopyUtils;
 
+import static slidenerd.vivz.fpam.extras.Constants.EXTRA_POSITION;
+import static slidenerd.vivz.fpam.extras.Constants.EXTRA_POST;
+
 @EActivity
 @OptionsMenu(R.menu.menu_main)
 public class ActivityMain extends ActivityBase {
@@ -63,11 +66,11 @@ public class ActivityMain extends ActivityBase {
     }
 
     @Receiver(actions = Constants.ACTION_DELETE_POST, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
-    public void onBroadcastSwipedPost(Context context, Intent intent) {
-        Post swipedPost = Parcels.unwrap(intent.getExtras().getParcelable("post"));
-        int position = intent.getExtras().getInt("position");
-        L.t(this, "position " + position + " post username " + swipedPost.getUserName());
-        mTask.triggerDeletePosts(mApplication.getToken(), position, CopyUtils.duplicatePost(swipedPost));
+    public void onBroadcastRequestDelete(Context context, Intent intent) {
+        Post swipedPost = Parcels.unwrap(intent.getExtras().getParcelable(EXTRA_POST));
+        int position = intent.getExtras().getInt(EXTRA_POSITION);
+        L.m("position " + position + " post username " + swipedPost.getUserName());
+        mTask.deletePostsAsync(mApplication.getToken(), position, CopyUtils.duplicatePost(swipedPost));
     }
 
     public static class MainPagerAdapter extends FragmentStatePagerAdapter {

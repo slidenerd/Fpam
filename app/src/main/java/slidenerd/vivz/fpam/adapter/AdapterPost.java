@@ -31,6 +31,7 @@ import slidenerd.vivz.fpam.widget.ExpandableTextView;
 public class AdapterPost extends RecyclerView.Adapter<AdapterPost.ItemHolder> {
 
     private Context mContext;
+    private Realm mRealm;
     private RealmResults<Post> mResults;
     private LayoutInflater mLayoutInflater;
 
@@ -45,6 +46,7 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.ItemHolder> {
 
     public AdapterPost(Context context, Realm realm, RealmResults<Post> results) {
         mContext = context;
+        mRealm = realm;
         mLayoutInflater = LayoutInflater.from(context);
 
         //Initialize post image width and height
@@ -93,6 +95,13 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.ItemHolder> {
     @Override
     public int getItemCount() {
         return mResults.size();
+    }
+
+    public void remove(int position) {
+        mRealm.beginTransaction();
+        mResults.get(position).removeFromRealm();
+        mRealm.commitTransaction();
+        notifyItemRemoved(position);
     }
 
     @Nullable

@@ -12,7 +12,10 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 
+import slidenerd.vivz.fpam.log.L;
+
 /**
+ * TODO doesnt work properly if wasabeef animators are used as item decorations in the recyclerview before adding this, haven't tested the after adding scenario yet.
  * A {@link android.view.View.OnTouchListener} that makes the list items in a collection view
  * dismissable.
  * It is given special treatment because by default it handles touches for its list items...
@@ -112,11 +115,12 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends RecyclerView
     public Object makeScrollListener() {
         return mRecyclerView.makeScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrollStateChanged(RecyclerView absListView, int scrollState) {
+            public void onScrollStateChanged(RecyclerView recyclerView, int scrollState) {
 
                 //After swiping a post and showing the undo layout, if a person scrolls up or down, cancel the pending delete and show the layout of the post once again.
                 undoPendingDismiss();
-                setEnabled(scrollState == RecyclerView.SCROLL_STATE_IDLE);
+                setEnabled(scrollState != RecyclerView.SCROLL_STATE_DRAGGING);
+                L.m("scroll state " + scrollState);
             }
         });
     }

@@ -31,7 +31,6 @@ import java.util.Arrays;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
-import jp.wasabeef.recyclerview.animators.FlipInLeftYAnimator;
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.AdapterPost;
@@ -48,9 +47,14 @@ import slidenerd.vivz.fpam.model.realm.Keyword;
 import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.NavUtils;
 
+import static slidenerd.vivz.fpam.extras.Constants.ACTION_DELETE_STATUS;
+import static slidenerd.vivz.fpam.extras.Constants.ACTION_LOAD_FEED;
+import static slidenerd.vivz.fpam.extras.Constants.EXTRA_OUTCOME;
+import static slidenerd.vivz.fpam.extras.Constants.EXTRA_POSITION;
+import static slidenerd.vivz.fpam.extras.Constants.EXTRA_SELECTED_GROUP;
 
 /**
- * TODO handle error conditions, handle the loginmanager properly, how the items are shown while deleting and after deleting, move the background activities to a retained fragment, move the scroll position to wherever the user was previously after restoring adapter on delete
+ * TODO handle error conditions, handle the loginmanager properly, how the items are shown while deleting and after deleting, move the scroll position to wherever the user was previously after restoring adapter on delete
  * A simple {@link Fragment} subclass.
  */
 @EFragment
@@ -124,44 +128,40 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         mResults = mRealm.where(Post.class).equalTo("postId", "NONE").findAll();
         mRecyclerPosts = (RecyclerView) view.findViewById(R.id.recycler_posts);
         mRecyclerPosts.setLayoutManager(new LinearLayoutManager(mContext));
-        FlipInLeftYAnimator animator = new FlipInLeftYAnimator();
-        mRecyclerPosts.setItemAnimator(animator);
         mAdapter = new AdapterPost(mContext, mRealm, mResults);
         mAdapter.setHasStableIds(true);
         mRecyclerPosts.setAdapter(mAdapter);
-        final SwipeToDismissTouchListener<RecyclerViewHelperImpl> touchListener =
-                new SwipeToDismissTouchListener<>(
-                        new RecyclerViewHelperImpl(mRecyclerPosts),
-                        new SwipeToDismissTouchListener.DismissCallbacks<RecyclerViewHelperImpl>() {
-                            @Override
-                            public boolean canDismiss(int position) {
-                                return true;
-                            }
+        final SwipeToDismissTouchListener<RecyclerViewHelperImpl> touchListener = new SwipeToDismissTouchListener<>(
+                new RecyclerViewHelperImpl(mRecyclerPosts),
+                new SwipeToDismissTouchListener.DismissCallbacks<RecyclerViewHelperImpl>() {
+                    @Override
+                    public boolean canDismiss(int position) {
+                        return true;
+                    }
 
-                            @Override
-                            public void onDismiss(RecyclerViewHelperImpl view, int position) {
-                                NavUtils.broadcastDeletePost(mContext, position, mAdapter.getItem(position));
-                            }
-                        });
+                    @Override
+                    public void onDismiss(RecyclerViewHelperImpl view, int position) {
+                        NavUtils.broadcastRequestDelete(mContext, position, mAdapter.getItem(position));
+                    }
+                });
 
 
         mRecyclerPosts.setOnTouchListener(touchListener);
         // Setting this scroll listener is required to ensure that during ListView scrolling,
         // we don't look for swipes.
         mRecyclerPosts.addOnScrollListener((RecyclerView.OnScrollListener) touchListener.makeScrollListener());
-        mRecyclerPosts.addOnItemTouchListener(new SwipeableItemClickListener(mContext,
-                new OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position) {
-                        if (view.getId() == R.id.txt_delete) {
-                            touchListener.processPendingDismisses();
-                        } else if (view.getId() == R.id.txt_undo) {
-                            touchListener.undoPendingDismiss();
-                        } else { // R.id.txt_data
+        mRecyclerPosts.addOnItemTouchListener(new SwipeableItemClickListener(mContext, new OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                if (view.getId() == R.id.txt_delete) {
+                    touchListener.processPendingDismisses();
+                } else if (view.getId() == R.id.txt_undo) {
+                    touchListener.undoPendingDismiss();
+                } else { // R.id.txt_data
 
-                        }
-                    }
-                }));
+                }
+            }
+        }));
     }
 
 
@@ -207,9 +207,9 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     }
 
 
-    @Receiver(actions = Constants.ACTION_LOAD_FEED, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
+    @Receiver(actions = ACTION_LOAD_FEED, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
     public void onBroadcastSelectedGroup(Context context, Intent intent) {
-        mSelectedGroup = Parcels.unwrap(intent.getExtras().getParcelable(NavUtils.EXTRA_SELECTED_GROUP));
+        mSelectedGroup = Parcels.unwrap(intent.getExtras().getParcelable(EXTRA_SELECTED_GROUP));
         Core core = new Core();
         String deletes = Keyword.toString(core.getRelevantKeywords(mRealm, mSelectedGroup.getGroupId()));
         L.m(deletes);
@@ -220,5 +220,15 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
                 mAdapter.updateRealmResults(mResults);
             }
         });
+    }
+
+    @Receiver(actions = ACTION_DELETE_STATUS, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
+    public void onBroadcastDeleteStatus(Context context, Intent intent) {
+        boolean outcome = intent.getExtras().getBoolean(EXTRA_OUTCOME);
+        int position = intent.getExtras().getInt(EXTRA_POSITION);
+        if (outcome) {
+            L.m("notifying delete");
+            mAdapter.remove(position);
+        }
     }
 }

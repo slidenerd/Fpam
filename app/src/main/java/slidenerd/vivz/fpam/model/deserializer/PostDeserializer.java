@@ -44,7 +44,7 @@ public class PostDeserializer implements JsonDeserializer<Post> {
 
         final String postId = root.get(ID).getAsString();
 
-        final long rowId = ModelUtils.computeRowId(postId);
+        final long rowId = ModelUtils.computePostItemId(postId);
 
         //Retrieve 'created_time' that contains time in the form of dd:MM:yyyy'T'hh:mm:ssZ
 
