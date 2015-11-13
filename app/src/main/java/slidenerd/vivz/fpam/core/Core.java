@@ -92,13 +92,16 @@ public class Core {
                 DailyticsManager.updateEmpty(dailytics, realm, 1);
             }
             DailyticsManager.updateDeleted(dailytics, realm, 1);
-//            if (content != null && !content.trim().isEmpty()) {
-//                for (Keyword keyword : keywords) {
-//                    if (content.toLowerCase().contains(keyword.getKeyword())) {
-//                        //update the number of times each keyword is found as part of the analytics
-//                    }
-//                }
-//            }
+            if (content != null && !content.trim().isEmpty()) {
+                for (Keyword keyword : keywords) {
+                    int count = 0;
+                    if (content.toLowerCase().contains(keyword.getKeyword())) {
+                        //update the number of times each keyword is found as part of the analytics
+                        count++;
+                    }
+
+                }
+            }
 
 
             //update top x spammers as part of analytics
