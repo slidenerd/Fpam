@@ -50,10 +50,10 @@ public class Core {
         return list;
     }
 
-    public boolean deletePostFB(int position, AccessToken token, String postId, Realm realm) throws JSONException {
+    public boolean deletePostFB(AccessToken token, String postId, Realm realm) throws JSONException {
         Post post = realm.where(Post.class).equalTo(POST_ID, postId).findFirst();
-        List<Keyword> keywords = getRelevantKeywords(realm, post.getGroupId());
         Group group = realm.where(Group.class).equalTo(GROUP_ID, post.getGroupId()).findFirst();
+        List<Keyword> keywords = getRelevantKeywords(realm, post.getGroupId());
         Analytics analytics = AnalyticsManager.getInstance(realm, post.getGroupId(), group.getGroupName());
         boolean success = FBUtils.requestDeletePost(token, post);
         String spammerId = ModelUtils.computeSpammerId(post.getUserId(), post.getGroupId());

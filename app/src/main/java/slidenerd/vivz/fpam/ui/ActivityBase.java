@@ -17,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewStub;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.login.LoginManager;
@@ -27,10 +26,10 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsItem;
 
 import slidenerd.vivz.fpam.Fpam;
+import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.background.TaskFragmentLoadPosts;
 import slidenerd.vivz.fpam.background.TaskFragmentLoadPosts_;
-import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.settings.SettingsActivity_;
 import slidenerd.vivz.fpam.util.DatabaseUtils;
 import slidenerd.vivz.fpam.util.FBUtils;
@@ -48,7 +47,6 @@ public abstract class ActivityBase extends AppCompatActivity
     private static final String TAG_FRAGMENT_TASK_POSTS = "task_fragment";
     @App
     protected Fpam mApplication;
-    private MaterialDialog mProgress;
     private TaskFragmentLoadPosts_ mTask;
     private FragmentDrawer_ mDrawer;
     private FloatingActionButton mFab;
@@ -101,11 +99,6 @@ public abstract class ActivityBase extends AppCompatActivity
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
-        mProgress = new MaterialDialog.Builder(this)
-                .content(R.string.title_loading)
-                .progress(true, 0)
-                .progressIndeterminateStyle(true)
-                .build();
 
         //Give the subclasses an opportunity to create their views by indicating the parent tablayout and their main content view is ready.
 
@@ -221,12 +214,12 @@ public abstract class ActivityBase extends AppCompatActivity
 
     @Override
     public void beforePostsLoaded() {
-        mProgress.show();
+        FragmentProgress.show(this);
     }
 
     @Override
     public void afterPostsLoaded() {
-        mProgress.dismiss();
+        FragmentProgress.dismiss(this);
         broadcastSelectedGroup(mSelectedGroup);
     }
 

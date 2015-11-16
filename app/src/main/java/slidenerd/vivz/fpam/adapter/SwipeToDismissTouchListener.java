@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 
-import slidenerd.vivz.fpam.log.L;
+import slidenerd.vivz.fpam.L;
 
 /**
  * TODO doesnt work properly if wasabeef animators are used as item decorations in the recyclerview before adding this, haven't tested the after adding scenario yet.

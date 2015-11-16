@@ -43,6 +43,14 @@ public class Keyword extends RealmObject {
         return buffer.toString();
     }
 
+    public static String toString(Keyword keyword) {
+        return "Keyword{" +
+                "keyword='" + keyword.keyword + '\'' +
+                ", timestamp=" + keyword.timestamp +
+                ", groups=" + keyword.groups +
+                '}';
+    }
+
     public String getKeyword() {
         return keyword;
     }

@@ -19,7 +19,7 @@ import org.androidannotations.annotations.Receiver;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.background.TaskFragmentDeletePosts_;
 import slidenerd.vivz.fpam.extras.Constants;
-import slidenerd.vivz.fpam.log.L;
+import slidenerd.vivz.fpam.L;
 
 import static slidenerd.vivz.fpam.extras.Constants.EXTRA_ID;
 import static slidenerd.vivz.fpam.extras.Constants.EXTRA_POSITION;

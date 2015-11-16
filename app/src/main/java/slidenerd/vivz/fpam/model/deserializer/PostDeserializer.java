@@ -8,9 +8,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
+import slidenerd.vivz.fpam.L;
+import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.model.json.Post;
-import slidenerd.vivz.fpam.util.DateUtils;
 
 import static slidenerd.vivz.fpam.extras.Fields.CAPTION;
 import static slidenerd.vivz.fpam.extras.Fields.CREATED_TIME;
@@ -32,6 +35,18 @@ import static slidenerd.vivz.fpam.extras.Fields.URL;
  * Created by vivz on 01/10/15.
  */
 public class PostDeserializer implements JsonDeserializer<Post> {
+    private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+
+    public static final long formatFacebookTime(String timeString) {
+
+        long timeMillis = Constants.NA;
+        try {
+            timeMillis = format.parse(timeString).getTime();
+        } catch (ParseException e) {
+            L.m(timeString + " " + e);
+        }
+        return timeMillis;
+    }
 
     @Override
     public Post deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -47,11 +62,11 @@ public class PostDeserializer implements JsonDeserializer<Post> {
 
         //Retrieve 'created_time' that contains time in the form of dd:MM:yyyy'T'hh:mm:ssZ
 
-        final String createdTimeString = root.get(CREATED_TIME).getAsString();
+        final String createdTime = root.get(CREATED_TIME).getAsString();
 
         //Retrieve 'updated_time' that contains time in the form of dd:MM:yyyy'T'hh:mm:ssZ
 
-        final String updatedTimeString = root.get(UPDATED_TIME).getAsString();
+        final String updatedTime = root.get(UPDATED_TIME).getAsString();
 
         //Retrieve 'type' of the post
 
@@ -61,11 +76,11 @@ public class PostDeserializer implements JsonDeserializer<Post> {
 
         final JsonObject to = root.getAsJsonObject(TO);
         if (to != null) {
-            final JsonArray data = to.getAsJsonArray(DATA);
+            final JsonArray data = to.get(DATA).getAsJsonArray();
             if (data != null) {
                 final JsonObject first = data.get(0).getAsJsonObject();
                 if (first != null) {
-                    final String groupId = first.getAsJsonPrimitive(ID).getAsString();
+                    final String groupId = first.get(ID).getAsString();
                     final long rowId = Long.parseLong(groupId);
                     post.setGroupId(groupId);
                     post.setRowId(rowId);
@@ -74,40 +89,37 @@ public class PostDeserializer implements JsonDeserializer<Post> {
         }
 
         post.setPostId(postId);
-        post.setCreatedTime(DateUtils.getFBFormattedTime(createdTimeString));
-        post.setUpdatedTime(DateUtils.getFBFormattedTime(updatedTimeString));
+        post.setCreatedTime(formatFacebookTime(createdTime));
+        post.setUpdatedTime(formatFacebookTime(updatedTime));
         post.setType(type);
 
         //Retrieve 'from' that contains user info of who made a post, it is optional in case the person doesnt exist on Facebook anymore
 
-        final JsonObject fromObject = root.getAsJsonObject(FROM);
-        if (fromObject != null) {
+        final JsonObject from = root.getAsJsonObject(FROM);
+        if (from != null) {
 
             //Retrieve 'id' from the 'from' object that corresponds to user id which is optional if the person doesn't exist on Facebook
 
-            final JsonElement userIdElement = fromObject.get(ID);
+            final JsonElement userId = from.get(ID);
 
             //Retrieve 'name' from the 'from' object that corresponds to user name which is optional if the person doesn't exist on Facebook
 
-            final JsonElement userNameElement = fromObject.get(NAME);
+            final JsonElement userName = from.get(NAME);
 
-            final JsonElement userPictureElement = fromObject.get(PICTURE);
+            final JsonElement userPicture = from.get(PICTURE);
 
-            if (userIdElement != null) {
-                final String userId = userIdElement.getAsString();
-                post.setUserId(userId);
+            if (userId != null) {
+                post.setUserId(userId.getAsString());
             }
-            if (userNameElement != null) {
-                final String userName = userNameElement.getAsString();
-                post.setUserName(userName);
+            if (userName != null) {
+                post.setUserName(userName.getAsString());
             }
-            if (userPictureElement != null) {
-                final JsonElement userPictureDataElement = userPictureElement.getAsJsonObject().get(DATA);
-                if (userPictureDataElement != null) {
-                    final JsonElement userPictureUrlElement = userPictureDataElement.getAsJsonObject().get(URL);
-                    if (userPictureUrlElement != null) {
-                        final String userPicture = userPictureUrlElement.getAsString();
-                        post.setUserPicture(userPicture);
+            if (userPicture != null) {
+                final JsonElement data = userPicture.getAsJsonObject().get(DATA);
+                if (data != null) {
+                    final JsonElement url = data.getAsJsonObject().get(URL);
+                    if (url != null) {
+                        post.setUserPicture(url.getAsString());
                     }
                 }
             }
@@ -115,50 +127,44 @@ public class PostDeserializer implements JsonDeserializer<Post> {
 
         //Retrieve 'message' from the root JSON object which is optional
 
-        final JsonElement messageElement = root.get(MESSAGE);
-        if (messageElement != null) {
-            final String message = messageElement.getAsString();
-            post.setMessage(message);
+        final JsonElement message = root.get(MESSAGE);
+        if (message != null) {
+            post.setMessage(message.getAsString());
         }
 
         //Retrieve 'name' from the root JSONObject which is optional and contains the name of a link as part of name, caption, description when a user posts links
 
-        final JsonElement nameElement = root.get(NAME);
-        if (nameElement != null) {
-            final String name = nameElement.getAsString();
-            post.setName(name);
+        final JsonElement name = root.get(NAME);
+        if (name != null) {
+            post.setName(name.getAsString());
         }
 
         //Retrieve 'caption' from the root JSONObject which is optional and contains the caption of a link as part of name, caption, description when a user posts links
 
-        final JsonElement captionElement = root.get(CAPTION);
-        if (captionElement != null) {
-            final String caption = captionElement.getAsString();
-            post.setCaption(caption);
+        final JsonElement caption = root.get(CAPTION);
+        if (caption != null) {
+            post.setCaption(caption.getAsString());
         }
 
         //Retrieve 'description' from the root JSONObject which is optional and contains the description of a link as part of name, caption, description when a user posts links
 
-        final JsonElement descriptionElement = root.get(DESCRIPTION);
-        if (descriptionElement != null) {
-            final String description = descriptionElement.getAsString();
-            post.setDescription(description);
+        final JsonElement description = root.get(DESCRIPTION);
+        if (description != null) {
+            post.setDescription(description.getAsString());
         }
 
         //Retrieve 'picture' from the root JSONObject which is optional and contains a url of an image if used in the post
 
-        final JsonElement pictureElement = root.get(FULL_PICTURE);
-        if (pictureElement != null) {
-            final String picture = pictureElement.getAsString();
-            post.setPicture(picture);
+        final JsonElement picture = root.get(FULL_PICTURE);
+        if (picture != null) {
+            post.setPicture(picture.getAsString());
         }
 
         //Retrieve 'link' from the root JSONObject which is optional and contains a link if used in the post
 
-        final JsonElement linkElement = root.get(LINK);
-        if (linkElement != null) {
-            final String link = linkElement.getAsString();
-            post.setLink(link);
+        final JsonElement link = root.get(LINK);
+        if (link != null) {
+            post.setLink(link.getAsString());
         }
         return post;
     }

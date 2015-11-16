@@ -1,4 +1,4 @@
-package slidenerd.vivz.fpam.log;
+package slidenerd.vivz.fpam;
 
 import android.content.Context;
 import android.util.Log;

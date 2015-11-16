@@ -40,7 +40,7 @@ import slidenerd.vivz.fpam.adapter.SwipeToDismissTouchListener;
 import slidenerd.vivz.fpam.adapter.SwipeableItemClickListener;
 import slidenerd.vivz.fpam.core.Core;
 import slidenerd.vivz.fpam.extras.Constants;
-import slidenerd.vivz.fpam.log.L;
+import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.model.json.Post;
 import slidenerd.vivz.fpam.model.realm.Keyword;
 import slidenerd.vivz.fpam.util.FBUtils;

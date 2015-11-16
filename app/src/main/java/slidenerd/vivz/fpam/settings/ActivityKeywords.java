@@ -35,6 +35,9 @@ import slidenerd.vivz.fpam.adapter.SwipeableItemClickListener;
 import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.model.realm.Keyword;
 
+import static slidenerd.vivz.fpam.extras.Constants.GROUP_NAME;
+import static slidenerd.vivz.fpam.extras.Constants.KEYWORD;
+
 @EActivity(R.layout.activity_keywords)
 public class ActivityKeywords extends AppCompatActivity {
 
@@ -57,16 +60,17 @@ public class ActivityKeywords extends AppCompatActivity {
     void onCreateView() {
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        RealmResults<Keyword> results = mRealm.where(Keyword.class).findAllSortedAsync("keyword");
-        mRecyclerKeywords.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new AdapterKeywords(this, mRealm, results);
-        mAdapter.setHasStableIds(true);
-        results.addChangeListener(new RealmChangeListener() {
+        final RealmResults<Keyword> keywords = mRealm.where(Keyword.class).findAllSortedAsync(KEYWORD);
+        keywords.addChangeListener(new RealmChangeListener() {
             @Override
             public void onChange() {
                 mAdapter.notifyDataSetChanged();
             }
         });
+        mRecyclerKeywords.setLayoutManager(new LinearLayoutManager(this));
+        mAdapter = new AdapterKeywords(this, mRealm, keywords);
+        mAdapter.setHasStableIds(true);
+
         mRecyclerKeywords.setAdapter(mAdapter);
         final SwipeToDismissTouchListener<RecyclerViewHelperImpl> touchListener =
                 new SwipeToDismissTouchListener<>(
@@ -104,7 +108,7 @@ public class ActivityKeywords extends AppCompatActivity {
 
     public void showKeywordGroups(int position) {
         final Keyword keyword = mAdapter.getItem(position);
-        final RealmResults<Group> allGroups = mRealm.where(Group.class).findAllSortedAsync("groupName");
+        final RealmResults<Group> allGroups = mRealm.where(Group.class).findAllSortedAsync(GROUP_NAME);
         allGroups.addChangeListener(new RealmChangeListener() {
             @Override
             public void onChange() {
@@ -116,10 +120,10 @@ public class ActivityKeywords extends AppCompatActivity {
                     adapter.select(selectedGroups);
                 }
                 new MaterialDialog.Builder(ActivityKeywords.this)
-                        .title("Groups where \"" + keyword.getKeyword() + "\" is applicable")
+                        .title(getString(R.string.title_dialog_applicable_groups, keyword.getKeyword()))
                         .adapter(adapter, null)
-                        .positiveText("OK")
-                        .negativeText("Cancel")
+                        .positiveText(R.string.ok)
+                        .negativeText(R.string.cancel)
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {

@@ -40,6 +40,17 @@ public class Group extends RealmObject {
         this.monitored = monitored;
     }
 
+    public static String toString(Group group) {
+        return "Group{" +
+                "groupId='" + group.groupId + '\'' +
+                ", groupName='" + group.groupName + '\'' +
+                ", groupIcon='" + group.groupIcon + '\'' +
+                ", unread=" + group.unread +
+                ", lastLoaded=" + group.lastLoaded +
+                ", monitored=" + group.monitored +
+                ", count=" + group.count +
+                '}';
+    }
 
     /**
      * @return The groupName

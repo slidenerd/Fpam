@@ -28,7 +28,7 @@ import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.background.TaskLoadAdminAndGroups;
 import slidenerd.vivz.fpam.background.TaskLoadAdminAndGroups_;
 import slidenerd.vivz.fpam.extras.Constants;
-import slidenerd.vivz.fpam.log.L;
+import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.util.FBUtils;
 
 /**
@@ -66,7 +66,7 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
                         .customView(R.layout.request_permission, true)
                         .autoDismiss(false)
                         .cancelable(false)
-                        .positiveText(R.string.text_ok)
+                        .positiveText(R.string.ok)
                         .onAny(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {

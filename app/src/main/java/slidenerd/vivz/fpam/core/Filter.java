@@ -7,9 +7,8 @@ import org.json.JSONException;
 import java.util.ArrayList;
 
 import io.realm.Realm;
-import slidenerd.vivz.fpam.log.L;
+import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.model.json.Post;
-import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.model.pojo.DeleteRequestInfo;
 import slidenerd.vivz.fpam.model.pojo.DeleteResponseInfo;
 import slidenerd.vivz.fpam.model.realm.Spammer;

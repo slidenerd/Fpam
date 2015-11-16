@@ -8,6 +8,7 @@ public interface Constants {
     String GROUP_ID = "groupId";
     String GROUP_NAME = "groupName";
     String POST_ID = "postId";
+    String KEYWORD = "keyword";
 
     int TOP_ENTRIES_COUNT = 10;
     String ACTION_LOAD_FEED = "slidenerd.vivz.fpam.action.LOAD_FEED";

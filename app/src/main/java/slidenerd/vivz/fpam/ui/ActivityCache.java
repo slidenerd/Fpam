@@ -25,7 +25,6 @@ import slidenerd.vivz.fpam.model.json.Admin;
 import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.model.json.Post;
 import slidenerd.vivz.fpam.model.realm.Spammer;
-import slidenerd.vivz.fpam.util.PrintUtils;
 
 @EActivity(R.layout.activity_cache)
 @OptionsMenu(R.menu.menu_activity_cache_viewer)
@@ -74,7 +73,7 @@ public class ActivityCache extends AppCompatActivity {
                 if (results.isLoaded()) {
                     StringBuffer text = new StringBuffer();
                     for (Post post : results) {
-                        text.append(PrintUtils.toString(post));
+                        text.append(Post.toString(post));
                     }
                     mTextCache.setText(text);
                 }
@@ -103,12 +102,12 @@ public class ActivityCache extends AppCompatActivity {
         StringBuffer text = new StringBuffer();
         if (item.equals("Admin")) {
             Admin admin = mRealm.where(Admin.class).findFirst();
-            text.append(PrintUtils.toString(admin));
+            text.append(Admin.toString(admin));
             mSpinnerGroup.setVisibility(View.GONE);
         } else if (item.equals("Group")) {
             RealmResults<Group> results = mRealm.where(Group.class).findAll();
             for (Group group : results) {
-                text.append(PrintUtils.toString(group));
+                text.append(Group.toString(group));
             }
             mSpinnerGroup.setVisibility(View.GONE);
 
@@ -116,8 +115,8 @@ public class ActivityCache extends AppCompatActivity {
             mSpinnerGroup.setVisibility(View.VISIBLE);
         } else if (item.equals("Spammer")) {
             RealmResults<Spammer> results = mRealm.where(Spammer.class).findAllSorted("userName");
-            for (Spammer feed : results) {
-                text.append(PrintUtils.toString(feed));
+            for (Spammer spammer : results) {
+                text.append(Spammer.toString(spammer));
             }
             mSpinnerGroup.setVisibility(View.GONE);
         }

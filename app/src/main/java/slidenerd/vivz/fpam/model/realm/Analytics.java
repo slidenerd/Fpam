@@ -8,6 +8,7 @@ import io.realm.annotations.PrimaryKey;
  * Created by vivz on 10/11/15.
  */
 public class Analytics extends RealmObject {
+
     @PrimaryKey
     private String groupId;
     private String groupName;
@@ -15,7 +16,6 @@ public class Analytics extends RealmObject {
     private RealmList<Keyword> keywords = new RealmList<>();
     //Store the top X spammers of this groupId
     private RealmList<Spammer> spammers = new RealmList<>();
-
     //Must have default constructor if a custom constructor is included
     public Analytics() {
 
@@ -27,6 +27,16 @@ public class Analytics extends RealmObject {
         this.entries = (entries != null) ? entries : new RealmList<Postlytics>();
         this.keywords = (keywords != null) ? keywords : new RealmList<Keyword>();
         this.spammers = (spammers != null) ? spammers : new RealmList<Spammer>();
+    }
+
+    public static String toString(Analytics analytics) {
+        return "Analytics{" +
+                "groupId='" + analytics.groupId + '\'' +
+                ", groupName='" + analytics.groupName + '\'' +
+                ", entries=" + analytics.entries +
+                ", keywords=" + analytics.keywords +
+                ", spammers=" + analytics.spammers +
+                '}';
     }
 
     public String getGroupName() {

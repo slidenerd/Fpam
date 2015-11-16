@@ -21,13 +21,15 @@ import org.androidannotations.annotations.res.StringArrayRes;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.SettingsGroupsAdapter;
-import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.extras.MyPrefs_;
 import slidenerd.vivz.fpam.model.json.Group;
+
+import static slidenerd.vivz.fpam.extras.Constants.GROUP_NAME;
 
 /**
  * TODO save the list of groups selected by the user
@@ -78,22 +80,29 @@ public class SettingsFragmentGroups extends Fragment implements View.OnClickList
 
     @AfterViews
     void onViewCreated() {
-        int selectedIndex = getSelectedIndex();
+        final int selectedIndex = getSelectedIndex();
         mRecyclerGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerGroups.setHasFixedSize(true);
-        RealmResults<Group> results = DataStore.loadGroups(mRealm);
-        mAdapter = new SettingsGroupsAdapter(getActivity(), mRealm, results);
-        mHeaderGroups = LayoutInflater.from(mContext).inflate(R.layout.header_groups, mRecyclerGroups, false);
-        mAdapter.setHeaderView(mHeaderGroups);
-        mRecyclerGroups.setAdapter(mAdapter);
-        mAdapter.setEnabled(selectedIndex != 0);
-        mTextScanFrequency = (TextView) mHeaderGroups.findViewById(R.id.text_scan_frequency);
-        mTextSummaryScanFrequency = (TextView) mHeaderGroups.findViewById(R.id.text_summary_scan_frequency);
-        mTextScanFrequency.setOnClickListener(this);
-        mTextSummaryScanFrequency.setOnClickListener(this);
-        String selectedSummary = mScanFrequencyTitles[selectedIndex];
-        mTextSummaryScanFrequency.setText(selectedSummary);
-        mPref.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+        final RealmResults<Group> results = mRealm.where(Group.class).findAllSortedAsync(GROUP_NAME);
+        results.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                mAdapter = new SettingsGroupsAdapter(getActivity(), mRealm, results);
+                mHeaderGroups = LayoutInflater.from(mContext).inflate(R.layout.header_groups, mRecyclerGroups, false);
+                mAdapter.setHeaderView(mHeaderGroups);
+                mRecyclerGroups.setAdapter(mAdapter);
+                mAdapter.setEnabled(selectedIndex != 0);
+                mTextScanFrequency = (TextView) mHeaderGroups.findViewById(R.id.text_scan_frequency);
+                mTextSummaryScanFrequency = (TextView) mHeaderGroups.findViewById(R.id.text_summary_scan_frequency);
+                mTextScanFrequency.setOnClickListener(SettingsFragmentGroups.this);
+                mTextSummaryScanFrequency.setOnClickListener(SettingsFragmentGroups.this);
+                String selectedSummary = mScanFrequencyTitles[selectedIndex];
+                mTextSummaryScanFrequency.setText(selectedSummary);
+                mPref.getSharedPreferences().registerOnSharedPreferenceChangeListener(SettingsFragmentGroups.this);
+                results.removeChangeListeners();
+            }
+        });
+
     }
 
     @Override

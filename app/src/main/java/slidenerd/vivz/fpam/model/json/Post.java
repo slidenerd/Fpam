@@ -76,6 +76,26 @@ public class Post extends RealmObject {
         this.link = link;
     }
 
+    public static String toString(Post post) {
+        return "Post{" +
+                "postId='" + post.postId + '\'' +
+                ", rowId=" + post.rowId +
+                ", userId='" + post.userId + '\'' +
+                ", userName='" + post.userName + '\'' +
+                ", userPicture='" + post.userPicture + '\'' +
+                ", message='" + post.message + '\'' +
+                ", name='" + post.name + '\'' +
+                ", caption='" + post.caption + '\'' +
+                ", description='" + post.description + '\'' +
+                ", picture='" + post.picture + '\'' +
+                ", type='" + post.type + '\'' +
+                ", createdTime=" + post.createdTime +
+                ", updatedTime=" + post.updatedTime +
+                ", link='" + post.link + '\'' +
+                ", groupId='" + post.groupId + '\'' +
+                '}';
+    }
+
     /**
      * @return The caption
      */

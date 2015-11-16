@@ -18,8 +18,7 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.Fpam;
-import slidenerd.vivz.fpam.database.DataStore;
-import slidenerd.vivz.fpam.log.L;
+import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.model.json.Admin;
 import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.util.FBUtils;
@@ -29,7 +28,6 @@ public class TaskLoadAdminAndGroups extends Fragment {
     TaskCallback mCallback;
 
     public TaskLoadAdminAndGroups() {
-
     }
 
     @Override
@@ -75,7 +73,7 @@ public class TaskLoadAdminAndGroups extends Fragment {
 
             ArrayList<Group> currentGroups = FBUtils.requestGroupsSync(accessToken, gson);
 
-            //If a newly loaded group id matches with a previously loaded group id, then update the value of its timestamp and set its monitored parameter accordingly.
+            //If a newly loaded group id matches with a previously loaded group id, then update the value of its timestamp and set its monitored parameter accordingly along with the timestamp
 
             for (Group previousGroup : previousGroups) {
                 for (Group currentGroup : currentGroups) {
@@ -90,8 +88,10 @@ public class TaskLoadAdminAndGroups extends Fragment {
 
             //Store the fully constructed group objects to the realm database.
 
-            DataStore.storeAdmin(realm, admin);
-            DataStore.storeGroups(realm, currentGroups);
+            realm.beginTransaction();
+            realm.copyToRealmOrUpdate(admin);
+            realm.copyToRealmOrUpdate(currentGroups);
+            realm.commitTransaction();
 
         } catch (JSONException e) {
             L.m("" + e);
@@ -112,7 +112,9 @@ public class TaskLoadAdminAndGroups extends Fragment {
 
     @UiThread
     void onAdminAndGroupsLoaded() {
-        mCallback.afterAdminAndGroupsLoaded();
+        if (mCallback != null) {
+            mCallback.afterAdminAndGroupsLoaded();
+        }
     }
 
     public interface TaskCallback {

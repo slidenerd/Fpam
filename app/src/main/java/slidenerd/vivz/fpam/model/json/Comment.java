@@ -25,6 +25,16 @@ public class Comment extends RealmObject {
         this.created_time = created_time;
     }
 
+    public static String toString(Comment comment) {
+        return "Comment{" +
+                "commentId='" + comment.commentId + '\'' +
+                ", userId='" + comment.userId + '\'' +
+                ", userName='" + comment.userName + '\'' +
+                ", message='" + comment.message + '\'' +
+                ", created_time='" + comment.created_time + '\'' +
+                '}';
+    }
+
     /**
      * @return The message
      */

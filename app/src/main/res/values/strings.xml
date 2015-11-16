@@ -36,7 +36,6 @@
     <string name="request_permission_sentence_2">2. Fpam uses your email address to sync all your app settings. Fpam won\'t spam you</string>
     <string name="request_permission_sentence_3">3. Fpam will let you manage your groups from the app to control spam</string>
     <string name="request_permission_sentence_4">4. Fpam won\'t post anywhere without asking you</string>
-    <string name="text_ok">OK</string>
     <string name="key_scan_frequency">key_scan_frequency</string>
     <string name="key_cache_size">key_cache_size</string>
     <string name="title_activity_post">Post</string>
@@ -47,7 +46,9 @@
     <string name="title_activity_keywords">Keywords</string>
     <string name="title_activity_activity_keywords">Keywords</string>
     <string name="hint_keyword">Example \"100% free\"</string>
-    <string name="title_loading">We are testing your patience</string>
+    <string name="title_dialog_applicable_groups">Which groups include \"%1$s\"</string>
+    <string name="loading">We are testing your patience</string>
     <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
     <string name="message_invalid_post">Sorry, we did not get the button on this post to delete</string>
 </resources>

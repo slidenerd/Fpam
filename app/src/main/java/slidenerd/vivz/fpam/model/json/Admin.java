@@ -28,6 +28,17 @@ public class Admin extends RealmObject {
         this.url = url;
     }
 
+    public static String toString(Admin admin) {
+        return "Admin{" +
+                "id='" + admin.id + '\'' +
+                ", email='" + admin.email + '\'' +
+                ", name='" + admin.name + '\'' +
+                ", width=" + admin.width +
+                ", height=" + admin.height +
+                ", isSilhouette=" + admin.isSilhouette +
+                ", url='" + admin.url + '\'' +
+                '}';
+    }
 
     /**
      * @return The id

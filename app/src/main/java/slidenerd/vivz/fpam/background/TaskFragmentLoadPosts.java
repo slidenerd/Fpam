@@ -20,18 +20,17 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import slidenerd.vivz.fpam.Fpam;
+import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.core.AnalyticsManager;
 import slidenerd.vivz.fpam.core.Filter;
 import slidenerd.vivz.fpam.core.PostlyticsManager;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.extras.MyPrefs_;
-import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.model.json.Post;
 import slidenerd.vivz.fpam.model.realm.Analytics;
 import slidenerd.vivz.fpam.model.realm.Postlytics;
-import slidenerd.vivz.fpam.util.DateUtils;
 import slidenerd.vivz.fpam.util.FBUtils;
 
 import static slidenerd.vivz.fpam.extras.Constants.GROUP_ID;
@@ -72,7 +71,9 @@ public class TaskFragmentLoadPosts extends Fragment {
     }
 
     public void triggerLoadPosts(@NonNull String groupId, AccessToken accessToken) {
-        mCallback.beforePostsLoaded();
+        if (mCallback != null) {
+            mCallback.beforePostsLoaded();
+        }
         loadPostsAsync(groupId, accessToken);
     }
 
@@ -97,13 +98,14 @@ public class TaskFragmentLoadPosts extends Fragment {
 
                 //Get the time stamp of when this group was last loaded and convert that timestamp to UTC format
 
-                long lastLoadedTimestamp = DateUtils.getUTCTimestamp(DataStore.getLastLoadedTimestamp(realm, groupId));
+                Group group = realm.where(Group.class).equalTo(GROUP_ID, groupId).findFirst();
+                long utcTimestamp = group.getLastLoaded() / 1000L;
                 ArrayList<Post> posts;
 
                 //If the group was loaded before as indicated by a valid timestamp, then fetch all posts made since that timestamp or maximum number of posts as per the cache size from the app settings whichever is greater
 
-                if (lastLoadedTimestamp > 0) {
-                    posts = FBUtils.requestFeedSince(token, Fpam.getGson(), groupId, maximumPostsStored, lastLoadedTimestamp);
+                if (utcTimestamp > 0) {
+                    posts = FBUtils.requestFeedSince(token, Fpam.getGson(), groupId, maximumPostsStored, utcTimestamp);
                 }
 
                 //If the group was never loaded before, load it for the first time
@@ -122,7 +124,6 @@ public class TaskFragmentLoadPosts extends Fragment {
 
                     filteredLoadCount = posts.size();
 
-                    Group group = realm.where(Group.class).equalTo(GROUP_ID, groupId).findFirst();
                     //Get hold of the analytics object
                     Analytics analytics = AnalyticsManager.getInstance(realm, groupId, group.getGroupName());
 
@@ -169,7 +170,9 @@ public class TaskFragmentLoadPosts extends Fragment {
 
     @UiThread
     void onPostsLoaded() {
-        mCallback.afterPostsLoaded();
+        if (mCallback != null) {
+            mCallback.afterPostsLoaded();
+        }
     }
 
     @Override

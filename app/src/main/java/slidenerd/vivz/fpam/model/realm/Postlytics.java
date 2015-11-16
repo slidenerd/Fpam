@@ -44,6 +44,18 @@ public class Postlytics extends RealmObject {
 
     }
 
+    public static String toString(Postlytics postlytics) {
+        return "Postlytics{" +
+                "compositeGroupDateId='" + postlytics.compositeGroupDateId + '\'' +
+                ", scanned=" + postlytics.scanned +
+                ", deleted=" + postlytics.deleted +
+                ", deletedEmpty=" + postlytics.deletedEmpty +
+                ", deletedKeywords=" + postlytics.deletedKeywords +
+                ", deletedSpammer=" + postlytics.deletedSpammer +
+                ", failed=" + postlytics.failed +
+                '}';
+    }
+
     public String getCompositeGroupDateId() {
         return compositeGroupDateId;
     }

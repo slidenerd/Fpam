@@ -20,7 +20,7 @@ import io.realm.Realm;
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.core.Core;
 import slidenerd.vivz.fpam.extras.MyPrefs_;
-import slidenerd.vivz.fpam.log.L;
+import slidenerd.vivz.fpam.L;
 
 import static slidenerd.vivz.fpam.extras.Constants.ACTION_DELETE_RESPONSE;
 import static slidenerd.vivz.fpam.extras.Constants.EXTRA_OUTCOME;
@@ -70,7 +70,7 @@ public class TaskFragmentDeletePosts extends Fragment {
         Core core = new Core();
         try {
             realm = Realm.getDefaultInstance();
-            boolean status = core.deletePostFB(position, token, postId, realm);
+            boolean status = core.deletePostFB(token, postId, realm);
             onDelete(status, position);
 
         } catch (JSONException e) {
