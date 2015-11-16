@@ -13,7 +13,7 @@ import io.realm.RealmBaseAdapter;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.Group;
 
 /**
  * Created by vivz on 03/11/15.
@@ -38,10 +38,6 @@ public class AdapterKeywordGroups extends RealmBaseAdapter<Group> {
     @Override
     public long getItemId(int position) {
         return position;
-    }
-
-    public boolean allSelected() {
-        return mChecked.size() == mResults.size();
     }
 
     public void selectAll() {

@@ -1,14 +1,11 @@
 package slidenerd.vivz.fpam.model.realm;
 
-import org.parceler.ParcelPropertyConverter;
-
 import java.util.List;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
-import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.model.parcel.KeywordGroupsConverter;
+import slidenerd.vivz.fpam.model.json.Group;
 
 /**
  * Created by vivz on 02/11/15.
@@ -58,7 +55,6 @@ public class Keyword extends RealmObject {
         return groups;
     }
 
-    @ParcelPropertyConverter(KeywordGroupsConverter.class)
     public void setGroups(RealmList<Group> groups) {
         this.groups = groups;
     }

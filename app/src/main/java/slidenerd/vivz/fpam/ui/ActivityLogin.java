@@ -30,7 +30,6 @@ import slidenerd.vivz.fpam.background.TaskLoadAdminAndGroups_;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
 import slidenerd.vivz.fpam.util.FBUtils;
-import slidenerd.vivz.fpam.util.NavUtils;
 
 /**
  * TODO make a better dialog to ask permissions and handle onCancel and onError in a better manner
@@ -38,7 +37,7 @@ import slidenerd.vivz.fpam.util.NavUtils;
 @EActivity(R.layout.activity_login)
 @OptionsMenu(R.menu.menu_activity_login)
 public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAndGroups.TaskCallback {
-    private static final String TAG_TASK_FRAGMENT = "task_fragment";
+    private static final String TAG_FRAGMENT = "task_fragment";
     @App
     Fpam mApplication;
     @ViewById(R.id.progress)
@@ -92,10 +91,10 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCallbackManager = CallbackManager.Factory.create();
-        mTaskFragment = (TaskLoadAdminAndGroups_) getSupportFragmentManager().findFragmentByTag(TAG_TASK_FRAGMENT);
+        mTaskFragment = (TaskLoadAdminAndGroups_) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT);
         if (mTaskFragment == null) {
             mTaskFragment = new TaskLoadAdminAndGroups_();
-            getSupportFragmentManager().beginTransaction().add(mTaskFragment, TAG_TASK_FRAGMENT).commit();
+            getSupportFragmentManager().beginTransaction().add(mTaskFragment, TAG_FRAGMENT).commit();
         }
     }
 
@@ -124,7 +123,7 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
     @Override
     public void afterAdminAndGroupsLoaded() {
         mProgress.setVisibility(View.GONE);
-        NavUtils.startActivityMain(this);
+        ActivityMain_.intent(this).start();
         finish();
     }
 }

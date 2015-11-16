@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,7 +25,6 @@ import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.Receiver;
-import org.parceler.Parcels;
 
 import java.util.Arrays;
 
@@ -41,14 +41,14 @@ import slidenerd.vivz.fpam.adapter.SwipeableItemClickListener;
 import slidenerd.vivz.fpam.core.Core;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.feed.Post;
-import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.Post;
 import slidenerd.vivz.fpam.model.realm.Keyword;
 import slidenerd.vivz.fpam.util.FBUtils;
-import slidenerd.vivz.fpam.util.NavUtils;
 
-import static slidenerd.vivz.fpam.extras.Constants.ACTION_DELETE_STATUS;
+import static slidenerd.vivz.fpam.extras.Constants.ACTION_DELETE_POST;
+import static slidenerd.vivz.fpam.extras.Constants.ACTION_DELETE_RESPONSE;
 import static slidenerd.vivz.fpam.extras.Constants.ACTION_LOAD_FEED;
+import static slidenerd.vivz.fpam.extras.Constants.EXTRA_ID;
 import static slidenerd.vivz.fpam.extras.Constants.EXTRA_OUTCOME;
 import static slidenerd.vivz.fpam.extras.Constants.EXTRA_POSITION;
 import static slidenerd.vivz.fpam.extras.Constants.EXTRA_SELECTED_GROUP;
@@ -60,18 +60,18 @@ import static slidenerd.vivz.fpam.extras.Constants.EXTRA_SELECTED_GROUP;
 @EFragment
 public class FragmentPosts extends Fragment implements FacebookCallback<LoginResult> {
 
-    private static final String STATE_SELECTED_GROUP = "group";
+    private static final String STATE_SELECTED_GROUP_ID = "group_id";
     @App
     Fpam mApplication;
     @InstanceState
     String mGroupId = Constants.GROUP_ID_NONE;
-    private RecyclerView mRecyclerPosts;
+    private RecyclerView mRecycler;
     private AdapterPost mAdapter;
     private Realm mRealm;
     private CallbackManager mCallbackManager;
     private LoginManager mLoginManager;
-    private Group mSelectedGroup;
-    private RealmResults<Post> mResults;
+    private String mSelectedGroupId;
+    private RealmResults<Post> mPosts;
     private Context mContext;
 
     public FragmentPosts() {
@@ -105,7 +105,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         }
 
         if (savedInstanceState != null) {
-            mSelectedGroup = Parcels.unwrap(savedInstanceState.getParcelable(STATE_SELECTED_GROUP));
+            mSelectedGroupId = savedInstanceState.getString(STATE_SELECTED_GROUP_ID);
         }
     }
 
@@ -113,7 +113,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(STATE_SELECTED_GROUP, Parcels.wrap(Group.class, mSelectedGroup));
+        outState.putString(STATE_SELECTED_GROUP_ID, mSelectedGroupId);
     }
 
     @Nullable
@@ -125,14 +125,14 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mResults = mRealm.where(Post.class).equalTo("postId", "NONE").findAll();
-        mRecyclerPosts = (RecyclerView) view.findViewById(R.id.recycler_posts);
-        mRecyclerPosts.setLayoutManager(new LinearLayoutManager(mContext));
-        mAdapter = new AdapterPost(mContext, mRealm, mResults);
+        mPosts = mRealm.where(Post.class).equalTo("postId", "NONE").findAll();
+        mRecycler = (RecyclerView) view.findViewById(R.id.recycler_posts);
+        mRecycler.setLayoutManager(new LinearLayoutManager(mContext));
+        mAdapter = new AdapterPost(mContext, mRealm, mPosts);
         mAdapter.setHasStableIds(true);
-        mRecyclerPosts.setAdapter(mAdapter);
-        final SwipeToDismissTouchListener<RecyclerViewHelperImpl> touchListener = new SwipeToDismissTouchListener<>(
-                new RecyclerViewHelperImpl(mRecyclerPosts),
+        mRecycler.setAdapter(mAdapter);
+        final SwipeToDismissTouchListener<RecyclerViewHelperImpl> mTouchListener = new SwipeToDismissTouchListener<>(
+                new RecyclerViewHelperImpl(mRecycler),
                 new SwipeToDismissTouchListener.DismissCallbacks<RecyclerViewHelperImpl>() {
                     @Override
                     public boolean canDismiss(int position) {
@@ -141,24 +141,27 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
 
                     @Override
                     public void onDismiss(RecyclerViewHelperImpl view, int position) {
-                        NavUtils.broadcastRequestDelete(mContext, position, mAdapter.getItem(position));
+
+                        //On swiping a post, broadcast its position and postId for further processing
+                        Intent intent = new Intent(ACTION_DELETE_POST);
+                        intent.putExtra(EXTRA_POSITION, position);
+                        intent.putExtra(EXTRA_ID, mAdapter.getItem(position).getPostId());
+                        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
                     }
                 });
-
-
-        mRecyclerPosts.setOnTouchListener(touchListener);
+        mRecycler.setOnTouchListener(mTouchListener);
         // Setting this scroll listener is required to ensure that during ListView scrolling,
         // we don't look for swipes.
-        mRecyclerPosts.addOnScrollListener((RecyclerView.OnScrollListener) touchListener.makeScrollListener());
-        mRecyclerPosts.addOnItemTouchListener(new SwipeableItemClickListener(mContext, new OnItemClickListener() {
+        mRecycler.addOnScrollListener((RecyclerView.OnScrollListener) mTouchListener.makeScrollListener());
+        mRecycler.addOnItemTouchListener(new SwipeableItemClickListener(mContext, new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 if (view.getId() == R.id.txt_delete) {
-                    touchListener.processPendingDismisses();
+                    mTouchListener.processPendingDismisses();
                 } else if (view.getId() == R.id.txt_undo) {
-                    touchListener.undoPendingDismiss();
+                    mTouchListener.undoPendingDismiss();
                 } else { // R.id.txt_data
-
+                    //What to do when you click on a post?
                 }
             }
         }));
@@ -206,24 +209,23 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         mRealm.close();
     }
 
-
     @Receiver(actions = ACTION_LOAD_FEED, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
     public void onBroadcastSelectedGroup(Context context, Intent intent) {
-        mSelectedGroup = Parcels.unwrap(intent.getExtras().getParcelable(EXTRA_SELECTED_GROUP));
+        mSelectedGroupId = intent.getExtras().getString(EXTRA_SELECTED_GROUP);
         Core core = new Core();
-        String deletes = Keyword.toString(core.getRelevantKeywords(mRealm, mSelectedGroup.getGroupId()));
+        String deletes = Keyword.toString(core.getRelevantKeywords(mRealm, mSelectedGroupId));
         L.m(deletes);
-        mResults = mRealm.where(Post.class).beginsWith("postId", mSelectedGroup.getGroupId()).findAllSortedAsync("updatedTime", false);
-        mResults.addChangeListener(new RealmChangeListener() {
+        mPosts = mRealm.where(Post.class).beginsWith("postId", mSelectedGroupId).findAllSortedAsync("updatedTime", false);
+        mPosts.addChangeListener(new RealmChangeListener() {
             @Override
             public void onChange() {
-                mAdapter.updateRealmResults(mResults);
+                mAdapter.updateRealmResults(mPosts);
             }
         });
     }
 
-    @Receiver(actions = ACTION_DELETE_STATUS, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
-    public void onBroadcastDeleteStatus(Context context, Intent intent) {
+    @Receiver(actions = ACTION_DELETE_RESPONSE, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
+    public void onDeleteResponse(Context context, Intent intent) {
         boolean outcome = intent.getExtras().getBoolean(EXTRA_OUTCOME);
         int position = intent.getExtras().getInt(EXTRA_POSITION);
         if (outcome) {

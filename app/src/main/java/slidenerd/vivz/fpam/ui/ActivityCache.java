@@ -21,10 +21,9 @@ import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.database.DataStore;
-import slidenerd.vivz.fpam.model.json.admin.Admin;
-import slidenerd.vivz.fpam.model.json.feed.Post;
-import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.Admin;
+import slidenerd.vivz.fpam.model.json.Group;
+import slidenerd.vivz.fpam.model.json.Post;
 import slidenerd.vivz.fpam.model.realm.Spammer;
 import slidenerd.vivz.fpam.util.PrintUtils;
 
@@ -53,7 +52,7 @@ public class ActivityCache extends AppCompatActivity {
     void initUI() {
         String[] tables = new String[]{"Admin", "Group", "Post", "Spammer"};
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, tables);
-        ArrayList<Group> groups = DataStore.copyLoadGroups(mRealm);
+        RealmResults<Group> groups = mRealm.where(Group.class).findAll();
         ArrayList<String> groupIdNames = new ArrayList<>(groups.size());
         for (Group group : groups) {
             groupIdNames.add(group.getGroupName() + ":" + group.getGroupId());

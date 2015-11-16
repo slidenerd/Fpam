@@ -2,6 +2,7 @@ package slidenerd.vivz.fpam.settings;
 
 //TODO use a baseadapter for material dialog display of groups with a checkbox
 
+
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -31,7 +32,7 @@ import slidenerd.vivz.fpam.adapter.OnItemClickListener;
 import slidenerd.vivz.fpam.adapter.RecyclerViewHelperImpl;
 import slidenerd.vivz.fpam.adapter.SwipeToDismissTouchListener;
 import slidenerd.vivz.fpam.adapter.SwipeableItemClickListener;
-import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.model.realm.Keyword;
 
 @EActivity(R.layout.activity_keywords)
@@ -124,16 +125,13 @@ public class ActivityKeywords extends AppCompatActivity {
                             public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
                                 RealmList<Group> groups = adapter.getSelected();
                                 mRealm.beginTransaction();
-                                if (!adapter.allSelected()) {
-                                    keyword.setGroups(groups);
-                                } else {
-                                    keyword.setGroups(new RealmList<Group>());
-                                }
+                                keyword.setGroups(groups);
                                 mRealm.commitTransaction();
                             }
                         })
                         .build()
                         .show();
+                allGroups.removeChangeListeners();
             }
 
         });
@@ -165,4 +163,5 @@ public class ActivityKeywords extends AppCompatActivity {
         mRealm.close();
     }
 }
+
 

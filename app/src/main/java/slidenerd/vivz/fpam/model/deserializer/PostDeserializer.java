@@ -1,5 +1,6 @@
 package slidenerd.vivz.fpam.model.deserializer;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -8,9 +9,8 @@ import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
 
-import slidenerd.vivz.fpam.model.json.feed.Post;
+import slidenerd.vivz.fpam.model.json.Post;
 import slidenerd.vivz.fpam.util.DateUtils;
-import slidenerd.vivz.fpam.util.ModelUtils;
 
 import static slidenerd.vivz.fpam.extras.Fields.CAPTION;
 import static slidenerd.vivz.fpam.extras.Fields.CREATED_TIME;
@@ -23,6 +23,7 @@ import static slidenerd.vivz.fpam.extras.Fields.LINK;
 import static slidenerd.vivz.fpam.extras.Fields.MESSAGE;
 import static slidenerd.vivz.fpam.extras.Fields.NAME;
 import static slidenerd.vivz.fpam.extras.Fields.PICTURE;
+import static slidenerd.vivz.fpam.extras.Fields.TO;
 import static slidenerd.vivz.fpam.extras.Fields.TYPE;
 import static slidenerd.vivz.fpam.extras.Fields.UPDATED_TIME;
 import static slidenerd.vivz.fpam.extras.Fields.URL;
@@ -44,8 +45,6 @@ public class PostDeserializer implements JsonDeserializer<Post> {
 
         final String postId = root.get(ID).getAsString();
 
-        final long rowId = ModelUtils.computePostItemId(postId);
-
         //Retrieve 'created_time' that contains time in the form of dd:MM:yyyy'T'hh:mm:ssZ
 
         final String createdTimeString = root.get(CREATED_TIME).getAsString();
@@ -60,8 +59,21 @@ public class PostDeserializer implements JsonDeserializer<Post> {
 
         //Convert the time to milliseconds as per the local time zone and store them
 
+        final JsonObject to = root.getAsJsonObject(TO);
+        if (to != null) {
+            final JsonArray data = to.getAsJsonArray(DATA);
+            if (data != null) {
+                final JsonObject first = data.get(0).getAsJsonObject();
+                if (first != null) {
+                    final String groupId = first.getAsJsonPrimitive(ID).getAsString();
+                    final long rowId = Long.parseLong(groupId);
+                    post.setGroupId(groupId);
+                    post.setRowId(rowId);
+                }
+            }
+        }
+
         post.setPostId(postId);
-        post.setRowId(rowId);
         post.setCreatedTime(DateUtils.getFBFormattedTime(createdTimeString));
         post.setUpdatedTime(DateUtils.getFBFormattedTime(updatedTimeString));
         post.setType(type);

@@ -1,12 +1,13 @@
 package slidenerd.vivz.fpam.ui;
 
-import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -16,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewStub;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.login.LoginManager;
@@ -23,17 +25,18 @@ import com.facebook.login.LoginManager;
 import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsItem;
-import org.parceler.Parcels;
 
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.background.TaskFragmentLoadPosts;
 import slidenerd.vivz.fpam.background.TaskFragmentLoadPosts_;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.settings.SettingsActivity_;
 import slidenerd.vivz.fpam.util.DatabaseUtils;
 import slidenerd.vivz.fpam.util.FBUtils;
-import slidenerd.vivz.fpam.util.NavUtils;
+
+import static slidenerd.vivz.fpam.extras.Constants.ACTION_LOAD_FEED;
+import static slidenerd.vivz.fpam.extras.Constants.EXTRA_SELECTED_GROUP;
 
 @EActivity
 
@@ -45,11 +48,11 @@ public abstract class ActivityBase extends AppCompatActivity
     private static final String TAG_FRAGMENT_TASK_POSTS = "task_fragment";
     @App
     protected Fpam mApplication;
-    private ProgressDialog mProgress;
+    private MaterialDialog mProgress;
     private TaskFragmentLoadPosts_ mTask;
     private FragmentDrawer_ mDrawer;
     private FloatingActionButton mFab;
-    private Group mSelectedGroup;
+    private String mSelectedGroup;
     private DrawerLayout mDrawerLayout;
 
     private AccessTokenTracker mTracker = new AccessTokenTracker() {
@@ -98,22 +101,32 @@ public abstract class ActivityBase extends AppCompatActivity
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
-        mProgress = new ProgressDialog(this);
+        mProgress = new MaterialDialog.Builder(this)
+                .content(R.string.title_loading)
+                .progress(true, 0)
+                .progressIndeterminateStyle(true)
+                .build();
 
         //Give the subclasses an opportunity to create their views by indicating the parent tablayout and their main content view is ready.
 
         onCreateUserInterface(tabLayout, mainContentView);
 
         if (savedInstanceState != null) {
-            mSelectedGroup = Parcels.unwrap(savedInstanceState.getParcelable(STATE_SELECTED_GROUP));
+            mSelectedGroup = savedInstanceState.getString(STATE_SELECTED_GROUP);
             if (mSelectedGroup != null) {
-                NavUtils.broadcastSelectedGroup(this, mSelectedGroup, false);
+                broadcastSelectedGroup(mSelectedGroup);
             }
         }
     }
 
+    private void broadcastSelectedGroup(String groupId) {
+        Intent intent = new Intent(ACTION_LOAD_FEED);
+        intent.putExtra(EXTRA_SELECTED_GROUP, groupId);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
     private void moveToLogin() {
-        NavUtils.startActivityLogin(this);
+        ActivityLogin_.intent(this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP).start();
         finish();
     }
 
@@ -154,7 +167,7 @@ public abstract class ActivityBase extends AppCompatActivity
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(STATE_SELECTED_GROUP, Parcels.wrap(Group.class, mSelectedGroup));
+        outState.putString(STATE_SELECTED_GROUP, mSelectedGroup);
     }
 
 
@@ -175,7 +188,7 @@ public abstract class ActivityBase extends AppCompatActivity
         if (hasDrawer() && mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
         }
-        NavUtils.startActivitySettings(this);
+        SettingsActivity_.intent(this).start();
         return true;
     }
 
@@ -187,7 +200,7 @@ public abstract class ActivityBase extends AppCompatActivity
 
     @OptionsItem(R.id.action_cache)
     protected boolean onCacheSelected() {
-        NavUtils.startActivityCache(this);
+        ActivityCache_.intent(this).start();
         return true;
     }
 
@@ -196,10 +209,9 @@ public abstract class ActivityBase extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        mSelectedGroup = mDrawer.getSelectedGroup(id);
+        mSelectedGroup = mDrawer.getSelected(id);
         if (mSelectedGroup != null) {
-            setTitle(mSelectedGroup.getGroupName());
-            L.m("token " + mApplication.getToken());
+            setTitle(item.getTitle());
             mTask.triggerLoadPosts(mSelectedGroup, mApplication.getToken());
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -208,24 +220,14 @@ public abstract class ActivityBase extends AppCompatActivity
     }
 
     @Override
-    public void beforePostsLoaded(String message) {
-        mProgress.setTitle("Loading...");
-        mProgress.setMessage(message);
+    public void beforePostsLoaded() {
         mProgress.show();
     }
 
     @Override
-    public void onProgressUpdate(String title, String message) {
-        mProgress.setTitle(title);
-        mProgress.setMessage(message);
-    }
-
-    @Override
-    public void afterPostsLoaded(String message, Group group) {
+    public void afterPostsLoaded() {
         mProgress.dismiss();
-        Snackbar.make(mFab, message, Snackbar.LENGTH_LONG)
-                .setAction("Yay!", null).show();
-        NavUtils.broadcastSelectedGroup(this, group, true);
+        broadcastSelectedGroup(mSelectedGroup);
     }
 
 

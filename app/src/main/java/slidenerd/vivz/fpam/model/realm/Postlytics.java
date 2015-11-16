@@ -6,7 +6,7 @@ import io.realm.annotations.PrimaryKey;
 /**
  * Created by vivz on 11/11/15.
  */
-public class Dailytics extends RealmObject {
+public class Postlytics extends RealmObject {
     //A combination of group id followed by : followed by date in dd-MM-yyyy format
     @PrimaryKey
     private String compositeGroupDateId;
@@ -29,7 +29,7 @@ public class Dailytics extends RealmObject {
     //Total number of posts whose delete failed while executing on Graph API on a daily basis
     private int failed;
 
-    public Dailytics(String compositeGroupDateId, int scanned, int deleted, int deletedEmpty, int deletedKeywords, int deletedSpammer, int failed) {
+    public Postlytics(String compositeGroupDateId, int scanned, int deleted, int deletedEmpty, int deletedKeywords, int deletedSpammer, int failed) {
         this.compositeGroupDateId = compositeGroupDateId;
         this.scanned = scanned;
         this.deleted = deleted;
@@ -40,7 +40,7 @@ public class Dailytics extends RealmObject {
     }
 
     //Must have default constructor if a custom constructor is included
-    public Dailytics() {
+    public Postlytics() {
 
     }
 

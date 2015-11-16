@@ -20,19 +20,18 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.sharedpreferences.Pref;
-import org.parceler.Parcels;
-
-import java.util.ArrayList;
 
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
+import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.extras.MyPrefs_;
-import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.admin.Admin;
-import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.Admin;
+import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.ui.transform.CropCircleTransform;
+
+import static slidenerd.vivz.fpam.extras.Constants.GROUP_NAME;
 
 /**
  * TODO show the drawer if its the first time else hide it, make the logout and settings work, align the images inside the drawer
@@ -48,11 +47,32 @@ public class FragmentDrawer extends Fragment {
     /*
         The list of groups that the logged in user is an admin of.
      */
-    private ArrayList<Group> mGroups = new ArrayList<>();
+    private RealmResults<Group> mGroups;
     private Admin mAdmin;
     private Context mContext;
     private ActivityBase mActivity;
     private Realm mRealm;
+
+    //Did we add the admin to the header already?
+    private boolean isAdminAdded;
+
+    //Did we add the groups to the header already?
+    private boolean areGroupsAdded;
+
+    /**
+     * This is triggered each time admin or one of the groups is modified. To ensure that we don't add multiple headers or the same group more than once to the Navigation Drawer, check if both admin and groups have been loaded and they have not been added before. There is no need to save the isAdminAdded and areGroupsAdded before rotating the Fragment since the Fragment gets reset after rotation and their values become false once again letting us add them only once per orientation change.
+     */
+    private RealmChangeListener mChangeListener = new RealmChangeListener() {
+        @Override
+        public void onChange() {
+            if (mAdmin.isLoaded() && mGroups.isLoaded() && !isAdminAdded && !areGroupsAdded) {
+                addHeaderToDrawer(mAdmin);
+                addGroupsToDrawer(mGroups);
+                isAdminAdded = true;
+                areGroupsAdded = true;
+            }
+        }
+    };
 
     public FragmentDrawer() {
         // Required empty public constructor
@@ -76,32 +96,17 @@ public class FragmentDrawer extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRealm = Realm.getInstance(mContext);
-        if (savedInstanceState == null) {
-            mAdmin = DataStore.copyLoadAdmin(mRealm);
-            mGroups = DataStore.copyLoadGroups(mRealm);
-            L.m("Loading From Realm ");
-        } else {
-            mAdmin = Parcels.unwrap(savedInstanceState.getParcelable("admin"));
-            mGroups = Parcels.unwrap(savedInstanceState.getParcelable("groups"));
-            L.m("Loading From Parceler ");
-        }
+        mAdmin = mRealm.where(Admin.class).findFirstAsync();
+        mGroups = mRealm.where(Group.class).findAllSortedAsync(GROUP_NAME);
+
+        //Add change listener to be notified when the objects are loaded asynchronously
+        mAdmin.addChangeListener(mChangeListener);
+        mGroups.addChangeListener(mChangeListener);
     }
 
     @AfterViews
     public void onViewCreated() {
         mDrawer.setNavigationItemSelectedListener(mActivity);
-        if (mAdmin != null) {
-            addHeaderToDrawer(mAdmin);
-        }
-        addGroupsToDrawer(mGroups);
-    }
-
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable("admin", Parcels.wrap(Admin.class, mAdmin));
-        outState.putParcelable("groups", Parcels.wrap(mGroups));
     }
 
     /**
@@ -123,18 +128,16 @@ public class FragmentDrawer extends Fragment {
     }
 
     /**
-     * If the access token is null or expired, this Activity will finish executing but this method is still called inside the onCreate as per the debugger and hence, check whether we have a valid list before adding any items to the nav_drawer to prevent a crash.
-     *
-     * @param list the list of groups that the logged in user controls
+     * If the access token is null or expired, this Activity will finish executing but this method is still called inside the onCreate as per the debugger and hence, check whether we have a valid groups before adding any items to the nav_drawer to prevent a crash.
      */
-    public void addGroupsToDrawer(ArrayList<Group> list) {
+    public void addGroupsToDrawer(RealmResults<Group> groups) {
         Menu menu = mDrawer.getMenu();
         if (mGroups.isEmpty()) {
             MenuItem item = menu.add(100, 100, 100, R.string.text_groups_none);
             item.setIcon(android.R.drawable.stat_notify_error);
         } else {
             int i = Constants.MENU_START_ID;
-            for (Group group : list) {
+            for (Group group : groups) {
                 final MenuItem item = menu.add(100, i, i, group.getGroupName());
                 item.setIcon(R.drawable.ic_group_black);
                 i++;
@@ -150,12 +153,12 @@ public class FragmentDrawer extends Fragment {
     }
 
     @Click(R.id.action_settings)
-    public void onSettingsClick() {
+    public void onClickSettings() {
         mActivity.onSettingsSelected();
     }
 
     @Click(R.id.action_logout)
-    public void onLogoutClick() {
+    public void onClickLogout() {
         mActivity.logout();
     }
 
@@ -165,14 +168,18 @@ public class FragmentDrawer extends Fragment {
      * @return the group object corresponding to the id selected by the user.
      */
     @Nullable
-    public Group getSelectedGroup(int selectedMenuId) {
+    public String getSelected(int selectedMenuId) {
         int selectedPosition = selectedMenuId - Constants.MENU_START_ID;
-        return !mGroups.isEmpty() && selectedPosition >= 0 && selectedPosition < mGroups.size() ? mGroups.get(selectedPosition) : null;
+        return !mGroups.isEmpty() && selectedPosition >= 0 && selectedPosition < mGroups.size() ? mGroups.get(selectedPosition).getGroupId() : null;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        //Remove the change listeners prior to this Fragment getting destroyed
+        mAdmin.removeChangeListener(mChangeListener);
+        mGroups.removeChangeListener(mChangeListener);
         mRealm.close();
     }
 }

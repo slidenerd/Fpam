@@ -5,13 +5,17 @@ package slidenerd.vivz.fpam.extras;
  */
 public interface Constants {
 
+    String GROUP_ID = "groupId";
+    String GROUP_NAME = "groupName";
+    String POST_ID = "postId";
+
     int TOP_ENTRIES_COUNT = 10;
     String ACTION_LOAD_FEED = "slidenerd.vivz.fpam.action.LOAD_FEED";
     String ACTION_DELETE_POST = "slidenerd.vivz.fpam.action.DELETE_POST";
-    String ACTION_DELETE_STATUS = "slidenerd.vivz.fpam.action.DELETE_STATUS";
+    String ACTION_DELETE_RESPONSE = "slidenerd.vivz.fpam.action.DELETE_STATUS";
     String EXTRA_SELECTED_GROUP = "slidenerd.vivz.fpam.action.EXTRA_SELECTED_GROUP";
     String EXTRA_POSITION = "slidenerd.vivz.fpam.extra.POSITION";
-    String EXTRA_POST = "slidenerd.vivz.fpam.extra.POST";
+    String EXTRA_ID = "slidenerd.vivz.fpam.extra.ID";
     String EXTRA_OUTCOME = "slidenerd.vivz.fpam.extra.OUTCOME";
     String PERMISSION_EMAIL = "email";
     String PERMISSION_GROUPS = "user_managed_groups";

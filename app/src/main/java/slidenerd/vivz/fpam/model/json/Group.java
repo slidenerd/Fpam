@@ -1,14 +1,8 @@
-package slidenerd.vivz.fpam.model.json.group;
+package slidenerd.vivz.fpam.model.json;
 
-import org.parceler.Parcel;
-
-import io.realm.GroupRealmProxy;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-@Parcel(implementations = {GroupRealmProxy.class},
-        value = Parcel.Serialization.BEAN,
-        analyze = {Group.class})
 public class Group extends RealmObject {
 
     //The groupId of the group that uniquely identifies this group
@@ -28,6 +22,9 @@ public class Group extends RealmObject {
 
     //Boolean indicating whether this group is actively monitored in the background from the Settings of the app
     private boolean monitored;
+
+    //Tracks how many times a particular keyword was found while scanning the feed of a group
+    private int count;
 
     //Default constructor must be declared if a custom constructor is included
     public Group() {
@@ -114,5 +111,13 @@ public class Group extends RealmObject {
 
     public void setMonitored(boolean monitored) {
         this.monitored = monitored;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 }

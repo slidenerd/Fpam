@@ -1,17 +1,14 @@
 package slidenerd.vivz.fpam.database;
 
-import android.support.annotation.Nullable;
-
 import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.admin.Admin;
-import slidenerd.vivz.fpam.model.json.feed.Post;
-import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.Admin;
+import slidenerd.vivz.fpam.model.json.Group;
+import slidenerd.vivz.fpam.model.json.Post;
 import slidenerd.vivz.fpam.model.realm.Spammer;
-import slidenerd.vivz.fpam.util.CopyUtils;
 
 public class DataStore {
 
@@ -22,16 +19,6 @@ public class DataStore {
         realm.beginTransaction();
         realm.copyToRealmOrUpdate(groups);
         realm.commitTransaction();
-    }
-
-    /**
-     * Notice the default value for the json String that has all groups. If the JSON String is null, our ArrayList will be null, if the json String is empty, our ArrayList will be null, however if our JSON String has a default value of [], our ArrayList will be empty and not null. Our objective is to ensure the ArrayList does not get a null value if something goes wrong.
-     *
-     * @return a list of groups that were retrieved from the backend, if the admin owns no groups or if there was a problem while retrieving data, then return an empty list.
-     */
-    public static ArrayList<Group> copyLoadGroups(Realm realm) {
-        RealmResults<Group> realmGroups = realm.where(Group.class).findAllSorted("groupName");
-        return CopyUtils.duplicateGroups(realmGroups);
     }
 
     public static RealmResults<Group> loadGroups(Realm realm) {
@@ -55,21 +42,9 @@ public class DataStore {
         realm.commitTransaction();
     }
 
-    /**
-     * The fromJson method throws a JsonSyntaxException - if json is not a valid representation for an object of type typeOfT and an object of type T from the json. Returns null if json is null.
-     *
-     * @return an admin whose account is currently logged in if the login was successful, on any error, it returns null
-     */
-    @Nullable
-    public static Admin copyLoadAdmin(Realm realm) {
-        //read the picture data first
-        Admin src = realm.where(Admin.class).findFirst();
-        return src != null ? CopyUtils.duplicateAdmin(src) : null;
-    }
 
-
-    public static void limitStoredPosts(Realm realm, Group group, int maximumPostsStored) {
-        RealmResults<Post> results = realm.where(Post.class).beginsWith("postId", group.getGroupId()).findAllSorted("updatedTime", false);
+    public static void limitStoredPosts(Realm realm, String groupId, int maximumPostsStored) {
+        RealmResults<Post> results = realm.where(Post.class).beginsWith("postId", groupId).findAllSorted("updatedTime", false);
         int numberOfPostsRemoved = 0;
         realm.beginTransaction();
         while (results.size() > maximumPostsStored) {

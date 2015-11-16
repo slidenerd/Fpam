@@ -21,9 +21,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import slidenerd.vivz.fpam.extras.Constants;
-import slidenerd.vivz.fpam.model.json.admin.Admin;
-import slidenerd.vivz.fpam.model.json.feed.Post;
-import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.Admin;
+import slidenerd.vivz.fpam.model.json.Group;
+import slidenerd.vivz.fpam.model.json.Post;
 import slidenerd.vivz.fpam.model.pojo.DeleteRequestInfo;
 import slidenerd.vivz.fpam.model.pojo.DeleteResponseInfo;
 
@@ -148,13 +148,13 @@ public class FBUtils {
         return listGroups;
     }
 
-    public static ArrayList<Post> requestFeedFirstTime(AccessToken token, Gson gson, Group group) throws JSONException {
+    public static ArrayList<Post> requestFeedFirstTime(AccessToken token, Gson gson, String groupId) throws JSONException {
         ArrayList<Post> listPosts = new ArrayList<>(Constants.RESULTS_PER_PAGE);
         TypeToken<ArrayList<Post>> typeToken = new TypeToken<ArrayList<Post>>() {
         };
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "from{name,id,picture},message,caption,comments{from,message},description,name,full_picture,type,updated_time,attachments{type},link,created_time");
-        GraphRequest request = new GraphRequest(token, "/" + group.getGroupId() + "/feed");
+        parameters.putString("fields", "from{name,id,picture},message,caption,comments{from,message},description,name,full_picture,type,updated_time,to{id},link,created_time");
+        GraphRequest request = new GraphRequest(token, "/" + groupId + "/feed");
         request.setParameters(parameters);
         GraphResponse response = request.executeAndWait();
         JSONObject root = response.getJSONObject();
@@ -173,7 +173,7 @@ public class FBUtils {
         return listPosts;
     }
 
-    public static ArrayList<Post> requestFeedSince(AccessToken token, Gson gson, Group group, int maximumNumberOfPostsToRetrieve, long sinceUnixEpoch) throws JSONException, FacebookException {
+    public static ArrayList<Post> requestFeedSince(AccessToken token, Gson gson, String groupId, int maximumNumberOfPostsToRetrieve, long sinceUnixEpoch) throws JSONException, FacebookException {
         ArrayList<Post> listPosts = new ArrayList<>(maximumNumberOfPostsToRetrieve);
         TypeToken<ArrayList<Post>> typeToken = new TypeToken<ArrayList<Post>>() {
         };
@@ -184,7 +184,7 @@ public class FBUtils {
         Bundle parametersSubsequent = new Bundle();
         parametersSubsequent.putString("fields", "from{name,id,picture},message,caption,comments{from,message},description,name,full_picture,type,updated_time,attachments{type},link,created_time");
         boolean hasMoreData = false;
-        GraphRequest request = new GraphRequest(token, "/" + group.getGroupId() + "/feed");
+        GraphRequest request = new GraphRequest(token, "/" + groupId + "/feed");
         request.setParameters(parameters);
         GraphResponse response = request.executeAndWait();
         int numberOfPostsRetrieved = 0;

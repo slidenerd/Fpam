@@ -8,7 +8,7 @@ import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
 
-import slidenerd.vivz.fpam.model.json.admin.Admin;
+import slidenerd.vivz.fpam.model.json.Admin;
 
 import static slidenerd.vivz.fpam.extras.Fields.DATA;
 import static slidenerd.vivz.fpam.extras.Fields.EMAIL;

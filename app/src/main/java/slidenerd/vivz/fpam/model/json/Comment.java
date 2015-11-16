@@ -1,14 +1,8 @@
-package slidenerd.vivz.fpam.model.json.feed;
+package slidenerd.vivz.fpam.model.json;
 
-import org.parceler.Parcel;
-
-import io.realm.CommentRealmProxy;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-@Parcel(implementations = {CommentRealmProxy.class},
-        value = Parcel.Serialization.BEAN,
-        analyze = {Comment.class})
 public class Comment extends RealmObject {
 
     @PrimaryKey

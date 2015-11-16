@@ -20,8 +20,8 @@ import io.realm.RealmResults;
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.admin.Admin;
-import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.Admin;
+import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.util.FBUtils;
 
 @EFragment
@@ -69,31 +69,21 @@ public class TaskLoadAdminAndGroups extends Fragment {
 
             //Get the list of groups retrieved in the previous round.
 
-            RealmResults<Group> results = realm.where(Group.class).findAll();
-
-            //Copy their mIds, timestamp and whether they are monitored in the background
-
-            String[] ids = new String[results.size()];
-            long[] timestamps = new long[results.size()];
-            boolean[] monitored = new boolean[results.size()];
-            for (int i = 0; i < results.size(); i++) {
-                Group group = results.get(i);
-                ids[i] = group.getGroupId();
-                timestamps[i] = group.getLastLoaded();
-                monitored[i] = group.isMonitored();
-            }
+            RealmResults<Group> previousGroups = realm.where(Group.class).findAll();
 
             //Request the fresh list of group objects from the JSON feed. For each group object in this list, its monitored and timestamp are set at default.
 
-            ArrayList<Group> groups = FBUtils.requestGroupsSync(accessToken, gson);
+            ArrayList<Group> currentGroups = FBUtils.requestGroupsSync(accessToken, gson);
 
             //If a newly loaded group id matches with a previously loaded group id, then update the value of its timestamp and set its monitored parameter accordingly.
 
-            for (Group group : groups) {
-                for (int j = 0; j < results.size(); j++) {
-                    if (group.getGroupId().equals(ids[j])) {
-                        group.setMonitored(monitored[j]);
-                        group.setLastLoaded(timestamps[j]);
+            for (Group previousGroup : previousGroups) {
+                for (Group currentGroup : currentGroups) {
+                    if (currentGroup.getGroupId().equals(previousGroup.getGroupId())) {
+                        currentGroup.setMonitored(previousGroup.isMonitored());
+                        currentGroup.setLastLoaded(previousGroup.getLastLoaded());
+                        currentGroup.setCount(previousGroup.getCount());
+                        break;
                     }
                 }
             }
@@ -101,7 +91,7 @@ public class TaskLoadAdminAndGroups extends Fragment {
             //Store the fully constructed group objects to the realm database.
 
             DataStore.storeAdmin(realm, admin);
-            DataStore.storeGroups(realm, groups);
+            DataStore.storeGroups(realm, currentGroups);
 
         } catch (JSONException e) {
             L.m("" + e);
@@ -122,9 +112,7 @@ public class TaskLoadAdminAndGroups extends Fragment {
 
     @UiThread
     void onAdminAndGroupsLoaded() {
-        if (mCallback != null) {
-            mCallback.afterAdminAndGroupsLoaded();
-        }
+        mCallback.afterAdminAndGroupsLoaded();
     }
 
     public interface TaskCallback {

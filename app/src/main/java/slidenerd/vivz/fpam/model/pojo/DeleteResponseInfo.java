@@ -1,6 +1,6 @@
 package slidenerd.vivz.fpam.model.pojo;
 
-import slidenerd.vivz.fpam.model.json.feed.Post;
+import slidenerd.vivz.fpam.model.json.Post;
 
 /**
  * Created by vivz on 11/10/15.

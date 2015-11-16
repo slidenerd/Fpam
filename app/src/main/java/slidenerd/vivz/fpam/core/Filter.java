@@ -8,8 +8,8 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.feed.Post;
-import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.Post;
+import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.model.pojo.DeleteRequestInfo;
 import slidenerd.vivz.fpam.model.pojo.DeleteResponseInfo;
 import slidenerd.vivz.fpam.model.realm.Spammer;
@@ -31,15 +31,13 @@ public class Filter {
      *
      * @param token
      * @param realm
-     * @param group
      */
-    public static String filterPostsOnLoad(AccessToken token, Realm realm, Group group, ArrayList<Post> posts) throws JSONException {
+    public static String filterPostsOnLoad(AccessToken token, Realm realm, String groupId, ArrayList<Post> posts) throws JSONException {
 
         StringBuffer message = new StringBuffer();
 
         //find the group id to which this post belongs
 
-        String groupId = group.getGroupId();
         ArrayList<DeleteRequestInfo> deletes = new ArrayList<>(posts.size());
         ArrayList<Spammer> spammers = new ArrayList<>(posts.size());
         int size = 0;

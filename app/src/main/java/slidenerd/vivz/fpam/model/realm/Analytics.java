@@ -1,13 +1,8 @@
 package slidenerd.vivz.fpam.model.realm;
 
-import org.parceler.ParcelPropertyConverter;
-
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
-import slidenerd.vivz.fpam.model.parcel.DailyticsParcelConverter;
-import slidenerd.vivz.fpam.model.parcel.SpammerParcelConverter;
-import slidenerd.vivz.fpam.model.parcel.WordlyticsParcelConverter;
 
 /**
  * Created by vivz on 10/11/15.
@@ -16,8 +11,8 @@ public class Analytics extends RealmObject {
     @PrimaryKey
     private String groupId;
     private String groupName;
-    private RealmList<Dailytics> entries = new RealmList<>();
-    private RealmList<Wordlytics> keywords = new RealmList<>();
+    private RealmList<Postlytics> entries = new RealmList<>();
+    private RealmList<Keyword> keywords = new RealmList<>();
     //Store the top X spammers of this groupId
     private RealmList<Spammer> spammers = new RealmList<>();
 
@@ -26,11 +21,11 @@ public class Analytics extends RealmObject {
 
     }
 
-    public Analytics(String groupId, String groupName, RealmList<Dailytics> entries, RealmList<Wordlytics> keywords, RealmList<Spammer> spammers) {
+    public Analytics(String groupId, String groupName, RealmList<Postlytics> entries, RealmList<Keyword> keywords, RealmList<Spammer> spammers) {
         this.groupId = groupId;
         this.groupName = groupName;
-        this.entries = (entries != null) ? entries : new RealmList<Dailytics>();
-        this.keywords = (keywords != null) ? keywords : new RealmList<Wordlytics>();
+        this.entries = (entries != null) ? entries : new RealmList<Postlytics>();
+        this.keywords = (keywords != null) ? keywords : new RealmList<Keyword>();
         this.spammers = (spammers != null) ? spammers : new RealmList<Spammer>();
     }
 
@@ -46,8 +41,6 @@ public class Analytics extends RealmObject {
         return spammers;
     }
 
-
-    @ParcelPropertyConverter(SpammerParcelConverter.class)
     public void setSpammers(RealmList<Spammer> spammers) {
         this.spammers = spammers;
     }
@@ -60,21 +53,19 @@ public class Analytics extends RealmObject {
         this.groupId = groupId;
     }
 
-    public RealmList<Wordlytics> getKeywords() {
+    public RealmList<Keyword> getKeywords() {
         return keywords;
     }
 
-    @ParcelPropertyConverter(WordlyticsParcelConverter.class)
-    public void setKeywords(RealmList<Wordlytics> keywords) {
+    public void setKeywords(RealmList<Keyword> keywords) {
         this.keywords = keywords;
     }
 
-    public RealmList<Dailytics> getEntries() {
+    public RealmList<Postlytics> getEntries() {
         return entries;
     }
 
-    @ParcelPropertyConverter(DailyticsParcelConverter.class)
-    public void setEntries(RealmList<Dailytics> entries) {
+    public void setEntries(RealmList<Postlytics> entries) {
         this.entries = entries;
     }
 }

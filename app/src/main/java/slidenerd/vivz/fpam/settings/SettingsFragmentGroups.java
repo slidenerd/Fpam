@@ -27,7 +27,7 @@ import slidenerd.vivz.fpam.adapter.SettingsGroupsAdapter;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.extras.MyPrefs_;
-import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.Group;
 
 /**
  * TODO save the list of groups selected by the user

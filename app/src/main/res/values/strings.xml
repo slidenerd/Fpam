@@ -47,4 +47,7 @@
     <string name="title_activity_keywords">Keywords</string>
     <string name="title_activity_activity_keywords">Keywords</string>
     <string name="hint_keyword">Example \"100% free\"</string>
+    <string name="title_loading">We are testing your patience</string>
+    <string name="ok">OK</string>
+    <string name="message_invalid_post">Sorry, we did not get the button on this post to delete</string>
 </resources>

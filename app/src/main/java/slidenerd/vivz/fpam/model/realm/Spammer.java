@@ -1,17 +1,12 @@
 package slidenerd.vivz.fpam.model.realm;
 
-import org.parceler.Parcel;
-
 import io.realm.RealmObject;
-import io.realm.SpammerRealmProxy;
 import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by vivz on 07/10/15.
  */
-@Parcel(implementations = {SpammerRealmProxy.class},
-        value = Parcel.Serialization.BEAN,
-        analyze = {Spammer.class})
+
 public class Spammer extends RealmObject {
     //This is a combination of the user id followed by the group id separated by a colon
     @PrimaryKey

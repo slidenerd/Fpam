@@ -20,18 +20,24 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import slidenerd.vivz.fpam.Fpam;
+import slidenerd.vivz.fpam.core.AnalyticsManager;
 import slidenerd.vivz.fpam.core.Filter;
+import slidenerd.vivz.fpam.core.PostlyticsManager;
 import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.extras.MyPrefs_;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.feed.Post;
-import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.Group;
+import slidenerd.vivz.fpam.model.json.Post;
+import slidenerd.vivz.fpam.model.realm.Analytics;
+import slidenerd.vivz.fpam.model.realm.Postlytics;
 import slidenerd.vivz.fpam.util.DateUtils;
 import slidenerd.vivz.fpam.util.FBUtils;
 
+import static slidenerd.vivz.fpam.extras.Constants.GROUP_ID;
+
 /**
- * TODO handle the case where the delete fails or the person has deleted the post from Facebook directly instead of this app
+ * TODO handle the case where the delete fails or the person has deleted the post from Facebook directly instead of this app and try to send a group id instead of the whole group
  * The retained fragment used to load posts in the background
  */
 @EFragment
@@ -65,23 +71,18 @@ public class TaskFragmentLoadPosts extends Fragment {
         setRetainInstance(true);
     }
 
-    public void triggerLoadPosts(@NonNull Group group, AccessToken accessToken) {
-        if (mCallback != null) {
-            mCallback.beforePostsLoaded("");
-        } else {
-            L.m("Callback was null");
-        }
-        loadPostsAsync(group, accessToken);
+    public void triggerLoadPosts(@NonNull String groupId, AccessToken accessToken) {
+        mCallback.beforePostsLoaded();
+        loadPostsAsync(groupId, accessToken);
     }
 
     /**
      * If the feed is loaded for the first time, then load posts the simple way without considering the timestamp. There is no need to consider the limit enforced by the admin from the settings of the app since the default option for limit corresponds to 25 which also happens to be the maximum number of results returned by facebook graph api if loading data using the simple way. If the loading process returned non empty results, then store the timestamp of when this group was loaded. If the feed is loaded for a subsequent time, use the previously stored timestamp from the previous step to fetch all the posts from the timestamp till the current time. Since the number of posts may be literally very large, consider the limits set by the admin for settings to get at max limit number of posts.
      *
-     * @param group the group selected by the user from the navigation drawer
      * @param token the access token provided by facebook after login
      */
     @Background
-    void loadPostsAsync(@NonNull Group group, AccessToken token) {
+    void loadPostsAsync(@NonNull String groupId, AccessToken token) {
         if (FBUtils.isValid(token)) {
             Realm realm = null;
             int originalLoadCount;
@@ -96,20 +97,19 @@ public class TaskFragmentLoadPosts extends Fragment {
 
                 //Get the time stamp of when this group was last loaded and convert that timestamp to UTC format
 
-                long lastLoadedTimestamp = DateUtils.getUTCTimestamp(DataStore.getLastLoadedTimestamp(realm, group.getGroupId()));
+                long lastLoadedTimestamp = DateUtils.getUTCTimestamp(DataStore.getLastLoadedTimestamp(realm, groupId));
                 ArrayList<Post> posts;
 
                 //If the group was loaded before as indicated by a valid timestamp, then fetch all posts made since that timestamp or maximum number of posts as per the cache size from the app settings whichever is greater
 
                 if (lastLoadedTimestamp > 0) {
-                    posts = FBUtils.requestFeedSince(token, Fpam.getGson(), group, maximumPostsStored, lastLoadedTimestamp);
+                    posts = FBUtils.requestFeedSince(token, Fpam.getGson(), groupId, maximumPostsStored, lastLoadedTimestamp);
                 }
 
                 //If the group was never loaded before, load it for the first time
                 else {
-                    posts = FBUtils.requestFeedFirstTime(token, Fpam.getGson(), group);
+                    posts = FBUtils.requestFeedFirstTime(token, Fpam.getGson(), groupId);
                 }
-                onProgressUpdate("Loaded", posts.size() + " posts from " + group.getGroupName());
                 originalLoadCount = posts.size();
 
                 //If we did retrieve posts, update the timestamp of when the group was loaded
@@ -118,20 +118,29 @@ public class TaskFragmentLoadPosts extends Fragment {
 
                     //Filter spam posts made by known spammers or containing certain words
 
-                    Filter.filterPostsOnLoad(token, realm, group, posts);
+                    Filter.filterPostsOnLoad(token, realm, groupId, posts);
 
                     filteredLoadCount = posts.size();
 
-                    //Get this group object from realm in order to update its timestamp
+                    Group group = realm.where(Group.class).equalTo(GROUP_ID, groupId).findFirst();
+                    //Get hold of the analytics object
+                    Analytics analytics = AnalyticsManager.getInstance(realm, groupId, group.getGroupName());
 
-                    Group realmGroup = realm.where(Group.class).equalTo("groupId", group.getGroupId()).findFirst();
+                    //Get a reference to the Postlytics object for the current date in order to update the number of posts scanned
+                    Postlytics postlytics = PostlyticsManager.getInstance(realm, groupId);
+
+                    //Get this group object from realm in order to update its timestamp
+                    Group realmGroup = realm.where(Group.class).equalTo(GROUP_ID, groupId).findFirst();
                     realm.beginTransaction();
                     realm.copyToRealmOrUpdate(posts);
                     realmGroup.setLastLoaded(System.currentTimeMillis());
+                    postlytics.setScanned(postlytics.getScanned() + posts.size());
+                    realm.copyToRealmOrUpdate(postlytics);
+                    analytics.getEntries().add(postlytics);
                     realm.commitTransaction();
                     //Limit the number of entries stored in the database, based on the cache settings of the app, if the admin has set the cache to 25, if the number of posts loaded were 25 but the number of posts already present in the database were 15, then get rid of the oldest 15 posts and store the new 25 posts in the database.
 
-                    DataStore.limitStoredPosts(realm, group, maximumPostsStored);
+                    DataStore.limitStoredPosts(realm, groupId, maximumPostsStored);
 
                 }
 
@@ -140,9 +149,10 @@ public class TaskFragmentLoadPosts extends Fragment {
                     message = originalLoadCount + ((originalLoadCount - filteredLoadCount > 0) ? " Posts Loaded And " + (originalLoadCount - filteredLoadCount) + " spam posts removed" : "");
 
                 } else {
-                    message = "No New Posts Loaded For " + group.getGroupName();
+                    message = "No New Posts Loaded For " + groupId;
                 }
-                onPostsLoaded(message, group);
+                L.m(message);
+                onPostsLoaded();
             } catch (JSONException e) {
                 L.m("" + e);
             } catch (FacebookException e) {
@@ -153,26 +163,13 @@ public class TaskFragmentLoadPosts extends Fragment {
                 }
             }
         } else {
-            onPostsLoaded("Did not find a valid access token while loading" + token, group);
+            onPostsLoaded();
         }
     }
 
     @UiThread
-    void onProgressUpdate(String title, String message) {
-        if (mCallback != null) {
-            mCallback.onProgressUpdate(title, message);
-        } else {
-            L.m("Callback was null");
-        }
-    }
-
-    @UiThread
-    void onPostsLoaded(String message, Group group) {
-        if (mCallback != null) {
-            mCallback.afterPostsLoaded(message, group);
-        } else {
-            L.m("Callback was null");
-        }
+    void onPostsLoaded() {
+        mCallback.afterPostsLoaded();
     }
 
     @Override
@@ -182,10 +179,8 @@ public class TaskFragmentLoadPosts extends Fragment {
     }
 
     public interface TaskCallback {
-        void beforePostsLoaded(String message);
+        void beforePostsLoaded();
 
-        void onProgressUpdate(String title, String message);
-
-        void afterPostsLoaded(String message, Group group);
+        void afterPostsLoaded();
     }
 }

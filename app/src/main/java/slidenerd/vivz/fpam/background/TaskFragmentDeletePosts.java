@@ -2,8 +2,10 @@ package slidenerd.vivz.fpam.background;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.facebook.AccessToken;
 
@@ -19,10 +21,10 @@ import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.core.Core;
 import slidenerd.vivz.fpam.extras.MyPrefs_;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.feed.Post;
-import slidenerd.vivz.fpam.model.json.group.Group;
-import slidenerd.vivz.fpam.util.ModelUtils;
-import slidenerd.vivz.fpam.util.NavUtils;
+
+import static slidenerd.vivz.fpam.extras.Constants.ACTION_DELETE_RESPONSE;
+import static slidenerd.vivz.fpam.extras.Constants.EXTRA_OUTCOME;
+import static slidenerd.vivz.fpam.extras.Constants.EXTRA_POSITION;
 
 /**
  * TODO handle the case where the delete fails or the person has deleted the post from Facebook directly instead of this app
@@ -63,14 +65,13 @@ public class TaskFragmentDeletePosts extends Fragment {
      * @param token the access token provided by facebook after login
      */
     @Background
-    void deletePostsAsync(AccessToken token, int position, Post post) {
+    void deletePostsAsync(AccessToken token, int position, String postId) {
         Realm realm = null;
         Core core = new Core();
         try {
             realm = Realm.getDefaultInstance();
-            Group group = realm.where(Group.class).equalTo("groupId", ModelUtils.computeGroupId(post.getPostId())).findFirst();
-            boolean status = core.deletePostFB(position, token, group, post, realm);
-            onPostsDeleted(status, position);
+            boolean status = core.deletePostFB(position, token, postId, realm);
+            onDelete(status, position);
 
         } catch (JSONException e) {
             L.m(e + "");
@@ -82,7 +83,10 @@ public class TaskFragmentDeletePosts extends Fragment {
     }
 
     @UiThread
-    void onPostsDeleted(boolean outcome, int position) {
-        NavUtils.broadcastDeleteStatus(mContext, outcome, position);
+    void onDelete(boolean outcome, int position) {
+        Intent intent = new Intent(ACTION_DELETE_RESPONSE);
+        intent.putExtra(EXTRA_OUTCOME, outcome);
+        intent.putExtra(EXTRA_POSITION, position);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 }

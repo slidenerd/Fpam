@@ -14,7 +14,7 @@ import android.widget.TextView;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.util.VersionUtils;
 
 /**

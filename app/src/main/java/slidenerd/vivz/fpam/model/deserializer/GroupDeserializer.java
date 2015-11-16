@@ -8,7 +8,7 @@ import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
 
-import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.Group;
 
 import static slidenerd.vivz.fpam.extras.Fields.ICON;
 import static slidenerd.vivz.fpam.extras.Fields.ID;

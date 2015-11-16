@@ -1,14 +1,8 @@
-package slidenerd.vivz.fpam.model.json.admin;
+package slidenerd.vivz.fpam.model.json;
 
-import org.parceler.Parcel;
-
-import io.realm.AdminRealmProxy;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-@Parcel(implementations = {AdminRealmProxy.class},
-        value = Parcel.Serialization.BEAN,
-        analyze = {Admin.class})
 public class Admin extends RealmObject {
 
     @PrimaryKey

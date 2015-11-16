@@ -33,7 +33,7 @@ public class AdapterKeywords extends RecyclerView.Adapter<AdapterKeywords.Keywor
         notifyDataSetChanged();
     }
 
-    public void add(String keywordString) {
+    public void add(final String keywordString) {
         Keyword keyword = new Keyword(keywordString, System.currentTimeMillis());
         mRealm.beginTransaction();
         mRealm.copyToRealmOrUpdate(keyword);
@@ -63,7 +63,7 @@ public class AdapterKeywords extends RecyclerView.Adapter<AdapterKeywords.Keywor
 
     @Override
     public void onBindViewHolder(KeywordHolder holder, final int position) {
-        final Keyword keyword = mResults.get(position);
+        Keyword keyword = mResults.get(position);
         holder.setKeyword(keyword.getKeyword());
     }
 

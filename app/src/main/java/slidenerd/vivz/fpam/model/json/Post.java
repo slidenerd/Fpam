@@ -1,6 +1,4 @@
-package slidenerd.vivz.fpam.model.json.feed;
-
-import org.parceler.Parcel;
+package slidenerd.vivz.fpam.model.json;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
@@ -8,9 +6,7 @@ import io.realm.annotations.PrimaryKey;
 /**
  * TODO deal with attachments in some way
  */
-@Parcel(implementations = {Post.class},
-        value = Parcel.Serialization.BEAN,
-        analyze = {Post.class})
+
 public class Post extends RealmObject {
 
     //The unqiue id of each post
@@ -54,12 +50,16 @@ public class Post extends RealmObject {
     //The link if any present in this post, this is optional
     private String link;
 
+    //the group id of the group where this Post was made.
+    private String groupId;
+
     //Must have default constructor if a custom constructor is included
     public Post() {
 
     }
 
-    public Post(String postId, long rowId, String userId, String userName, String userPicture, String message, String name, String caption, String description, String picture, String type, long createdTime, long updatedTime, String link) {
+    public Post(String groupId, String postId, long rowId, String userId, String userName, String userPicture, String name, String message, String caption, String description, String link, String picture, String type, long createdTime, long updatedTime) {
+        this.groupId = groupId;
         this.postId = postId;
         this.rowId = rowId;
         this.userId = userId;
@@ -234,5 +234,13 @@ public class Post extends RealmObject {
 
     public void setRowId(long rowId) {
         this.rowId = rowId;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 }

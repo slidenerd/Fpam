@@ -19,9 +19,9 @@ import io.realm.RealmObject;
 import slidenerd.vivz.fpam.model.deserializer.AdminDeserializer;
 import slidenerd.vivz.fpam.model.deserializer.GroupDeserializer;
 import slidenerd.vivz.fpam.model.deserializer.PostDeserializer;
-import slidenerd.vivz.fpam.model.json.admin.Admin;
-import slidenerd.vivz.fpam.model.json.feed.Post;
-import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.Admin;
+import slidenerd.vivz.fpam.model.json.Post;
+import slidenerd.vivz.fpam.model.json.Group;
 
 /**
  * Created by vivz on 28/07/15.

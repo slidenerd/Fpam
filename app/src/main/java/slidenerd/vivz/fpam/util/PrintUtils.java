@@ -2,9 +2,9 @@ package slidenerd.vivz.fpam.util;
 
 import java.util.List;
 
-import slidenerd.vivz.fpam.model.json.admin.Admin;
-import slidenerd.vivz.fpam.model.json.feed.Post;
-import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.Admin;
+import slidenerd.vivz.fpam.model.json.Post;
+import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.model.realm.Spammer;
 
 public class PrintUtils {

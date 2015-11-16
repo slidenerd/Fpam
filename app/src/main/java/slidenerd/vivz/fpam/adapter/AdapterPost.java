@@ -14,13 +14,14 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import org.apache.commons.lang3.StringUtils;
+
 import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.model.json.feed.Post;
+import slidenerd.vivz.fpam.model.json.Post;
 import slidenerd.vivz.fpam.ui.transform.CropCircleTransform;
 import slidenerd.vivz.fpam.ui.transform.CropTransformation;
-import slidenerd.vivz.fpam.util.CopyUtils;
 import slidenerd.vivz.fpam.util.DisplayUtils;
 import slidenerd.vivz.fpam.widget.ExpandableTextView;
 
@@ -106,7 +107,7 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.ItemHolder> {
 
     @Nullable
     public Post getItem(int position) {
-        return CopyUtils.duplicatePost(mResults.get(position));
+        return mResults.get(position);
     }
 
     public class ItemHolder extends RecyclerView.ViewHolder {
@@ -143,7 +144,7 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.ItemHolder> {
         public void setProfilePicture(String uri) {
 
             //As per the solution discussed here http://stackoverflow.com/questions/32706246/recyclerview-adapter-and-glide-same-image-every-4-5-rows
-            if (uri != null) {
+            if (StringUtils.isNotBlank(uri)) {
                 Glide.with(mContext)
                         .load(uri)
                         .asBitmap()
@@ -158,7 +159,7 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.ItemHolder> {
         public void setPostPicture(String uri) {
 
             //As per the solution discussed here http://stackoverflow.com/questions/32706246/recyclerview-adapter-and-glide-same-image-every-4-5-rows
-            if (uri != null) {
+            if (StringUtils.isNotBlank(uri)) {
                 Glide.with(mContext)
                         .load(uri)
                         .asBitmap()

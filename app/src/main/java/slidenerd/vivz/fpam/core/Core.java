@@ -9,17 +9,19 @@ import java.util.List;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
-import slidenerd.vivz.fpam.model.json.feed.Post;
-import slidenerd.vivz.fpam.model.json.group.Group;
+import slidenerd.vivz.fpam.model.json.Group;
+import slidenerd.vivz.fpam.model.json.Post;
 import slidenerd.vivz.fpam.model.realm.Analytics;
-import slidenerd.vivz.fpam.model.realm.Dailytics;
 import slidenerd.vivz.fpam.model.realm.Keyword;
+import slidenerd.vivz.fpam.model.realm.Postlytics;
 import slidenerd.vivz.fpam.model.realm.Spammer;
 import slidenerd.vivz.fpam.util.FBUtils;
 import slidenerd.vivz.fpam.util.ModelUtils;
 
+import static slidenerd.vivz.fpam.extras.Constants.GROUP_ID;
+import static slidenerd.vivz.fpam.extras.Constants.POST_ID;
+
 /**
- * TODO save analytics object
  * Created by vivz on 10/11/15.
  */
 public class Core {
@@ -48,15 +50,22 @@ public class Core {
         return list;
     }
 
-    public boolean deletePostFB(int position, AccessToken token, Group group, Post post, Realm realm) throws JSONException {
-        List<Keyword> keywords = getRelevantKeywords(realm, group.getGroupId());
-        Analytics analytics = AnalyticsManager.getInstance(realm, group.getGroupId(), group.getGroupName());
+    public boolean deletePostFB(int position, AccessToken token, String postId, Realm realm) throws JSONException {
+        Post post = realm.where(Post.class).equalTo(POST_ID, postId).findFirst();
+        List<Keyword> keywords = getRelevantKeywords(realm, post.getGroupId());
+        Group group = realm.where(Group.class).equalTo(GROUP_ID, post.getGroupId()).findFirst();
+        Analytics analytics = AnalyticsManager.getInstance(realm, post.getGroupId(), group.getGroupName());
         boolean success = FBUtils.requestDeletePost(token, post);
-        String spammerId = ModelUtils.computeSpammerId(post.getUserId(), group.getGroupId());
-        String dailyticsDate = ModelUtils.computeAnalyticsDate(post.getUpdatedTime());
-        String dailyticsId = ModelUtils.computeDailyticsId(group.getGroupId(), dailyticsDate);
-        Dailytics dailytics = DailyticsManager.getInstance(realm, dailyticsId);
+        String spammerId = ModelUtils.computeSpammerId(post.getUserId(), post.getGroupId());
+        Postlytics postlytics = PostlyticsManager.getInstance(realm, post.getGroupId());
+        int deleted = 0;
+        int deletedEmpty = 0;
+        int deletedKeywords = 0;
+        int deletedSpammer = 0;
+        int failed = 0;
         if (success) {
+
+            deleted++;
 
             //if the user id does not exist in the database, add the combination of this user id and group id as a new entry in the Spammers database
 
@@ -77,6 +86,7 @@ public class Core {
                 spammer.setSpamCount(spammer.getSpamCount() + 1);
                 spammer.setLastActive(System.currentTimeMillis());
                 realm.commitTransaction();
+                deletedSpammer++;
                 //if the combination of user id and group id is not found in the database, create it
             }
 
@@ -85,21 +95,43 @@ public class Core {
             String message = post.getMessage();
             String caption = post.getCaption();
             String description = post.getDescription();
-            String content = message + "\n" + caption + "\n" + description;
+            StringBuffer content = new StringBuffer();
+            if (message != null) {
+                content.append(message.toLowerCase()).append(" ");
+            }
+            if (caption != null) {
+                content.append(caption.toLowerCase()).append(" ");
+            }
+            if (description != null) {
+                content.append(description.toLowerCase());
+            }
 
             if (message == null || message.trim().isEmpty()) {
                 //update the number of empty messages found under this group id as part of analytics
-                DailyticsManager.updateEmpty(dailytics, realm, 1);
+//                PostlyticsManager.updateEmpty(postlytics, realm, 1);
+                deletedEmpty++;
             }
-            DailyticsManager.updateDeleted(dailytics, realm, 1);
-            if (content != null && !content.trim().isEmpty()) {
-                for (Keyword keyword : keywords) {
+//            PostlyticsManager.updateDeleted(postlytics, realm, 1);
+            if (!content.toString().trim().isEmpty()) {
+                Keyword keyword = null;
+                for (int i = 0; i < keywords.size(); i++) {
                     int count = 0;
-                    if (content.toLowerCase().contains(keyword.getKeyword())) {
+                    keyword = keywords.get(i);
+                    if (content.toString().contains(keyword.getKeyword())) {
                         //update the number of times each keyword is found as part of the analytics
                         count++;
                     }
-
+                    if (keyword != null) {
+                        RealmList<Group> groups = keyword.getGroups();
+                        for (Group g : groups) {
+                            if (g.getGroupId().equals(post.getGroupId())) {
+                                realm.beginTransaction();
+                                g.setCount(g.getCount() + count);
+                                realm.commitTransaction();
+                                break;
+                            }
+                        }
+                    }
                 }
             }
 
@@ -110,11 +142,11 @@ public class Core {
 
         } else {
             //update delete failed count
-            DailyticsManager.updateFailed(dailytics, realm, 1);
+            PostlyticsManager.updateFailed(postlytics, realm, 1);
         }
         realm.beginTransaction();
-        realm.copyToRealmOrUpdate(dailytics);
-        analytics.getEntries().add(dailytics);
+        realm.copyToRealmOrUpdate(postlytics);
+        analytics.getEntries().add(postlytics);
         realm.copyToRealmOrUpdate(analytics);
         realm.commitTransaction();
         return success;

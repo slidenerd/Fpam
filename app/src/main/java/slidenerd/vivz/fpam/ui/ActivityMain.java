@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,32 +15,29 @@ import android.view.View;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.Receiver;
-import org.parceler.Parcels;
 
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.background.TaskFragmentDeletePosts_;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.log.L;
-import slidenerd.vivz.fpam.model.json.feed.Post;
-import slidenerd.vivz.fpam.util.CopyUtils;
 
+import static slidenerd.vivz.fpam.extras.Constants.EXTRA_ID;
 import static slidenerd.vivz.fpam.extras.Constants.EXTRA_POSITION;
-import static slidenerd.vivz.fpam.extras.Constants.EXTRA_POST;
 
 @EActivity
 @OptionsMenu(R.menu.menu_main)
 public class ActivityMain extends ActivityBase {
-    private static final String TAG_FRAGMENT_TASK_DELETE = "delete_posts";
+    private static final String TAG_FRAGMENT = "delete_posts";
     private ViewPager mPager;
     private TaskFragmentDeletePosts_ mTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mTask = (TaskFragmentDeletePosts_) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_TASK_DELETE);
+        mTask = (TaskFragmentDeletePosts_) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT);
         if (mTask == null) {
             mTask = new TaskFragmentDeletePosts_();
-            getSupportFragmentManager().beginTransaction().add(mTask, TAG_FRAGMENT_TASK_DELETE).commit();
+            getSupportFragmentManager().beginTransaction().add(mTask, TAG_FRAGMENT).commit();
         }
     }
 
@@ -66,11 +64,22 @@ public class ActivityMain extends ActivityBase {
     }
 
     @Receiver(actions = Constants.ACTION_DELETE_POST, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
-    public void onBroadcastRequestDelete(Context context, Intent intent) {
-        Post swipedPost = Parcels.unwrap(intent.getExtras().getParcelable(EXTRA_POST));
+    public void onDeleteRequest(Context context, Intent intent) {
+        String postId = intent.getExtras().getString(EXTRA_ID);
         int position = intent.getExtras().getInt(EXTRA_POSITION);
-        L.m("position " + position + " post username " + swipedPost.getUserName());
-        mTask.deletePostsAsync(mApplication.getToken(), position, CopyUtils.duplicatePost(swipedPost));
+        L.m("position " + position + " post id " + postId);
+        if (postId != null) {
+            mTask.deletePostsAsync(mApplication.getToken(), position, postId);
+        } else {
+            final Snackbar snackbar = Snackbar.make(mPager, R.string.message_invalid_post, Snackbar.LENGTH_INDEFINITE);
+            snackbar.setAction(R.string.ok, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    snackbar.dismiss();
+                }
+            });
+            snackbar.show();
+        }
     }
 
     public static class MainPagerAdapter extends FragmentStatePagerAdapter {
@@ -84,7 +93,7 @@ public class ActivityMain extends ActivityBase {
 
         @Override
         public Fragment getItem(int position) {
-            Fragment fragment = null;
+            Fragment fragment;
             if (position == 0) {
                 fragment = FragmentPosts_.builder().build();
             } else {
