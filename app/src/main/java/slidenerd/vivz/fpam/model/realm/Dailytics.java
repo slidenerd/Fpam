@@ -6,7 +6,7 @@ import io.realm.annotations.PrimaryKey;
 /**
  * Created by vivz on 11/11/15.
  */
-public class Postlytics extends RealmObject {
+public class Dailytics extends RealmObject {
     //A combination of group id followed by : followed by date in dd-MM-yyyy format
     @PrimaryKey
     private String compositeGroupDateId;
@@ -29,7 +29,7 @@ public class Postlytics extends RealmObject {
     //Total number of posts whose delete failed while executing on Graph API on a daily basis
     private int failed;
 
-    public Postlytics(String compositeGroupDateId, int scanned, int deleted, int deletedEmpty, int deletedKeywords, int deletedSpammer, int failed) {
+    public Dailytics(String compositeGroupDateId, int scanned, int deleted, int deletedEmpty, int deletedKeywords, int deletedSpammer, int failed) {
         this.compositeGroupDateId = compositeGroupDateId;
         this.scanned = scanned;
         this.deleted = deleted;
@@ -40,19 +40,19 @@ public class Postlytics extends RealmObject {
     }
 
     //Must have default constructor if a custom constructor is included
-    public Postlytics() {
+    public Dailytics() {
 
     }
 
-    public static String toString(Postlytics postlytics) {
-        return "Postlytics{" +
-                "compositeGroupDateId='" + postlytics.compositeGroupDateId + '\'' +
-                ", scanned=" + postlytics.scanned +
-                ", deleted=" + postlytics.deleted +
-                ", deletedEmpty=" + postlytics.deletedEmpty +
-                ", deletedKeywords=" + postlytics.deletedKeywords +
-                ", deletedSpammer=" + postlytics.deletedSpammer +
-                ", failed=" + postlytics.failed +
+    public static String toString(Dailytics dailytics) {
+        return "Dailytics{" +
+                "compositeGroupDateId='" + dailytics.compositeGroupDateId + '\'' +
+                ", scanned=" + dailytics.scanned +
+                ", deleted=" + dailytics.deleted +
+                ", deletedEmpty=" + dailytics.deletedEmpty +
+                ", deletedKeywords=" + dailytics.deletedKeywords +
+                ", deletedSpammer=" + dailytics.deletedSpammer +
+                ", failed=" + dailytics.failed +
                 '}';
     }
 

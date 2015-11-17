@@ -21,19 +21,16 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.L;
-import slidenerd.vivz.fpam.core.AnalyticsManager;
-import slidenerd.vivz.fpam.core.Filter;
-import slidenerd.vivz.fpam.core.PostlyticsManager;
-import slidenerd.vivz.fpam.database.DataStore;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.extras.MyPrefs_;
 import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.model.json.Post;
-import slidenerd.vivz.fpam.model.realm.Analytics;
-import slidenerd.vivz.fpam.model.realm.Postlytics;
+import slidenerd.vivz.fpam.model.realm.Dailytics;
 import slidenerd.vivz.fpam.util.FBUtils;
+import slidenerd.vivz.fpam.util.ModelUtils;
 
 import static slidenerd.vivz.fpam.extras.Constants.GROUP_ID;
+import static slidenerd.vivz.fpam.extras.Constants.POSTLYTICS_ID;
 
 /**
  * TODO handle the case where the delete fails or the person has deleted the post from Facebook directly instead of this app and try to send a group id instead of the whole group
@@ -120,28 +117,29 @@ public class TaskFragmentLoadPosts extends Fragment {
 
                     //Filter spam posts made by known spammers or containing certain words
 
-                    Filter.filterPostsOnLoad(token, realm, groupId, posts);
+//                    Filter.filterPostsOnLoad(token, realm, groupId, posts);
 
-                    filteredLoadCount = posts.size();
+//                    filteredLoadCount = posts.size();
 
-                    //Get hold of the analytics object
-                    Analytics analytics = AnalyticsManager.getInstance(realm, groupId, group.getGroupName());
+                    //Compute the unique id of a dailytics object with is the combination of group id and the current date in dd-MM-yyyy format
+                    String postlyticsId = ModelUtils.computePostlyticsId(groupId);
 
-                    //Get a reference to the Postlytics object for the current date in order to update the number of posts scanned
-                    Postlytics postlytics = PostlyticsManager.getInstance(realm, groupId);
+                    //Get a reference to the current dailytics object for today
+                    Dailytics dailytics = realm.where(Dailytics.class).equalTo(POSTLYTICS_ID, postlyticsId).findFirst();
 
-                    //Get this group object from realm in order to update its timestamp
-                    Group realmGroup = realm.where(Group.class).equalTo(GROUP_ID, groupId).findFirst();
+                    if (dailytics == null) {
+                        dailytics = new Dailytics(postlyticsId, posts.size(), 0, 0, 0, 0, 0);
+                    }
+
                     realm.beginTransaction();
                     realm.copyToRealmOrUpdate(posts);
-                    realmGroup.setLastLoaded(System.currentTimeMillis());
-                    postlytics.setScanned(postlytics.getScanned() + posts.size());
-                    realm.copyToRealmOrUpdate(postlytics);
-                    analytics.getEntries().add(postlytics);
+                    group.setLastLoaded(System.currentTimeMillis());
+                    dailytics.setScanned(dailytics.getScanned() + posts.size());
+                    realm.copyToRealmOrUpdate(dailytics);
                     realm.commitTransaction();
                     //Limit the number of entries stored in the database, based on the cache settings of the app, if the admin has set the cache to 25, if the number of posts loaded were 25 but the number of posts already present in the database were 15, then get rid of the oldest 15 posts and store the new 25 posts in the database.
 
-                    DataStore.limitStoredPosts(realm, groupId, maximumPostsStored);
+//                    DataStore.limitStoredPosts(realm, groupId, maximumPostsStored);
 
                 }
 

@@ -71,8 +71,14 @@ public class PostDeserializer implements JsonDeserializer<Post> {
         //Retrieve 'type' of the post
 
         final String type = root.get(TYPE).getAsString();
+        post.setPostId(postId);
+        post.setRowId(Post.computeRowId(postId));
 
         //Convert the time to milliseconds as per the local time zone and store them
+        post.setCreatedTime(formatFacebookTime(createdTime));
+        post.setUpdatedTime(formatFacebookTime(updatedTime));
+        post.setType(type);
+
 
         final JsonObject to = root.getAsJsonObject(TO);
         if (to != null) {
@@ -81,17 +87,12 @@ public class PostDeserializer implements JsonDeserializer<Post> {
                 final JsonObject first = data.get(0).getAsJsonObject();
                 if (first != null) {
                     final String groupId = first.get(ID).getAsString();
-                    final long rowId = Long.parseLong(groupId);
                     post.setGroupId(groupId);
-                    post.setRowId(rowId);
                 }
             }
         }
 
-        post.setPostId(postId);
-        post.setCreatedTime(formatFacebookTime(createdTime));
-        post.setUpdatedTime(formatFacebookTime(updatedTime));
-        post.setType(type);
+
 
         //Retrieve 'from' that contains user info of who made a post, it is optional in case the person doesnt exist on Facebook anymore
 

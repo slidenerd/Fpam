@@ -11,48 +11,35 @@ public class Analytics extends RealmObject {
 
     @PrimaryKey
     private String groupId;
-    private String groupName;
-    private RealmList<Postlytics> entries = new RealmList<>();
-    private RealmList<Keyword> keywords = new RealmList<>();
-    //Store the top X spammers of this groupId
-    private RealmList<Spammer> spammers = new RealmList<>();
+    private RealmList<Occurrence> topKeywords = new RealmList<>();
+    //Store the top X topSpammers of this groupId
+    private RealmList<Spammer> topSpammers = new RealmList<>();
+
     //Must have default constructor if a custom constructor is included
     public Analytics() {
 
     }
 
-    public Analytics(String groupId, String groupName, RealmList<Postlytics> entries, RealmList<Keyword> keywords, RealmList<Spammer> spammers) {
+    public Analytics(String groupId, RealmList<Occurrence> topKeywords, RealmList<Spammer> topSpammers) {
         this.groupId = groupId;
-        this.groupName = groupName;
-        this.entries = (entries != null) ? entries : new RealmList<Postlytics>();
-        this.keywords = (keywords != null) ? keywords : new RealmList<Keyword>();
-        this.spammers = (spammers != null) ? spammers : new RealmList<Spammer>();
+        this.topKeywords = topKeywords;
+        this.topSpammers = topSpammers;
     }
 
     public static String toString(Analytics analytics) {
         return "Analytics{" +
                 "groupId='" + analytics.groupId + '\'' +
-                ", groupName='" + analytics.groupName + '\'' +
-                ", entries=" + analytics.entries +
-                ", keywords=" + analytics.keywords +
-                ", spammers=" + analytics.spammers +
+                ", topKeywords=" + analytics.topKeywords +
+                ", topSpammers=" + analytics.topSpammers +
                 '}';
     }
 
-    public String getGroupName() {
-        return groupName;
+    public RealmList<Spammer> getTopSpammers() {
+        return topSpammers;
     }
 
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }
-
-    public RealmList<Spammer> getSpammers() {
-        return spammers;
-    }
-
-    public void setSpammers(RealmList<Spammer> spammers) {
-        this.spammers = spammers;
+    public void setTopSpammers(RealmList<Spammer> topSpammers) {
+        this.topSpammers = topSpammers;
     }
 
     public String getGroupId() {
@@ -63,19 +50,11 @@ public class Analytics extends RealmObject {
         this.groupId = groupId;
     }
 
-    public RealmList<Keyword> getKeywords() {
-        return keywords;
+    public RealmList<Occurrence> getTopKeywords() {
+        return topKeywords;
     }
 
-    public void setKeywords(RealmList<Keyword> keywords) {
-        this.keywords = keywords;
-    }
-
-    public RealmList<Postlytics> getEntries() {
-        return entries;
-    }
-
-    public void setEntries(RealmList<Postlytics> entries) {
-        this.entries = entries;
+    public void setTopKeywords(RealmList<Occurrence> topKeywords) {
+        this.topKeywords = topKeywords;
     }
 }

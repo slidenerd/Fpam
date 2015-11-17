@@ -12,7 +12,7 @@ public class ModelUtils {
         return userId + ":" + groupId;
     }
 
-    public static String computeDailyticsId(String groupId) {
+    public static String computePostlyticsId(String groupId) {
         long currentTime = System.currentTimeMillis();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         String analyticsDate;

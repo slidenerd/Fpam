@@ -14,7 +14,7 @@
     <string name="tab_stats">Stats</string>
 
     <string name="text_empty_posts">No Posts To Display</string>
-    <string name="text_no_spammers">No spammers added yet</string>
+    <string name="text_no_spammers">No topSpammers added yet</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -29,7 +29,7 @@
     <string name="placeholder_setting_title">Setting Title</string>
     <string name="placeholder_setting_summary">This is the summary of our setting</string>
 
-    <string name="text_summary_keywords">Posts with keywords are considered spam</string>
+    <string name="text_summary_keywords">Posts with topKeywords are considered spam</string>
     <string name="pref_summary_scan_frequency">Every 2 hours</string>
     <string name="text_permission_declined">Permission Declined</string>
     <string name="request_permission_sentence_1">1. Fpam would love to have your approval to access your email address and list of groups you manage on Facebook</string>

@@ -13,6 +13,9 @@ public class Post extends RealmObject {
     @PrimaryKey
     private String postId;
 
+    //the group id of the group where this Post was made.
+    private String groupId;
+
     private long rowId;
 
     //The user id of the person making the post
@@ -50,35 +53,15 @@ public class Post extends RealmObject {
     //The link if any present in this post, this is optional
     private String link;
 
-    //the group id of the group where this Post was made.
-    private String groupId;
-
     //Must have default constructor if a custom constructor is included
     public Post() {
 
     }
 
-    public Post(String groupId, String postId, long rowId, String userId, String userName, String userPicture, String name, String message, String caption, String description, String link, String picture, String type, long createdTime, long updatedTime) {
-        this.groupId = groupId;
-        this.postId = postId;
-        this.rowId = rowId;
-        this.userId = userId;
-        this.userName = userName;
-        this.userPicture = userPicture;
-        this.message = message;
-        this.name = name;
-        this.caption = caption;
-        this.description = description;
-        this.picture = picture;
-        this.type = type;
-        this.createdTime = createdTime;
-        this.updatedTime = updatedTime;
-        this.link = link;
-    }
-
-    public static String toString(Post post) {
+    public static String toPrint(Post post) {
         return "Post{" +
                 "postId='" + post.postId + '\'' +
+                ", groupId='" + post.groupId + '\'' +
                 ", rowId=" + post.rowId +
                 ", userId='" + post.userId + '\'' +
                 ", userName='" + post.userName + '\'' +
@@ -92,128 +75,44 @@ public class Post extends RealmObject {
                 ", createdTime=" + post.createdTime +
                 ", updatedTime=" + post.updatedTime +
                 ", link='" + post.link + '\'' +
-                ", groupId='" + post.groupId + '\'' +
                 '}';
     }
 
-    /**
-     * @return The caption
-     */
-    public String getCaption() {
-        return caption;
+    public static long computeRowId(String postId) {
+        long rowId = -1;
+        int index = postId.indexOf('_');
+        if (index != -1) {
+            String suffix = postId.substring(index + 1, postId.length());
+            try {
+                rowId = Long.parseLong(suffix);
+            } catch (NumberFormatException ignore) {
+            }
+        }
+        return rowId;
     }
 
-    /**
-     * @param caption The caption
-     */
-    public void setCaption(String caption) {
-        this.caption = caption;
-    }
-
-    /**
-     * @return The description
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * @param description The description
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-     * @return The name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @param name The name
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * @return The picture
-     */
-    public String getPicture() {
-        return picture;
-    }
-
-    /**
-     * @param picture The picture
-     */
-    public void setPicture(String picture) {
-        this.picture = picture;
-    }
-
-    /**
-     * @return The type
-     */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * @param type The type
-     */
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    /**
-     * @return The updatedTime
-     */
-    public long getUpdatedTime() {
-        return updatedTime;
-    }
-
-    /**
-     * @param updatedTime The updatedTime
-     */
-    public void setUpdatedTime(long updatedTime) {
-        this.updatedTime = updatedTime;
-    }
-
-    /**
-     * @return The link
-     */
-    public String getLink() {
-        return link;
-    }
-
-    /**
-     * @param link The link
-     */
-    public void setLink(String link) {
-        this.link = link;
-    }
-
-    /**
-     * @return The postId
-     */
     public String getPostId() {
         return postId;
     }
 
-    /**
-     * @param postId The postId
-     */
     public void setPostId(String postId) {
         this.postId = postId;
     }
 
-    public String getMessage() {
-        return message;
+    public String getGroupId() {
+        return groupId;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    public long getRowId() {
+        return rowId;
+    }
+
+    public void setRowId(long rowId) {
+        this.rowId = rowId;
     }
 
     public String getUserId() {
@@ -232,14 +131,6 @@ public class Post extends RealmObject {
         this.userName = userName;
     }
 
-    public long getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(long createdTime) {
-        this.createdTime = createdTime;
-    }
-
     public String getUserPicture() {
         return userPicture;
     }
@@ -248,19 +139,75 @@ public class Post extends RealmObject {
         this.userPicture = userPicture;
     }
 
-    public long getRowId() {
-        return rowId;
+    public String getMessage() {
+        return message;
     }
 
-    public void setRowId(long rowId) {
-        this.rowId = rowId;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-    public String getGroupId() {
-        return groupId;
+    public String getName() {
+        return name;
     }
 
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getCaption() {
+        return caption;
+    }
+
+    public void setCaption(String caption) {
+        this.caption = caption;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public long getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(long createdTime) {
+        this.createdTime = createdTime;
+    }
+
+    public long getUpdatedTime() {
+        return updatedTime;
+    }
+
+    public void setUpdatedTime(long updatedTime) {
+        this.updatedTime = updatedTime;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 }

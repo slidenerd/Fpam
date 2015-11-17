@@ -213,7 +213,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     public void onBroadcastSelectedGroup(Context context, Intent intent) {
         mSelectedGroupId = intent.getExtras().getString(EXTRA_SELECTED_GROUP);
         Core core = new Core();
-        String deletes = Keyword.toString(core.getRelevantKeywords(mRealm, mSelectedGroupId));
+        String deletes = Keyword.toString(core.getKeywordsForGroup(mRealm, mSelectedGroupId));
         L.m(deletes);
         mPosts = mRealm.where(Post.class).beginsWith("postId", mSelectedGroupId).findAllSortedAsync("updatedTime", false);
         mPosts.addChangeListener(new RealmChangeListener() {

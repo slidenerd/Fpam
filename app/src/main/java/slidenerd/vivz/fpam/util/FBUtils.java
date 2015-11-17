@@ -27,6 +27,7 @@ import slidenerd.vivz.fpam.model.json.Post;
 import slidenerd.vivz.fpam.model.pojo.DeleteRequestInfo;
 import slidenerd.vivz.fpam.model.pojo.DeleteResponseInfo;
 
+import static slidenerd.vivz.fpam.extras.Constants.FEED_FIELDS;
 import static slidenerd.vivz.fpam.extras.Constants.PUBLISH_ACTIONS;
 import static slidenerd.vivz.fpam.extras.Constants.READ_PERMISSIONS;
 import static slidenerd.vivz.fpam.extras.Fields.AFTER;
@@ -153,7 +154,7 @@ public class FBUtils {
         TypeToken<ArrayList<Post>> typeToken = new TypeToken<ArrayList<Post>>() {
         };
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "from{name,id,picture},message,caption,comments{from,message},description,name,full_picture,type,updated_time,to{id},link,created_time");
+        parameters.putString("fields", FEED_FIELDS);
         GraphRequest request = new GraphRequest(token, "/" + groupId + "/feed");
         request.setParameters(parameters);
         GraphResponse response = request.executeAndWait();
@@ -178,7 +179,7 @@ public class FBUtils {
         TypeToken<ArrayList<Post>> typeToken = new TypeToken<ArrayList<Post>>() {
         };
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "from{name,id,picture},message,caption,comments{from,message},description,name,full_picture,type,updated_time,attachments{type},link,created_time");
+        parameters.putString("fields", FEED_FIELDS);
         parameters.putString("since", sinceUnixEpoch + "");
 
         Bundle parametersSubsequent = new Bundle();
@@ -188,8 +189,8 @@ public class FBUtils {
         request.setParameters(parameters);
         GraphResponse response = request.executeAndWait();
         int numberOfPostsRetrieved = 0;
-        JSONObject root = null;
-        JSONArray dataArray = null;
+        JSONObject root;
+        JSONArray dataArray;
         do {
             root = response.getJSONObject();
             if (root != null) {

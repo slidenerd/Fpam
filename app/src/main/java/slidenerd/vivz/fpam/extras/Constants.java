@@ -5,12 +5,20 @@ package slidenerd.vivz.fpam.extras;
  */
 public interface Constants {
 
+    int LESS = -1;
+    int GREATER = 1;
+    int EQUAL = 0;
+
+    String FEED_FIELDS = "from{name,id,picture},message,caption,comments{from,message},description,name,full_picture,type,updated_time,to{id},link,created_time";
+
     String GROUP_ID = "groupId";
     String GROUP_NAME = "groupName";
     String POST_ID = "postId";
     String KEYWORD = "keyword";
+    String POSTLYTICS_ID = "compositeGroupDateId";
+    String SPAMMER_ID = "compositeUserGroupId";
 
-    int TOP_ENTRIES_COUNT = 10;
+    int TOP_ENTRIES_COUNT = 3;
     String ACTION_LOAD_FEED = "slidenerd.vivz.fpam.action.LOAD_FEED";
     String ACTION_DELETE_POST = "slidenerd.vivz.fpam.action.DELETE_POST";
     String ACTION_DELETE_RESPONSE = "slidenerd.vivz.fpam.action.DELETE_STATUS";

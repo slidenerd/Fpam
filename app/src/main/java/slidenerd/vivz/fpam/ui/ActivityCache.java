@@ -73,7 +73,7 @@ public class ActivityCache extends AppCompatActivity {
                 if (results.isLoaded()) {
                     StringBuffer text = new StringBuffer();
                     for (Post post : results) {
-                        text.append(Post.toString(post));
+                        text.append(Post.toPrint(post));
                     }
                     mTextCache.setText(text);
                 }
