@@ -18,6 +18,8 @@ public interface Constants {
     String POSTLYTICS_ID = "compositeGroupDateId";
     String SPAMMER_ID = "compositeUserGroupId";
     String UPDATED_TIME = "updatedTime";
+    String COMPOSITE_GROUP_KEYWORD_ID = "compositeGroupKeywordId";
+    String COUNT = "count";
 
     int TOP_ENTRIES_COUNT = 3;
     String ACTION_LOAD_FEED = "slidenerd.vivz.fpam.action.LOAD_FEED";

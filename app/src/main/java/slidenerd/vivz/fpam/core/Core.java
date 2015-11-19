@@ -13,17 +13,17 @@ import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.L;
-import slidenerd.vivz.fpam.extras.OccurrenceComparator;
+import slidenerd.vivz.fpam.extras.FrequencyComparator;
 import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.model.json.Post;
-import slidenerd.vivz.fpam.model.realm.Analytics;
 import slidenerd.vivz.fpam.model.realm.Dailytics;
-import slidenerd.vivz.fpam.model.realm.Frequency;
+import slidenerd.vivz.fpam.model.realm.TopKeywords;
 import slidenerd.vivz.fpam.model.realm.Keyword;
 import slidenerd.vivz.fpam.model.realm.Spammer;
 import slidenerd.vivz.fpam.util.FBUtils;
 
-import static slidenerd.vivz.fpam.extras.Constants.GROUP_ID;
+import static slidenerd.vivz.fpam.extras.Constants.COMPOSITE_GROUP_KEYWORD_ID;
+import static slidenerd.vivz.fpam.extras.Constants.COUNT;
 import static slidenerd.vivz.fpam.extras.Constants.POSTLYTICS_ID;
 import static slidenerd.vivz.fpam.extras.Constants.POST_ID;
 import static slidenerd.vivz.fpam.extras.Constants.SPAMMER_ID;
@@ -71,12 +71,6 @@ public class Core {
             //get a list of keywords that apply to this group
             List<Keyword> keywords = getKeywordsForGroup(realm, groupId);
 
-            //get the analytics object associated with this group
-            Analytics analytics = realm.where(Analytics.class).equalTo(GROUP_ID, groupId).findFirst();
-
-            if (analytics == null) {
-                analytics = new Analytics(groupId, new RealmList<Frequency>(), new RealmList<Spammer>());
-            }
             //Compute the unique id of a dailytics object with is the combination of group id and the current date in dd-MM-yyyy format
             String dailyticsId = Dailytics.computeId(groupId);
 
@@ -88,9 +82,6 @@ public class Core {
             if (dailytics == null) {
                 return false;
             }
-
-            //Get the top x items from the analytics for this group id
-            RealmList<Frequency> topX = analytics.getTopKeywords();
 
             success = FBUtils.requestDeletePost(token, post);
 
@@ -141,8 +132,14 @@ public class Core {
 
                 if (StringUtils.isNotBlank(content)) {
 
-                    OccurrenceComparator comparator = new OccurrenceComparator();
-                    ArrayList<Frequency> frequencies = new ArrayList<>();
+                    RealmResults<TopKeywords> topXKeywords = realm.where(TopKeywords.class).beginsWith(COMPOSITE_GROUP_KEYWORD_ID, groupId).findAllSorted(COUNT);
+                    realm.beginTransaction();
+                    for (int i = topXKeywords.size() - 1; i >= TOP_ENTRIES_COUNT; i--) {
+                        topXKeywords.get(i).removeFromRealm();
+                    }
+                    realm.commitTransaction();
+                    FrequencyComparator comparator = new FrequencyComparator();
+                    ArrayList<TopKeywords> frequencies = new ArrayList<>();
 
                     //Convert the content to lowercase to find occurrence of each keyword in it.
                     String lowercaseContent = content.toLowerCase();
@@ -155,26 +152,30 @@ public class Core {
 
                         //if we have a non zero count, store the keyword and its occurrence and mark the boolean variable which indicates whether keywords were found in the content
                         if (count > 0) {
-                            Frequency frequency = new Frequency();
-                            frequency.setText(keyword.getKeyword());
-                            frequency.setCount(count);
-                            frequencies.add(frequency);
+                            TopKeywords topKeywords = new TopKeywords();
+                            String frequencyId = TopKeywords.computeGroupKeywordId(groupId, keyword.getKeyword());
+                            topKeywords.setCompositeGroupKeywordId(frequencyId);
+                            topKeywords.setCount(count);
+                            frequencies.add(topKeywords);
                             postContainsKeywords = true;
                         }
                     }
-                    if (!frequencies.isEmpty() && !topX.isEmpty()) {
-                        frequencies.addAll(0, topX);
+                    frequencies.addAll(topXKeywords);
+                    if (postContainsKeywords) {
                         Collections.sort(frequencies, comparator);
+                        realm.beginTransaction();
+                        for (int i = 0; i < frequencies.size() && i < TOP_ENTRIES_COUNT; i++) {
+                            for (TopKeywords topKeywords : topXKeywords) {
+                                String word1 = TopKeywords.getKeyword(topKeywords.getCompositeGroupKeywordId());
+                                String word2 = TopKeywords.getKeyword(frequencies.get(i).getCompositeGroupKeywordId());
+                                if (StringUtils.equals(word1, word2)) {
+                                    topKeywords.setCount(topKeywords.getCount() + 1);
 
-                        for (int i = 0; i < TOP_ENTRIES_COUNT; i++) {
-                            try {
-                                topX.set(i, frequencies.get(i));
-                            } catch (IndexOutOfBoundsException e) {
-                                topX.add(frequencies.get(i));
+                                }
+                                realm.copyToRealmOrUpdate(topKeywords);
+                                break;
                             }
                         }
-                        realm.beginTransaction();
-                        realm.copyToRealm(topX);
                         realm.commitTransaction();
                     }
                 }
@@ -212,8 +213,7 @@ public class Core {
 
             realm.beginTransaction();
             realm.copyToRealmOrUpdate(dailytics);
-            //analytics.setTopKeywords(topX);
-            realm.copyToRealmOrUpdate(analytics);
+//            analytics.setTopKeywords(topX);
             realm.commitTransaction();
         } else {
             L.m("Did not find a valid group Id while deleting a post");

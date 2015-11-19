@@ -34,7 +34,7 @@ public class DatabaseUtils {
             // init email intent and add export.realm as attachment
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setData(Uri.parse("mailto:")); // only email apps should handle this
-            String[] addresses = {"slidenerd@gmail.com", "ankush1158@gmail.com"};
+            String[] addresses = {"slidenerd@gmail.com"};
             intent.putExtra(Intent.EXTRA_EMAIL, addresses);
             intent.setType("plain/text");
             intent.putExtra(Intent.EXTRA_SUBJECT, "Fpam Database Exported");

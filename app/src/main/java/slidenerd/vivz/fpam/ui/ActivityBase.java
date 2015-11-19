@@ -34,9 +34,8 @@ import slidenerd.vivz.fpam.background.TaskFragmentLoadPosts;
 import slidenerd.vivz.fpam.background.TaskFragmentLoadPosts_;
 import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.model.json.Post;
-import slidenerd.vivz.fpam.model.realm.Analytics;
 import slidenerd.vivz.fpam.model.realm.Dailytics;
-import slidenerd.vivz.fpam.model.realm.Frequency;
+import slidenerd.vivz.fpam.model.realm.TopKeywords;
 import slidenerd.vivz.fpam.model.realm.Keyword;
 import slidenerd.vivz.fpam.model.realm.Spammer;
 import slidenerd.vivz.fpam.settings.SettingsActivity_;
@@ -204,10 +203,9 @@ public abstract class ActivityBase extends AppCompatActivity
     protected boolean onCacheSelected() {
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
-        realm.where(Frequency.class).findAll().clear();
+        realm.where(TopKeywords.class).findAll().clear();
         realm.where(Dailytics.class).findAll().clear();
         realm.where(Spammer.class).findAll().clear();
-        realm.where(Analytics.class).findAll().clear();
         realm.where(Post.class).findAll().clear();
         realm.where(Keyword.class).findAll().clear();
         RealmResults<Group> groups = realm.where(Group.class).findAll();

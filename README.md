@@ -187,7 +187,7 @@ There are some important considerations about how data is processed with Fpam, l
 
 A link/links found within the description or caption or message will be hence forth called LINK_CONTENT and a link found within the link tag in the json groupMetaData if it is non null will be hence forth called LINK_TAG.
 
-The 4 pieces of information that we need to analyze are : the person who posted, the message that was posted if any, the LINK_TAG if any and the picture if any. The message that was posted may be of 4 types 1) no message or no text 2) only text 3) message with only LINK_CONTENT inside its contents 4)message with text and one or more LINK_CONTENT in its contents.
+The 4 pieces of information that we need to analyze are : the person who posted, the message that was posted if any, the LINK_TAG if any and the picture if any. The message that was posted may be of 4 types 1) no message or no compositeGroupKeywordId 2) only compositeGroupKeywordId 3) message with only LINK_CONTENT inside its contents 4)message with compositeGroupKeywordId and one or more LINK_CONTENT in its contents.
 
 Analytics [Overall for each postId]
 
@@ -288,9 +288,9 @@ Analytics [Overall for each postId]
 			<dl>MESSAGE_ONLY_LINK</dl>
 			<dd>A postId with message tag that has only a link in it also known as LINK_CONTENT and may contain data in the other fields such as groupName, caption, description which will be referred to henceforth as MESSAGE_ONLY_LINK</dd>
 			<dl>MESSAGE_TEXT</dl>
-			<dd>A postId with message tag that has only text and may contain data in the other fields such as groupName, caption, description which will be referred to henceforth as MESSAGE_TEXT</dd>
+			<dd>A postId with message tag that has only compositeGroupKeywordId and may contain data in the other fields such as groupName, caption, description which will be referred to henceforth as MESSAGE_TEXT</dd>
 			<dl>MESSAGE_TEXT_AND_LINK</dl>
-			<dd>A postId with message that that has text and LINK_CONTENT and may contain data in the other fields such as groupName, caption, description which will be referred to henceforth as MESSAGE_TEXT_AND_LINK</dd>
+			<dd>A postId with message that that has compositeGroupKeywordId and LINK_CONTENT and may contain data in the other fields such as groupName, caption, description which will be referred to henceforth as MESSAGE_TEXT_AND_LINK</dd>
 		</dl>
 		<ol>
 			<li>For a postId of type MESSAGE_EMPTY
