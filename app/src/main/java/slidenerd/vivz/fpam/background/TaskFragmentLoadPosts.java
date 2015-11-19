@@ -128,30 +128,21 @@ public class TaskFragmentLoadPosts extends Fragment {
                         Dailytics dailytics = realm.where(Dailytics.class).equalTo(POSTLYTICS_ID, dailyticsId).findFirst();
 
                         if (dailytics == null) {
-                            dailytics = new Dailytics(dailyticsId, posts.size(), 0, 0, 0, 0, 0);
+                            dailytics = new Dailytics(dailyticsId, 0, 0, 0, 0, 0, 0);
                         }
 
                         realm.beginTransaction();
                         realm.copyToRealmOrUpdate(posts);
                         group.setLastLoaded(System.currentTimeMillis());
-                        dailytics.setScanned(dailytics.getScanned() + posts.size());
+                        int scannedOld = dailytics.getScanned();
+                        int scannedNew = posts.size();
+                        dailytics.setScanned(scannedOld + scannedNew);
                         realm.copyToRealmOrUpdate(dailytics);
                         realm.commitTransaction();
                         //Limit the number of entries stored in the database, based on the cache settings of the app, if the admin has set the cache to 25, if the number of posts loaded were 25 but the number of posts already present in the database were 15, then get rid of the oldest 15 posts and store the new 25 posts in the database.
 
 //                    DataStore.limitStoredPosts(realm, groupId, maximum);
-
                     }
-
-                    String message = null;
-                    if (originalLoadCount > 0) {
-                        message = originalLoadCount + ((originalLoadCount - filteredLoadCount > 0) ? " Posts Loaded And " + (originalLoadCount - filteredLoadCount) + " spam posts removed" : "");
-
-                    } else {
-                        message = "No New Posts Loaded For " + groupId;
-                    }
-                    L.m(message);
-                    onPostsLoaded();
                 } else {
                     L.m("group was invalid while loading posts");
                 }
@@ -163,6 +154,7 @@ public class TaskFragmentLoadPosts extends Fragment {
                 if (realm != null) {
                     realm.close();
                 }
+                onPostsLoaded();
             }
         } else {
             L.m("invalid access token since it was null or expired while loading posts");

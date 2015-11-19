@@ -133,8 +133,6 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         super.onViewCreated(view, savedInstanceState);
         mRecycler = (RecyclerView) view.findViewById(R.id.recycler_posts);
         mRecycler.setLayoutManager(new LinearLayoutManager(mContext));
-        mPosts = mRealm.where(Post.class).beginsWith(POST_ID, "NONE").findAllAsync();
-        mPosts.addChangeListener(mListener);
         mAdapter = new AdapterPost(mContext, mRealm, mPosts);
         mAdapter.setHasStableIds(true);
         mRecycler.setAdapter(mAdapter);
@@ -213,7 +211,9 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mPosts.removeChangeListener(mListener);
+        if (mPosts != null) {
+            mPosts.removeChangeListener(mListener);
+        }
     }
 
     @Override
@@ -226,8 +226,10 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     public void onBroadcastSelectedGroup(Context context, Intent intent) {
         mSelectedGroupId = intent.getExtras().getString(EXTRA_SELECTED_GROUP);
         mPosts = mRealm.where(Post.class).beginsWith(POST_ID, mSelectedGroupId).findAllSortedAsync(UPDATED_TIME, false);
-        mPosts.addChangeListener(mListener);
         mAdapter.updateRealmResults(mPosts);
+        if (mPosts != null) {
+            mPosts.addChangeListener(mListener);
+        }
     }
 
     @Receiver(actions = ACTION_DELETE_RESPONSE, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)

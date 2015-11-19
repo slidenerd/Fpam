@@ -74,12 +74,14 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.ItemHolder> {
 
     @Override
     public void onBindViewHolder(ItemHolder holder, int position) {
-        Post post = mResults.get(position);
-        holder.setUserName(post.getUserName());
-        holder.setUpdatedTime(post.getUpdatedTime());
-        holder.setMessage(post.getMessage(), mState, position);
-        holder.setPostPicture(post.getPicture());
-        holder.setProfilePicture(post.getUserPicture());
+        if (mResults != null) {
+            Post post = mResults.get(position);
+            holder.setUserName(post.getUserName());
+            holder.setUpdatedTime(post.getUpdatedTime());
+            holder.setMessage(post.getMessage(), mState, position);
+            holder.setPostPicture(post.getPicture());
+            holder.setProfilePicture(post.getUserPicture());
+        }
         // Check for an expanded view, collapse if you find one
 
     }
@@ -91,17 +93,17 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.ItemHolder> {
      * @param queryResults the new RealmResults coming from the new query.
      */
     public void updateRealmResults(RealmResults<Post> queryResults) {
-        mResults = queryResults;
+         mResults = queryResults;
     }
 
     @Override
     public long getItemId(int position) {
-        return mResults.get(position).getRowId();
+        return mResults == null ? RecyclerView.NO_ID : mResults.get(position).getRowId();
     }
 
     @Override
     public int getItemCount() {
-        return mResults.size();
+        return mResults == null ? 0 : mResults.size();
     }
 
     public void remove(int position) {
