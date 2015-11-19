@@ -1,5 +1,7 @@
 package slidenerd.vivz.fpam.model.json;
 
+import org.apache.commons.lang3.StringUtils;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -40,7 +42,11 @@ public class Group extends RealmObject {
         this.monitored = monitored;
     }
 
-    public static String toString(Group group) {
+    public static boolean isValidGroup(Group group) {
+        return group != null && StringUtils.isNotBlank(group.getGroupId());
+    }
+
+    public static String toPrint(Group group) {
         return "Group{" +
                 "groupId='" + group.groupId + '\'' +
                 ", groupName='" + group.groupName + '\'' +

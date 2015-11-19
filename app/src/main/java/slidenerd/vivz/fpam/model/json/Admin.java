@@ -28,7 +28,7 @@ public class Admin extends RealmObject {
         this.url = url;
     }
 
-    public static String toString(Admin admin) {
+    public static String toPrint(Admin admin) {
         return "Admin{" +
                 "id='" + admin.id + '\'' +
                 ", email='" + admin.email + '\'' +

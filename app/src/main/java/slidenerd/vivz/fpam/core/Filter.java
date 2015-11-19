@@ -13,7 +13,6 @@ import slidenerd.vivz.fpam.model.pojo.DeleteRequestInfo;
 import slidenerd.vivz.fpam.model.pojo.DeleteResponseInfo;
 import slidenerd.vivz.fpam.model.realm.Spammer;
 import slidenerd.vivz.fpam.util.FBUtils;
-import slidenerd.vivz.fpam.util.ModelUtils;
 
 /**
  * Created by vivz on 11/10/15.
@@ -96,7 +95,7 @@ public class Filter {
 
                     //update the number of spam posts made by this spammer and the timestamp which indicates when this post was deleted
 
-                    String compositeUserGroupId = ModelUtils.computeSpammerId(userId, groupId);
+                    String compositeUserGroupId = Spammer.computeId(userId, groupId);
 
                     //if there is a spammer entry with the user id of the person making this post and the group id of this group
 

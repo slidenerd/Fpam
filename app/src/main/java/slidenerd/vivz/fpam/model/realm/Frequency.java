@@ -5,7 +5,7 @@ import io.realm.RealmObject;
 /**
  * Created by vivz on 17/11/15.
  */
-public class Occurrence extends RealmObject {
+public class Frequency extends RealmObject {
     private String text;
     private int count;
 

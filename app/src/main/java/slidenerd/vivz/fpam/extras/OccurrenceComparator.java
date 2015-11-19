@@ -2,7 +2,7 @@ package slidenerd.vivz.fpam.extras;
 
 import java.util.Comparator;
 
-import slidenerd.vivz.fpam.model.realm.Occurrence;
+import slidenerd.vivz.fpam.model.realm.Frequency;
 
 import static slidenerd.vivz.fpam.extras.Constants.GREATER;
 import static slidenerd.vivz.fpam.extras.Constants.LESS;
@@ -10,9 +10,9 @@ import static slidenerd.vivz.fpam.extras.Constants.LESS;
 /**
  * Created by vivz on 17/11/15.
  */
-public class OccurrenceComparator implements Comparator<Occurrence> {
+public class OccurrenceComparator implements Comparator<Frequency> {
     @Override
-    public int compare(Occurrence lhs, Occurrence rhs) {
+    public int compare(Frequency lhs, Frequency rhs) {
 
         if (rhs.getCount() < lhs.getCount()) {
             return LESS;

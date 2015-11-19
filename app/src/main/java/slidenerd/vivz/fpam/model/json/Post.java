@@ -1,5 +1,7 @@
 package slidenerd.vivz.fpam.model.json;
 
+import org.apache.commons.lang3.StringUtils;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -56,6 +58,10 @@ public class Post extends RealmObject {
     //Must have default constructor if a custom constructor is included
     public Post() {
 
+    }
+
+    public static boolean isValidPost(Post post) {
+        return post != null && StringUtils.isNoneBlank(post.getPostId(), post.getGroupId()) && post.getRowId() > 0;
     }
 
     public static String toPrint(Post post) {

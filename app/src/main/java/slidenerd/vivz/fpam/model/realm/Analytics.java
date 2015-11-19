@@ -11,7 +11,7 @@ public class Analytics extends RealmObject {
 
     @PrimaryKey
     private String groupId;
-    private RealmList<Occurrence> topKeywords = new RealmList<>();
+    private RealmList<Frequency> topKeywords = new RealmList<>();
     //Store the top X topSpammers of this groupId
     private RealmList<Spammer> topSpammers = new RealmList<>();
 
@@ -20,13 +20,13 @@ public class Analytics extends RealmObject {
 
     }
 
-    public Analytics(String groupId, RealmList<Occurrence> topKeywords, RealmList<Spammer> topSpammers) {
+    public Analytics(String groupId, RealmList<Frequency> topKeywords, RealmList<Spammer> topSpammers) {
         this.groupId = groupId;
         this.topKeywords = topKeywords;
         this.topSpammers = topSpammers;
     }
 
-    public static String toString(Analytics analytics) {
+    public static String toPrint(Analytics analytics) {
         return "Analytics{" +
                 "groupId='" + analytics.groupId + '\'' +
                 ", topKeywords=" + analytics.topKeywords +
@@ -50,11 +50,11 @@ public class Analytics extends RealmObject {
         this.groupId = groupId;
     }
 
-    public RealmList<Occurrence> getTopKeywords() {
+    public RealmList<Frequency> getTopKeywords() {
         return topKeywords;
     }
 
-    public void setTopKeywords(RealmList<Occurrence> topKeywords) {
+    public void setTopKeywords(RealmList<Frequency> topKeywords) {
         this.topKeywords = topKeywords;
     }
 }

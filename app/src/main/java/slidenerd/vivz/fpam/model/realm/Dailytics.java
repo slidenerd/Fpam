@@ -1,5 +1,8 @@
 package slidenerd.vivz.fpam.model.realm;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -44,7 +47,7 @@ public class Dailytics extends RealmObject {
 
     }
 
-    public static String toString(Dailytics dailytics) {
+    public static String toPrint(Dailytics dailytics) {
         return "Dailytics{" +
                 "compositeGroupDateId='" + dailytics.compositeGroupDateId + '\'' +
                 ", scanned=" + dailytics.scanned +
@@ -54,6 +57,17 @@ public class Dailytics extends RealmObject {
                 ", deletedSpammer=" + dailytics.deletedSpammer +
                 ", failed=" + dailytics.failed +
                 '}';
+    }
+    public static String computeId(String groupId) {
+        long now = System.currentTimeMillis();
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+        String date;
+        if (now > 0) {
+            date = format.format(new Date(now));
+        } else {
+            date = "NA";
+        }
+        return groupId + ":" + date;
     }
 
     public String getCompositeGroupDateId() {

@@ -15,7 +15,7 @@ public class Comments extends RealmObject {
 
     }
 
-    public static String toString(Comments comments) {
+    public static String toPrint(Comments comments) {
         return "Comments{" +
                 "postId='" + comments.postId + '\'' +
                 ", data=" + comments.data +

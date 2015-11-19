@@ -30,7 +30,7 @@ public class Spammer extends RealmObject {
         this.authorized = authorized;
     }
 
-    public static String toString(Spammer spammer) {
+    public static String toPrint(Spammer spammer) {
         return "Spammer{" +
                 "compositeUserGroupId='" + spammer.compositeUserGroupId + '\'' +
                 ", userName='" + spammer.userName + '\'' +
@@ -38,6 +38,10 @@ public class Spammer extends RealmObject {
                 ", lastActive=" + spammer.lastActive +
                 ", authorized=" + spammer.authorized +
                 '}';
+    }
+
+    public static String computeId(String userId, String groupId) {
+        return userId + ":" + groupId;
     }
 
     public String getUserName() {

@@ -31,7 +31,7 @@ public class Keyword extends RealmObject {
         this.groups = (groups != null ? groups : new RealmList<Group>());
     }
 
-    public static String toString(List<Keyword> keywords) {
+    public static String toPrint(List<Keyword> keywords) {
         StringBuffer buffer = new StringBuffer();
         for (Keyword keyword : keywords) {
             buffer.append(keyword.getKeyword()).append("\n").append(keyword.getTimestamp()).append("\n");
@@ -43,7 +43,7 @@ public class Keyword extends RealmObject {
         return buffer.toString();
     }
 
-    public static String toString(Keyword keyword) {
+    public static String toPrint(Keyword keyword) {
         return "Keyword{" +
                 "keyword='" + keyword.keyword + '\'' +
                 ", timestamp=" + keyword.timestamp +

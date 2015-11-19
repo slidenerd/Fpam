@@ -14,7 +14,7 @@
     <item
         android:id="@+id/action_cache"
         android:orderInCategory="300"
-        android:title="@string/title_activity_cache"
+        android:title="@string/title_activity_clear"
         app:showAsAction="never" />
 
 </menu>

@@ -32,17 +32,15 @@ import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.Fpam;
+import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.AdapterPost;
 import slidenerd.vivz.fpam.adapter.OnItemClickListener;
 import slidenerd.vivz.fpam.adapter.RecyclerViewHelperImpl;
 import slidenerd.vivz.fpam.adapter.SwipeToDismissTouchListener;
 import slidenerd.vivz.fpam.adapter.SwipeableItemClickListener;
-import slidenerd.vivz.fpam.core.Core;
 import slidenerd.vivz.fpam.extras.Constants;
-import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.model.json.Post;
-import slidenerd.vivz.fpam.model.realm.Keyword;
 import slidenerd.vivz.fpam.util.FBUtils;
 
 import static slidenerd.vivz.fpam.extras.Constants.ACTION_DELETE_POST;
@@ -52,6 +50,8 @@ import static slidenerd.vivz.fpam.extras.Constants.EXTRA_ID;
 import static slidenerd.vivz.fpam.extras.Constants.EXTRA_OUTCOME;
 import static slidenerd.vivz.fpam.extras.Constants.EXTRA_POSITION;
 import static slidenerd.vivz.fpam.extras.Constants.EXTRA_SELECTED_GROUP;
+import static slidenerd.vivz.fpam.extras.Constants.POST_ID;
+import static slidenerd.vivz.fpam.extras.Constants.UPDATED_TIME;
 
 /**
  * TODO handle error conditions, handle the loginmanager properly, how the items are shown while deleting and after deleting, move the scroll position to wherever the user was previously after restoring adapter on delete
@@ -73,6 +73,12 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     private String mSelectedGroupId;
     private RealmResults<Post> mPosts;
     private Context mContext;
+    private RealmChangeListener mListener = new RealmChangeListener() {
+        @Override
+        public void onChange() {
+            mAdapter.notifyDataSetChanged();
+        }
+    };
 
     public FragmentPosts() {
         // Required empty public constructor
@@ -125,9 +131,10 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mPosts = mRealm.where(Post.class).equalTo("postId", "NONE").findAll();
         mRecycler = (RecyclerView) view.findViewById(R.id.recycler_posts);
         mRecycler.setLayoutManager(new LinearLayoutManager(mContext));
+        mPosts = mRealm.where(Post.class).beginsWith(POST_ID, "NONE").findAllAsync();
+        mPosts.addChangeListener(mListener);
         mAdapter = new AdapterPost(mContext, mRealm, mPosts);
         mAdapter.setHasStableIds(true);
         mRecycler.setAdapter(mAdapter);
@@ -204,6 +211,12 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mPosts.removeChangeListener(mListener);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         mRealm.close();
@@ -212,16 +225,9 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     @Receiver(actions = ACTION_LOAD_FEED, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
     public void onBroadcastSelectedGroup(Context context, Intent intent) {
         mSelectedGroupId = intent.getExtras().getString(EXTRA_SELECTED_GROUP);
-        Core core = new Core();
-        String deletes = Keyword.toString(core.getKeywordsForGroup(mRealm, mSelectedGroupId));
-        L.m(deletes);
-        mPosts = mRealm.where(Post.class).beginsWith("postId", mSelectedGroupId).findAllSortedAsync("updatedTime", false);
-        mPosts.addChangeListener(new RealmChangeListener() {
-            @Override
-            public void onChange() {
-                mAdapter.updateRealmResults(mPosts);
-            }
-        });
+        mPosts = mRealm.where(Post.class).beginsWith(POST_ID, mSelectedGroupId).findAllSortedAsync(UPDATED_TIME, false);
+        mPosts.addChangeListener(mListener);
+        mAdapter.updateRealmResults(mPosts);
     }
 
     @Receiver(actions = ACTION_DELETE_RESPONSE, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)

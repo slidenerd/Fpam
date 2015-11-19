@@ -42,6 +42,10 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.ItemHolder> {
     //Height of the image found in the post if there is one
     private int mPostImageHeight;
 
+    private CropCircleTransform mUserTransform;
+
+    private CropTransformation mPostTransform;
+
     //Keep track of whether an item at a given position is expanded or collapsed, the key is the position whereas the value is boolean indicating whether the item is expanded or collapsed.
     private SparseBooleanArray mState = new SparseBooleanArray();
 
@@ -54,6 +58,9 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.ItemHolder> {
         Point size = DisplayUtils.getPostImageSize(context);
         mPostImageWidth = size.x;
         mPostImageHeight = size.y;
+
+        mUserTransform = new CropCircleTransform(mContext);
+        mPostTransform = new CropTransformation(mContext, mPostImageWidth, mPostImageHeight);
         updateRealmResults(results);
     }
 
@@ -85,7 +92,6 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.ItemHolder> {
      */
     public void updateRealmResults(RealmResults<Post> queryResults) {
         mResults = queryResults;
-        notifyDataSetChanged();
     }
 
     @Override
@@ -148,7 +154,7 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.ItemHolder> {
                 Glide.with(mContext)
                         .load(uri)
                         .asBitmap()
-                        .transform(new CropCircleTransform(mContext))
+                        .transform(mUserTransform)
                         .into(mProfilePicture);
             } else {
                 Glide.clear(mProfilePicture);
@@ -163,7 +169,7 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.ItemHolder> {
                 Glide.with(mContext)
                         .load(uri)
                         .asBitmap()
-                        .transform(new CropTransformation(mContext, mPostImageWidth, mPostImageHeight))
+                        .transform(mPostTransform)
                         .into(mPostPicture);
             } else {
                 Glide.clear(mPostPicture);

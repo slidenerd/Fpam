@@ -27,7 +27,6 @@ import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.model.json.Post;
 import slidenerd.vivz.fpam.model.realm.Dailytics;
 import slidenerd.vivz.fpam.util.FBUtils;
-import slidenerd.vivz.fpam.util.ModelUtils;
 
 import static slidenerd.vivz.fpam.extras.Constants.GROUP_ID;
 import static slidenerd.vivz.fpam.extras.Constants.POSTLYTICS_ID;
@@ -89,69 +88,73 @@ public class TaskFragmentLoadPosts extends Fragment {
             try {
                 realm = Realm.getDefaultInstance();
 
-                //Get the maximum number of posts to retrieve or cache size from app settings
-
-                int maximumPostsStored = mPref.cacheSize().getOr(Constants.DEFAULT_NUMBER_OF_ITEMS_TO_FETCH);
-
-                //Get the time stamp of when this group was last loaded and convert that timestamp to UTC format
-
                 Group group = realm.where(Group.class).equalTo(GROUP_ID, groupId).findFirst();
-                long utcTimestamp = group.getLastLoaded() / 1000L;
-                ArrayList<Post> posts;
 
-                //If the group was loaded before as indicated by a valid timestamp, then fetch all posts made since that timestamp or maximum number of posts as per the cache size from the app settings whichever is greater
+                if (Group.isValidGroup(group)) {
+                    //Get the maximum number of posts to retrieve or cache size from app settings
+                    int maximum = mPref.cacheSize().getOr(Constants.DEFAULT_NUMBER_OF_ITEMS_TO_FETCH);
 
-                if (utcTimestamp > 0) {
-                    posts = FBUtils.requestFeedSince(token, Fpam.getGson(), groupId, maximumPostsStored, utcTimestamp);
-                }
 
-                //If the group was never loaded before, load it for the first time
-                else {
-                    posts = FBUtils.requestFeedFirstTime(token, Fpam.getGson(), groupId);
-                }
-                originalLoadCount = posts.size();
+                    //Get the time stamp of when this group was last loaded and convert that timestamp to UTC format
+                    long utcTimestamp = group.getLastLoaded() / 1000L;
+                    ArrayList<Post> posts;
 
-                //If we did retrieve posts, update the timestamp of when the group was loaded
+                    //If the group was loaded before as indicated by a valid timestamp, then fetch all posts made since that timestamp or maximum number of posts as per the cache size from the app settings whichever is greater
 
-                if (!posts.isEmpty()) {
+                    if (utcTimestamp > 0) {
+                        posts = FBUtils.requestFeedSince(token, Fpam.getGson(), groupId, maximum, utcTimestamp);
+                    }
 
-                    //Filter spam posts made by known spammers or containing certain words
+                    //If the group was never loaded before, load it for the first time
+                    else {
+                        posts = FBUtils.requestFeedFirstTime(token, Fpam.getGson(), groupId, maximum);
+                    }
+                    originalLoadCount = posts.size();
+
+                    //If we did retrieve posts, update the timestamp of when the group was loaded
+
+                    if (!posts.isEmpty()) {
+
+                        //Filter spam posts made by known spammers or containing certain words
 
 //                    Filter.filterPostsOnLoad(token, realm, groupId, posts);
 
 //                    filteredLoadCount = posts.size();
 
-                    //Compute the unique id of a dailytics object with is the combination of group id and the current date in dd-MM-yyyy format
-                    String postlyticsId = ModelUtils.computePostlyticsId(groupId);
+                        //Compute the unique id of a dailytics object with is the combination of group id and the current date in dd-MM-yyyy format
+                        String dailyticsId = Dailytics.computeId(groupId);
 
-                    //Get a reference to the current dailytics object for today
-                    Dailytics dailytics = realm.where(Dailytics.class).equalTo(POSTLYTICS_ID, postlyticsId).findFirst();
+                        //Get a reference to the current dailytics object for today
+                        Dailytics dailytics = realm.where(Dailytics.class).equalTo(POSTLYTICS_ID, dailyticsId).findFirst();
 
-                    if (dailytics == null) {
-                        dailytics = new Dailytics(postlyticsId, posts.size(), 0, 0, 0, 0, 0);
+                        if (dailytics == null) {
+                            dailytics = new Dailytics(dailyticsId, posts.size(), 0, 0, 0, 0, 0);
+                        }
+
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(posts);
+                        group.setLastLoaded(System.currentTimeMillis());
+                        dailytics.setScanned(dailytics.getScanned() + posts.size());
+                        realm.copyToRealmOrUpdate(dailytics);
+                        realm.commitTransaction();
+                        //Limit the number of entries stored in the database, based on the cache settings of the app, if the admin has set the cache to 25, if the number of posts loaded were 25 but the number of posts already present in the database were 15, then get rid of the oldest 15 posts and store the new 25 posts in the database.
+
+//                    DataStore.limitStoredPosts(realm, groupId, maximum);
+
                     }
 
-                    realm.beginTransaction();
-                    realm.copyToRealmOrUpdate(posts);
-                    group.setLastLoaded(System.currentTimeMillis());
-                    dailytics.setScanned(dailytics.getScanned() + posts.size());
-                    realm.copyToRealmOrUpdate(dailytics);
-                    realm.commitTransaction();
-                    //Limit the number of entries stored in the database, based on the cache settings of the app, if the admin has set the cache to 25, if the number of posts loaded were 25 but the number of posts already present in the database were 15, then get rid of the oldest 15 posts and store the new 25 posts in the database.
+                    String message = null;
+                    if (originalLoadCount > 0) {
+                        message = originalLoadCount + ((originalLoadCount - filteredLoadCount > 0) ? " Posts Loaded And " + (originalLoadCount - filteredLoadCount) + " spam posts removed" : "");
 
-//                    DataStore.limitStoredPosts(realm, groupId, maximumPostsStored);
-
-                }
-
-                String message = null;
-                if (originalLoadCount > 0) {
-                    message = originalLoadCount + ((originalLoadCount - filteredLoadCount > 0) ? " Posts Loaded And " + (originalLoadCount - filteredLoadCount) + " spam posts removed" : "");
-
+                    } else {
+                        message = "No New Posts Loaded For " + groupId;
+                    }
+                    L.m(message);
+                    onPostsLoaded();
                 } else {
-                    message = "No New Posts Loaded For " + groupId;
+                    L.m("group was invalid while loading posts");
                 }
-                L.m(message);
-                onPostsLoaded();
             } catch (JSONException e) {
                 L.m("" + e);
             } catch (FacebookException e) {
@@ -162,6 +165,7 @@ public class TaskFragmentLoadPosts extends Fragment {
                 }
             }
         } else {
+            L.m("invalid access token since it was null or expired while loading posts");
             onPostsLoaded();
         }
     }

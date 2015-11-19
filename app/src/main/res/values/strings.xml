@@ -2,7 +2,7 @@
     <string name="app_name">Fpam</string>
     <string name="title_activity_main">Fpam</string>
     <string name="title_activity_login">Login</string>
-    <string name="title_activity_cache">Cache</string>
+    <string name="title_activity_clear">Clear All</string>
     <string name="navigation_settings">Settings</string>
     <string name="title_export_database">Export Database</string>
     <string name="action_logout">Logout</string>

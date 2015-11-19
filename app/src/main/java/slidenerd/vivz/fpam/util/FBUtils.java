@@ -149,8 +149,8 @@ public class FBUtils {
         return listGroups;
     }
 
-    public static ArrayList<Post> requestFeedFirstTime(AccessToken token, Gson gson, String groupId) throws JSONException {
-        ArrayList<Post> listPosts = new ArrayList<>(Constants.RESULTS_PER_PAGE);
+    public static ArrayList<Post> requestFeedFirstTime(AccessToken token, Gson gson, String groupId, int maximum) throws JSONException {
+        ArrayList<Post> listPosts = new ArrayList<>(maximum);
         TypeToken<ArrayList<Post>> typeToken = new TypeToken<ArrayList<Post>>() {
         };
         Bundle parameters = new Bundle();
@@ -158,37 +158,61 @@ public class FBUtils {
         GraphRequest request = new GraphRequest(token, "/" + groupId + "/feed");
         request.setParameters(parameters);
         GraphResponse response = request.executeAndWait();
-        JSONObject root = response.getJSONObject();
-        if (root != null) {
-            //Check if our root contains a json array called 'data' that has all the group objects inside it
-            if (root.has(DATA) && !root.isNull(DATA)) {
+        boolean hasMoreData = false;
+        int fetched = 0;
+        JSONObject root;
+        JSONArray dataArray;
+        do {
+            root = response.getJSONObject();
+            if (root != null) {
+                //Check if our root contains a json array called 'data' that has all the group objects inside it
+                if (root.has(DATA) && !root.isNull(DATA)) {
 
-                //retrieve our json array with group objects
-                JSONArray dataArray = root.getJSONArray(DATA);
+                    //retrieve our json array with group objects
 
-                //For each iteration, we fetch the list of groups and append all of them to what we have so far
+                    dataArray = root.getJSONArray(DATA);
 
-                listPosts = gson.fromJson(dataArray.toString(), typeToken.getType());
+                    //For each iteration, we fetch the list of groups and append all of them to what we have so far
+
+                    ArrayList<Post> posts = gson.fromJson(dataArray.toString(), typeToken.getType());
+                    for (Post post : posts) {
+
+                        if (fetched < maximum) {
+                            listPosts.add(post);
+                            fetched++;
+                        }
+                    }
+                    request = response.getRequestForPagedResults(GraphResponse.PagingDirection.NEXT);
+                    //We have more data if posts retrieved in the current iteration are not empty and we have a valid pagination request for the next round and we have not reached the limit or maximum number of posts to retrieve yet
+
+                    hasMoreData = !posts.isEmpty() && request != null && fetched != maximum;
+                    if (hasMoreData) {
+                        request.setParameters(parameters);
+                        response = request.executeAndWait();
+                    }
+                }
             }
         }
+        while (hasMoreData);
         return listPosts;
     }
 
-    public static ArrayList<Post> requestFeedSince(AccessToken token, Gson gson, String groupId, int maximumNumberOfPostsToRetrieve, long sinceUnixEpoch) throws JSONException, FacebookException {
-        ArrayList<Post> listPosts = new ArrayList<>(maximumNumberOfPostsToRetrieve);
-        TypeToken<ArrayList<Post>> typeToken = new TypeToken<ArrayList<Post>>() {
+    public static ArrayList<Post> requestFeedSince(AccessToken token, Gson gson, String groupId, int maximum, long sinceUtc) throws JSONException, FacebookException {
+        ArrayList<Post> listPosts = new ArrayList<>(maximum);
+        TypeToken<ArrayList<Post>> type = new TypeToken<ArrayList<Post>>() {
         };
         Bundle parameters = new Bundle();
         parameters.putString("fields", FEED_FIELDS);
-        parameters.putString("since", sinceUnixEpoch + "");
-
-        Bundle parametersSubsequent = new Bundle();
-        parametersSubsequent.putString("fields", "from{name,id,picture},message,caption,comments{from,message},description,name,full_picture,type,updated_time,attachments{type},link,created_time");
-        boolean hasMoreData = false;
+        parameters.putString("since", sinceUtc + "");
         GraphRequest request = new GraphRequest(token, "/" + groupId + "/feed");
         request.setParameters(parameters);
         GraphResponse response = request.executeAndWait();
-        int numberOfPostsRetrieved = 0;
+        Bundle parametersSubsequent = new Bundle();
+        parametersSubsequent.putString("fields", FEED_FIELDS);
+        boolean hasMoreData = false;
+
+
+        int fetched = 0;
         JSONObject root;
         JSONArray dataArray;
         do {
@@ -205,11 +229,11 @@ public class FBUtils {
 
                     //For each iteration, we fetch the list of groups and append all of them to what we have so far
 
-                    ArrayList<Post> posts = gson.fromJson(dataArray.toString(), typeToken.getType());
+                    ArrayList<Post> posts = gson.fromJson(dataArray.toString(), type.getType());
                     for (Post post : posts) {
-                        if (numberOfPostsRetrieved < maximumNumberOfPostsToRetrieve) {
+                        if (fetched < maximum) {
                             listPosts.add(post);
-                            numberOfPostsRetrieved++;
+                            fetched++;
                         }
                     }
                     request = response.getRequestForPagedResults(GraphResponse.PagingDirection.NEXT);
@@ -217,7 +241,7 @@ public class FBUtils {
 
                     //We have more data if posts retrieved in the current iteration are not empty and we have a valid pagination request for the next round and we have not reached the limit or maximum number of posts to retrieve yet
 
-                    hasMoreData = !posts.isEmpty() && request != null && numberOfPostsRetrieved != maximumNumberOfPostsToRetrieve;
+                    hasMoreData = !posts.isEmpty() && request != null && fetched != maximum;
                     if (hasMoreData) {
                         request.setParameters(parametersSubsequent);
                         response = request.executeAndWait();
