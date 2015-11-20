@@ -34,7 +34,7 @@ import io.realm.RealmResults;
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.adapter.AdapterPost;
+import slidenerd.vivz.fpam.adapter.AdapterPostSectioned;
 import slidenerd.vivz.fpam.adapter.OnItemClickListener;
 import slidenerd.vivz.fpam.adapter.RecyclerViewHelperImpl;
 import slidenerd.vivz.fpam.adapter.SwipeToDismissTouchListener;
@@ -66,7 +66,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     @InstanceState
     String mGroupId = Constants.GROUP_ID_NONE;
     private RecyclerView mRecycler;
-    private AdapterPost mAdapter;
+    private AdapterPostSectioned mAdapter;
     private Realm mRealm;
     private CallbackManager mCallbackManager;
     private LoginManager mLoginManager;
@@ -76,7 +76,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     private RealmChangeListener mListener = new RealmChangeListener() {
         @Override
         public void onChange() {
-            mAdapter.notifyDataSetChanged();
+            mAdapter.updateRealmResults(mPosts);
         }
     };
 
@@ -133,7 +133,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         super.onViewCreated(view, savedInstanceState);
         mRecycler = (RecyclerView) view.findViewById(R.id.recycler_posts);
         mRecycler.setLayoutManager(new LinearLayoutManager(mContext));
-        mAdapter = new AdapterPost(mContext, mRealm, mPosts);
+        mAdapter = new AdapterPostSectioned(mContext, mRealm, mPosts);
         mAdapter.setHasStableIds(true);
         mRecycler.setAdapter(mAdapter);
         final SwipeToDismissTouchListener<RecyclerViewHelperImpl> mTouchListener = new SwipeToDismissTouchListener<>(
@@ -226,7 +226,6 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     public void onBroadcastSelectedGroup(Context context, Intent intent) {
         mSelectedGroupId = intent.getExtras().getString(EXTRA_SELECTED_GROUP);
         mPosts = mRealm.where(Post.class).beginsWith(POST_ID, mSelectedGroupId).findAllSortedAsync(UPDATED_TIME, false);
-        mAdapter.updateRealmResults(mPosts);
         if (mPosts != null) {
             mPosts.addChangeListener(mListener);
         }

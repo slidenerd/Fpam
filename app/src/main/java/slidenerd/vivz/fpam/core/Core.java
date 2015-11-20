@@ -22,8 +22,7 @@ import slidenerd.vivz.fpam.model.realm.Keyword;
 import slidenerd.vivz.fpam.model.realm.Spammer;
 import slidenerd.vivz.fpam.util.FBUtils;
 
-import static slidenerd.vivz.fpam.extras.Constants.COMPOSITE_GROUP_KEYWORD_ID;
-import static slidenerd.vivz.fpam.extras.Constants.COUNT;
+import static slidenerd.vivz.fpam.extras.Constants.COMPOSITE_GROUP_ORDER_ID;
 import static slidenerd.vivz.fpam.extras.Constants.POSTLYTICS_ID;
 import static slidenerd.vivz.fpam.extras.Constants.POST_ID;
 import static slidenerd.vivz.fpam.extras.Constants.SPAMMER_ID;
@@ -87,9 +86,9 @@ public class Core {
 
             if (success) {
 
-                boolean postWasEmpty = false;
-                boolean postByExistingSpammer = false;
-                boolean postContainsKeywords = false;
+                boolean isMessageEmpty = false;
+                boolean byExistingSpammer = false;
+                boolean hasSpamKeywords = false;
                 //Compute the unique id for a spammer which is the combination of user id of a post and group id of the same post
                 String spammerId = Spammer.computeId(post.getUserId(), groupId);
 
@@ -112,7 +111,7 @@ public class Core {
                     spammer.setSpamCount(spammer.getSpamCount() + 1);
                     spammer.setLastActive(System.currentTimeMillis());
                     realm.commitTransaction();
-                    postByExistingSpammer = true;
+                    byExistingSpammer = true;
                     //if the combination of user id and group id is not found in the database, create it
                 }
 
@@ -127,54 +126,94 @@ public class Core {
                 if (StringUtils.isBlank(message)) {
 
                     //update the number of empty messages found under this group id as part of analytics
-                    postWasEmpty = true;
+                    isMessageEmpty = true;
                 }
 
                 if (StringUtils.isNotBlank(content)) {
 
-                    RealmResults<TopKeywords> topXKeywords = realm.where(TopKeywords.class).beginsWith(COMPOSITE_GROUP_KEYWORD_ID, groupId).findAllSorted(COUNT);
-                    realm.beginTransaction();
-                    for (int i = topXKeywords.size() - 1; i >= TOP_ENTRIES_COUNT; i--) {
-                        topXKeywords.get(i).removeFromRealm();
+                    ArrayList<TopKeywords> top = new ArrayList<>(TOP_ENTRIES_COUNT);
+                    for (int i = 0; i < TOP_ENTRIES_COUNT; i++) {
+
+                        //Compute the primary key of each TopKeywords entry which is the combination of group id and the order such as 1,2,3...n
+                        String compositeGroupOrderId = TopKeywords.computeGroupKeywordId(groupId, (i + 1));
+
+                        //To store N top keywords for our group with id 'X' we use the primary keys X:1,X:2, X:3...X:n
+                        TopKeywords current = realm.where(TopKeywords.class).equalTo(COMPOSITE_GROUP_ORDER_ID, compositeGroupOrderId).findFirst();
+
+                        //we add the keyword to our list if its not null
+                        if (current != null) {
+                            top.add(current);
+                        }
                     }
-                    realm.commitTransaction();
-                    FrequencyComparator comparator = new FrequencyComparator();
-                    ArrayList<TopKeywords> frequencies = new ArrayList<>();
+                    ArrayList<TopKeywords> list = new ArrayList<>();
 
                     //Convert the content to lowercase to find occurrence of each keyword in it.
                     String lowercaseContent = content.toLowerCase();
-
                     //Loop through the list of keywords
                     for (Keyword keyword : keywords) {
 
                         //For each keyword, check the number of times it was found, our keyword is always in lowercase as per our app design which means we need to convert content to lowercase
                         int count = StringUtils.countMatches(lowercaseContent, keyword.getKeyword());
 
+                        //We assume that the same word will not be present in both the top list from the database and the content which we just scanned.
+                        boolean duplicate = false;
+
                         //if we have a non zero count, store the keyword and its occurrence and mark the boolean variable which indicates whether keywords were found in the content
                         if (count > 0) {
-                            TopKeywords topKeywords = new TopKeywords();
-                            String frequencyId = TopKeywords.computeGroupKeywordId(groupId, keyword.getKeyword());
-                            topKeywords.setCompositeGroupKeywordId(frequencyId);
-                            topKeywords.setCount(count);
-                            frequencies.add(topKeywords);
-                            postContainsKeywords = true;
+
+                            //Loop through the list of top words to find if any of the words or phrases contained in the post are already present
+                            for (int i = 0; i < top.size(); i++) {
+                                TopKeywords current = top.get(i);
+
+                                //if a word or phrase is present in both places
+                                if (StringUtils.equals(current.getKeyword(), keyword.getKeyword())) {
+
+                                    //update the number of times that particular word has been found which is the sum of the number of times it existed in the database and the number of times it was found in this post
+                                    realm.beginTransaction();
+                                    current.setCount(current.getCount() + count);
+                                    realm.commitTransaction();
+
+                                    //mark this word as duplicate
+                                    duplicate = true;
+                                    break;
+                                }
+                            }
+
+                            //add the keyword to the list of keywords obtained by scanning the content as long as its not a duplicate
+                            if (!duplicate) {
+                                TopKeywords current = new TopKeywords();
+                                current.setKeyword(keyword.getKeyword());
+                                current.setCount(count);
+                                list.add(current);
+                            }
+
+                            //since we have atleast one spam word or phrase, set this variable
+                            hasSpamKeywords = true;
                         }
                     }
-                    frequencies.addAll(topXKeywords);
-                    if (postContainsKeywords) {
-                        Collections.sort(frequencies, comparator);
-                        realm.beginTransaction();
-                        for (int i = 0; i < frequencies.size() && i < TOP_ENTRIES_COUNT; i++) {
-                            for (TopKeywords topKeywords : topXKeywords) {
-                                String word1 = TopKeywords.getKeyword(topKeywords.getCompositeGroupKeywordId());
-                                String word2 = TopKeywords.getKeyword(frequencies.get(i).getCompositeGroupKeywordId());
-                                if (StringUtils.equals(word1, word2)) {
-                                    topKeywords.setCount(topKeywords.getCount() + 1);
 
-                                }
-                                realm.copyToRealmOrUpdate(topKeywords);
-                                break;
+                    if (hasSpamKeywords) {
+                        FrequencyComparator comparator = new FrequencyComparator();
+
+                        //add the top keywords retrieved from the database to the list of words retrieved after scanning the contents of this post
+                        list.addAll(top);
+
+                        //sort all the posts in descending order of the number of times they were found + alphabetically descending whenver they are found the same number of times
+                        Collections.sort(list, comparator);
+                        realm.beginTransaction();
+
+                        //we want to store only N entries or the number of entries obtained after adding the previous N entries in the database to the list of words obtained after scanning the current post whichever is smaller
+                        for (int i = 0; i < list.size() && i < TOP_ENTRIES_COUNT; i++) {
+                            TopKeywords current = list.get(i);
+
+                            //if the current item already has a primary key, don't set a primary key since it causes a crash, otherwise set it
+                            if (StringUtils.isBlank(current.getCompositeGroupOrderId())) {
+
+                                //Construct and set the primary key.
+                                String compositeGroupOrderId = TopKeywords.computeGroupKeywordId(groupId, (i + 1));
+                                current.setCompositeGroupOrderId(compositeGroupOrderId);
                             }
+                            realm.copyToRealmOrUpdate(current);
                         }
                         realm.commitTransaction();
                     }
@@ -184,17 +223,17 @@ public class Core {
                 dailytics.setDeleted(dailytics.getDeleted() + 1);
 
                 //If the post was made by a known spammer, increment the number of posts deleted so far because they were made by a known spammer
-                if (postByExistingSpammer) {
+                if (byExistingSpammer) {
                     dailytics.setDeletedSpammer(dailytics.getDeletedSpammer() + 1);
                 }
 
                 //if the post had an empty message, increment the number of posts deleted so far because they had an empty message
-                if (postWasEmpty) {
+                if (isMessageEmpty) {
                     dailytics.setDeletedEmpty(dailytics.getDeletedEmpty() + 1);
                 }
 
                 //if the post had keywords in it, increment the number of posts deleted so far because they had keywords in them
-                if (postContainsKeywords) {
+                if (hasSpamKeywords) {
                     dailytics.setDeletedKeywords(dailytics.getDeletedKeywords() + 1);
                 }
                 realm.commitTransaction();

@@ -8,27 +8,28 @@ import io.realm.annotations.PrimaryKey;
  */
 public class TopKeywords extends RealmObject {
     @PrimaryKey
-    private String compositeGroupKeywordId;
+    private String compositeGroupOrderId;
+    private String keyword;
     private int count;
 
-    public static String computeGroupKeywordId(String groupId, String keyword) {
-        return groupId + ":" + keyword;
+    public static String computeGroupKeywordId(String groupId, int order) {
+        return groupId + ":" + order;
     }
 
     public static String getGroupId(String compositeGroupKeywordId) {
         return compositeGroupKeywordId.substring(0, compositeGroupKeywordId.indexOf(':'));
     }
 
-    public static String getKeyword(String compositeGroupKeywordId) {
-        return compositeGroupKeywordId.substring(compositeGroupKeywordId.indexOf(':') + 1);
+    public static int getOrder(String compositeGroupKeywordId) {
+        return Integer.parseInt(compositeGroupKeywordId.substring(compositeGroupKeywordId.indexOf(':') + 1));
     }
 
-    public String getCompositeGroupKeywordId() {
-        return compositeGroupKeywordId;
+    public String getCompositeGroupOrderId() {
+        return compositeGroupOrderId;
     }
 
-    public void setCompositeGroupKeywordId(String compositeGroupKeywordId) {
-        this.compositeGroupKeywordId = compositeGroupKeywordId;
+    public void setCompositeGroupOrderId(String compositeGroupOrderId) {
+        this.compositeGroupOrderId = compositeGroupOrderId;
     }
 
     public int getCount() {
@@ -37,5 +38,13 @@ public class TopKeywords extends RealmObject {
 
     public void setCount(int count) {
         this.count = count;
+    }
+
+    public String getKeyword() {
+        return keyword;
+    }
+
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
     }
 }

@@ -18,7 +18,7 @@ public interface Constants {
     String POSTLYTICS_ID = "compositeGroupDateId";
     String SPAMMER_ID = "compositeUserGroupId";
     String UPDATED_TIME = "updatedTime";
-    String COMPOSITE_GROUP_KEYWORD_ID = "compositeGroupKeywordId";
+    String COMPOSITE_GROUP_ORDER_ID = "compositeGroupOrderId";
     String COUNT = "count";
 
     int TOP_ENTRIES_COUNT = 3;
