@@ -120,7 +120,6 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends RecyclerView
                 //After swiping a post and showing the undo layout, if a person scrolls up or down, cancel the pending delete and show the layout of the post once again.
                 undoPendingDismiss();
                 setEnabled(scrollState != RecyclerView.SCROLL_STATE_DRAGGING);
-                L.m("scroll state " + scrollState);
             }
         });
     }

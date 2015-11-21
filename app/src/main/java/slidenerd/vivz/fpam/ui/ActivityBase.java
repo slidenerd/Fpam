@@ -24,7 +24,10 @@ import com.facebook.login.LoginManager;
 import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.sharedpreferences.Pref;
+import org.apache.commons.lang3.StringUtils;
 
+import difflib.StringUtills;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.Fpam;
@@ -32,10 +35,11 @@ import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.background.TaskFragmentLoadPosts;
 import slidenerd.vivz.fpam.background.TaskFragmentLoadPosts_;
+import slidenerd.vivz.fpam.extras.MyPrefs_;
 import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.model.json.Post;
 import slidenerd.vivz.fpam.model.realm.Dailytics;
-import slidenerd.vivz.fpam.model.realm.TopKeywords;
+import slidenerd.vivz.fpam.model.realm.TopKeyword;
 import slidenerd.vivz.fpam.model.realm.Keyword;
 import slidenerd.vivz.fpam.model.realm.Spammer;
 import slidenerd.vivz.fpam.settings.SettingsActivity_;
@@ -50,7 +54,6 @@ import static slidenerd.vivz.fpam.extras.Constants.EXTRA_SELECTED_GROUP;
 public abstract class ActivityBase extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, TaskFragmentLoadPosts.TaskCallback {
 
-    private static final String STATE_SELECTED_GROUP = "state_selected_group";
     private static final String TAG_FRAGMENT_DRAWER = "nav_drawer";
     private static final String TAG_FRAGMENT_TASK_POSTS = "task_fragment";
     @App
@@ -58,8 +61,11 @@ public abstract class ActivityBase extends AppCompatActivity
     private TaskFragmentLoadPosts_ mTask;
     private FragmentDrawer_ mDrawer;
     private FloatingActionButton mFab;
-    private String mSelectedGroup;
+    private String mGroupId;
+    private String mTitle;
     private DrawerLayout mDrawerLayout;
+    @Pref
+    public MyPrefs_ mPref;
 
     private AccessTokenTracker mTracker = new AccessTokenTracker() {
         @Override
@@ -94,7 +100,11 @@ public abstract class ActivityBase extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
         if (hasDrawer()) {
+            mTitle = mPref.lastLoadedTitle().get();
+            mGroupId = mPref.lastLoadedGroup().get();
+            getSupportActionBar().setTitle(StringUtils.isNoneBlank(mTitle, mGroupId) ? mTitle : getString(R.string.app_name));
             initNavigationDrawer(toolbar);
         }
 
@@ -110,14 +120,8 @@ public abstract class ActivityBase extends AppCompatActivity
 
         //Give the subclasses an opportunity to create their views by indicating the parent tablayout and their main content view is ready.
 
-        onCreateUserInterface(tabLayout, mainContentView);
 
-        if (savedInstanceState != null) {
-            mSelectedGroup = savedInstanceState.getString(STATE_SELECTED_GROUP);
-            if (mSelectedGroup != null) {
-                broadcastSelectedGroup(mSelectedGroup);
-            }
-        }
+        onCreateUserInterface(tabLayout, mainContentView);
     }
 
     private void broadcastSelectedGroup(String groupId) {
@@ -164,14 +168,6 @@ public abstract class ActivityBase extends AppCompatActivity
         toggle.syncState();
     }
 
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(STATE_SELECTED_GROUP, mSelectedGroup);
-    }
-
-
     /**
      * If the drawer is open, close the drawer, else let the default behavior take place for back press
      */
@@ -203,7 +199,7 @@ public abstract class ActivityBase extends AppCompatActivity
     protected boolean onCacheSelected() {
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
-        realm.where(TopKeywords.class).findAll().clear();
+        realm.where(TopKeyword.class).findAll().clear();
         realm.where(Dailytics.class).findAll().clear();
         realm.where(Spammer.class).findAll().clear();
         realm.where(Post.class).findAll().clear();
@@ -222,10 +218,13 @@ public abstract class ActivityBase extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        mSelectedGroup = mDrawer.getSelected(id);
-        if (mSelectedGroup != null) {
-            setTitle(item.getTitle());
-            mTask.triggerLoadPosts(mSelectedGroup, mApplication.getToken());
+        mGroupId = mDrawer.getSelected(id);
+        if (mGroupId != null) {
+            mTitle = (String) item.getTitle();
+            getSupportActionBar().setTitle(mTitle);
+            mPref.lastLoadedGroup().put(mGroupId);
+            mPref.lastLoadedTitle().put(mTitle);
+            mTask.triggerLoadPosts(mGroupId, mApplication.getToken());
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -240,7 +239,7 @@ public abstract class ActivityBase extends AppCompatActivity
     @Override
     public void afterPostsLoaded() {
         FragmentProgress.dismiss(this);
-        broadcastSelectedGroup(mSelectedGroup);
+        broadcastSelectedGroup(mGroupId);
     }
 
 

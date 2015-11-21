@@ -6,7 +6,7 @@ import io.realm.annotations.PrimaryKey;
 /**
  * Created by vivz on 17/11/15.
  */
-public class TopKeywords extends RealmObject {
+public class TopKeyword extends RealmObject {
     @PrimaryKey
     private String compositeGroupOrderId;
     private String keyword;

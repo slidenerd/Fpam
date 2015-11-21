@@ -17,7 +17,7 @@ import slidenerd.vivz.fpam.extras.FrequencyComparator;
 import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.model.json.Post;
 import slidenerd.vivz.fpam.model.realm.Dailytics;
-import slidenerd.vivz.fpam.model.realm.TopKeywords;
+import slidenerd.vivz.fpam.model.realm.TopKeyword;
 import slidenerd.vivz.fpam.model.realm.Keyword;
 import slidenerd.vivz.fpam.model.realm.Spammer;
 import slidenerd.vivz.fpam.util.FBUtils;
@@ -90,7 +90,7 @@ public class Core {
                 boolean byExistingSpammer = false;
                 boolean hasSpamKeywords = false;
                 //Compute the unique id for a spammer which is the combination of user id of a post and group id of the same post
-                String spammerId = Spammer.computeId(post.getUserId(), groupId);
+                String spammerId = Spammer.computeId(groupId, post.getUserId());
 
                 //Check if this user exists in the spammer database for this particular group id
                 Spammer spammer = realm.where(Spammer.class).equalTo(SPAMMER_ID, spammerId).findFirst();
@@ -131,21 +131,21 @@ public class Core {
 
                 if (StringUtils.isNotBlank(content)) {
 
-                    ArrayList<TopKeywords> top = new ArrayList<>(TOP_ENTRIES_COUNT);
+                    ArrayList<TopKeyword> top = new ArrayList<>(TOP_ENTRIES_COUNT);
                     for (int i = 0; i < TOP_ENTRIES_COUNT; i++) {
 
-                        //Compute the primary key of each TopKeywords entry which is the combination of group id and the order such as 1,2,3...n
-                        String compositeGroupOrderId = TopKeywords.computeGroupKeywordId(groupId, (i + 1));
+                        //Compute the primary key of each TopKeyword entry which is the combination of group id and the order such as 1,2,3...n
+                        String compositeGroupOrderId = TopKeyword.computeGroupKeywordId(groupId, (i + 1));
 
                         //To store N top keywords for our group with id 'X' we use the primary keys X:1,X:2, X:3...X:n
-                        TopKeywords current = realm.where(TopKeywords.class).equalTo(COMPOSITE_GROUP_ORDER_ID, compositeGroupOrderId).findFirst();
+                        TopKeyword current = realm.where(TopKeyword.class).equalTo(COMPOSITE_GROUP_ORDER_ID, compositeGroupOrderId).findFirst();
 
                         //we add the keyword to our list if its not null
                         if (current != null) {
                             top.add(current);
                         }
                     }
-                    ArrayList<TopKeywords> list = new ArrayList<>();
+                    ArrayList<TopKeyword> list = new ArrayList<>();
 
                     //Convert the content to lowercase to find occurrence of each keyword in it.
                     String lowercaseContent = content.toLowerCase();
@@ -156,14 +156,14 @@ public class Core {
                         int count = StringUtils.countMatches(lowercaseContent, keyword.getKeyword());
 
                         //We assume that the same word will not be present in both the top list from the database and the content which we just scanned.
-                        boolean duplicate = false;
+                        boolean isPresent = false;
 
                         //if we have a non zero count, store the keyword and its occurrence and mark the boolean variable which indicates whether keywords were found in the content
                         if (count > 0) {
 
                             //Loop through the list of top words to find if any of the words or phrases contained in the post are already present
                             for (int i = 0; i < top.size(); i++) {
-                                TopKeywords current = top.get(i);
+                                TopKeyword current = top.get(i);
 
                                 //if a word or phrase is present in both places
                                 if (StringUtils.equals(current.getKeyword(), keyword.getKeyword())) {
@@ -174,14 +174,14 @@ public class Core {
                                     realm.commitTransaction();
 
                                     //mark this word as duplicate
-                                    duplicate = true;
+                                    isPresent = true;
                                     break;
                                 }
                             }
 
                             //add the keyword to the list of keywords obtained by scanning the content as long as its not a duplicate
-                            if (!duplicate) {
-                                TopKeywords current = new TopKeywords();
+                            if (!isPresent) {
+                                TopKeyword current = new TopKeyword();
                                 current.setKeyword(keyword.getKeyword());
                                 current.setCount(count);
                                 list.add(current);
@@ -204,13 +204,13 @@ public class Core {
 
                         //we want to store only N entries or the number of entries obtained after adding the previous N entries in the database to the list of words obtained after scanning the current post whichever is smaller
                         for (int i = 0; i < list.size() && i < TOP_ENTRIES_COUNT; i++) {
-                            TopKeywords current = list.get(i);
+                            TopKeyword current = list.get(i);
 
                             //if the current item already has a primary key, don't set a primary key since it causes a crash, otherwise set it
                             if (StringUtils.isBlank(current.getCompositeGroupOrderId())) {
 
                                 //Construct and set the primary key.
-                                String compositeGroupOrderId = TopKeywords.computeGroupKeywordId(groupId, (i + 1));
+                                String compositeGroupOrderId = TopKeyword.computeGroupKeywordId(groupId, (i + 1));
                                 current.setCompositeGroupOrderId(compositeGroupOrderId);
                             }
                             realm.copyToRealmOrUpdate(current);
@@ -240,8 +240,6 @@ public class Core {
 
 
                 //update top x spammers as part of analytics
-
-                //update top x keywords as part of analytics
 
             } else {
                 //update delete failed count

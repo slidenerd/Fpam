@@ -10,7 +10,7 @@ import io.realm.annotations.PrimaryKey;
 public class Spammer extends RealmObject {
     //This is a combination of the user id followed by the group id separated by a colon
     @PrimaryKey
-    private String compositeUserGroupId;
+    private String compositeGroupUserId;
     private String userName;
     private int spamCount;
     private long lastActive;
@@ -21,8 +21,8 @@ public class Spammer extends RealmObject {
 
     }
 
-    public Spammer(String compositeUserGroupId, String userName, int spamCount, long lastActive, boolean authorized) {
-        this.compositeUserGroupId = compositeUserGroupId;
+    public Spammer(String compositeGroupUserId, String userName, int spamCount, long lastActive, boolean authorized) {
+        this.compositeGroupUserId = compositeGroupUserId;
 
         this.userName = userName;
         this.spamCount = spamCount;
@@ -32,7 +32,7 @@ public class Spammer extends RealmObject {
 
     public static String toPrint(Spammer spammer) {
         return "Spammer{" +
-                "compositeUserGroupId='" + spammer.compositeUserGroupId + '\'' +
+                "compositeGroupUserId='" + spammer.compositeGroupUserId + '\'' +
                 ", userName='" + spammer.userName + '\'' +
                 ", spamCount=" + spammer.spamCount +
                 ", lastActive=" + spammer.lastActive +
@@ -40,8 +40,8 @@ public class Spammer extends RealmObject {
                 '}';
     }
 
-    public static String computeId(String userId, String groupId) {
-        return userId + ":" + groupId;
+    public static String computeId(String groupId, String userId) {
+        return groupId + ":" + userId;
     }
 
     public String getUserName() {
@@ -52,12 +52,12 @@ public class Spammer extends RealmObject {
         this.userName = userName;
     }
 
-    public String getCompositeUserGroupId() {
-        return compositeUserGroupId;
+    public String getCompositeGroupUserId() {
+        return compositeGroupUserId;
     }
 
-    public void setCompositeUserGroupId(String compositeUserGroupId) {
-        this.compositeUserGroupId = compositeUserGroupId;
+    public void setCompositeGroupUserId(String compositeGroupUserId) {
+        this.compositeGroupUserId = compositeGroupUserId;
     }
 
     public int getSpamCount() {

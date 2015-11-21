@@ -2,6 +2,7 @@ package slidenerd.vivz.fpam.extras;
 
 import org.androidannotations.annotations.sharedpreferences.DefaultBoolean;
 import org.androidannotations.annotations.sharedpreferences.DefaultInt;
+import org.androidannotations.annotations.sharedpreferences.DefaultString;
 import org.androidannotations.annotations.sharedpreferences.SharedPref;
 
 import slidenerd.vivz.fpam.R;
@@ -22,4 +23,8 @@ public interface MyPrefs {
     boolean deleteMultiple();
 
     String monitoredGroups();
+
+    String lastLoadedGroup();
+
+    String lastLoadedTitle();
 }

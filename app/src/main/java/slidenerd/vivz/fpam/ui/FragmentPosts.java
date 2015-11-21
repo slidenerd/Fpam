@@ -25,6 +25,7 @@ import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.Receiver;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import java.util.Arrays;
 
@@ -40,6 +41,7 @@ import slidenerd.vivz.fpam.adapter.RecyclerViewHelperImpl;
 import slidenerd.vivz.fpam.adapter.SwipeToDismissTouchListener;
 import slidenerd.vivz.fpam.adapter.SwipeableItemClickListener;
 import slidenerd.vivz.fpam.extras.Constants;
+import slidenerd.vivz.fpam.extras.MyPrefs_;
 import slidenerd.vivz.fpam.model.json.Post;
 import slidenerd.vivz.fpam.util.FBUtils;
 
@@ -60,11 +62,13 @@ import static slidenerd.vivz.fpam.extras.Constants.UPDATED_TIME;
 @EFragment
 public class FragmentPosts extends Fragment implements FacebookCallback<LoginResult> {
 
-    private static final String STATE_SELECTED_GROUP_ID = "group_id";
     @App
     Fpam mApplication;
     @InstanceState
     String mGroupId = Constants.GROUP_ID_NONE;
+
+    @Pref
+    MyPrefs_ mPref;
     private RecyclerView mRecycler;
     private AdapterPostSectioned mAdapter;
     private Realm mRealm;
@@ -109,18 +113,8 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         if (!FBUtils.isValidAndCanPublish(mApplication.getToken())) {
             mLoginManager.logInWithPublishPermissions(FragmentPosts.this, Arrays.asList(Constants.PUBLISH_ACTIONS));
         }
-
-        if (savedInstanceState != null) {
-            mSelectedGroupId = savedInstanceState.getString(STATE_SELECTED_GROUP_ID);
-        }
     }
 
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(STATE_SELECTED_GROUP_ID, mSelectedGroupId);
-    }
 
     @Nullable
     @Override
@@ -135,6 +129,8 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         mRecycler.setLayoutManager(new LinearLayoutManager(mContext));
         mAdapter = new AdapterPostSectioned(mContext, mRealm, mPosts);
         mAdapter.setHasStableIds(true);
+        mSelectedGroupId = mPref.lastLoadedGroup().get();
+        initWithPosts();
         mRecycler.setAdapter(mAdapter);
         final SwipeToDismissTouchListener<RecyclerViewHelperImpl> mTouchListener = new SwipeToDismissTouchListener<>(
                 new RecyclerViewHelperImpl(mRecycler),
@@ -225,9 +221,17 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     @Receiver(actions = ACTION_LOAD_FEED, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
     public void onBroadcastSelectedGroup(Context context, Intent intent) {
         mSelectedGroupId = intent.getExtras().getString(EXTRA_SELECTED_GROUP);
-        mPosts = mRealm.where(Post.class).beginsWith(POST_ID, mSelectedGroupId).findAllSortedAsync(UPDATED_TIME, false);
-        if (mPosts != null) {
-            mPosts.addChangeListener(mListener);
+        L.m("fragment on load " + mSelectedGroupId);
+        initWithPosts();
+
+    }
+
+    private void initWithPosts() {
+        if (mSelectedGroupId != null) {
+            mPosts = mRealm.where(Post.class).beginsWith(POST_ID, mSelectedGroupId).findAllSortedAsync(UPDATED_TIME, false);
+            if (mPosts != null) {
+                mPosts.addChangeListener(mListener);
+            }
         }
     }
 
@@ -236,7 +240,6 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         boolean outcome = intent.getExtras().getBoolean(EXTRA_OUTCOME);
         int position = intent.getExtras().getInt(EXTRA_POSITION);
         if (outcome) {
-            L.m("notifying delete");
             mAdapter.remove(position);
         }
     }

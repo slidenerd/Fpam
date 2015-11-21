@@ -19,6 +19,7 @@ public interface Constants {
     String SPAMMER_ID = "compositeUserGroupId";
     String UPDATED_TIME = "updatedTime";
     String COMPOSITE_GROUP_ORDER_ID = "compositeGroupOrderId";
+    String COMPOSITE_GROUP_USER_ID = "compositeGroupUserId";
     String COUNT = "count";
 
     int TOP_ENTRIES_COUNT = 3;

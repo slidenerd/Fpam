@@ -117,10 +117,6 @@ public class TaskFragmentLoadPosts extends Fragment {
 
                         //Filter spam posts made by known spammers or containing certain words
 
-//                    Filter.filterPostsOnLoad(token, realm, groupId, posts);
-
-//                    filteredLoadCount = posts.size();
-
                         //Compute the unique id of a dailytics object with is the combination of group id and the current date in dd-MM-yyyy format
                         String dailyticsId = Dailytics.computeId(groupId);
 
@@ -134,9 +130,7 @@ public class TaskFragmentLoadPosts extends Fragment {
                         realm.beginTransaction();
                         realm.copyToRealmOrUpdate(posts);
                         group.setLastLoaded(System.currentTimeMillis());
-                        int scannedOld = dailytics.getScanned();
-                        int scannedNew = posts.size();
-                        dailytics.setScanned(scannedOld + scannedNew);
+                        dailytics.setScanned(dailytics.getScanned() + posts.size());
                         realm.copyToRealmOrUpdate(dailytics);
                         realm.commitTransaction();
                         //Limit the number of entries stored in the database, based on the cache settings of the app, if the admin has set the cache to 25, if the number of posts loaded were 25 but the number of posts already present in the database were 15, then get rid of the oldest 15 posts and store the new 25 posts in the database.
