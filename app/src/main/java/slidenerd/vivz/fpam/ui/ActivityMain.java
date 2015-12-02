@@ -27,17 +27,17 @@ import static slidenerd.vivz.fpam.extras.Constants.EXTRA_POSITION;
 @EActivity
 @OptionsMenu(R.menu.menu_main)
 public class ActivityMain extends ActivityBase {
-    private static final String TAG_FRAGMENT = "delete_posts";
+    private static final String TAG = "delete_posts";
     private ViewPager mPager;
     private TaskFragmentDeletePosts_ mTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mTask = (TaskFragmentDeletePosts_) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT);
+        mTask = (TaskFragmentDeletePosts_) getSupportFragmentManager().findFragmentByTag(TAG);
         if (mTask == null) {
             mTask = new TaskFragmentDeletePosts_();
-            getSupportFragmentManager().beginTransaction().add(mTask, TAG_FRAGMENT).commit();
+            getSupportFragmentManager().beginTransaction().add(mTask, TAG).commit();
         }
     }
 
@@ -52,12 +52,12 @@ public class ActivityMain extends ActivityBase {
     }
 
     @Override
-    public int getContentViewRoot() {
+    public int getRoot() {
         return R.id.main_pager;
     }
 
     @Override
-    public void onCreateUserInterface(TabLayout tabLayout, View mainContentView) {
+    public void init(TabLayout tabLayout, View mainContentView) {
         mPager = (ViewPager) mainContentView;
         mPager.setAdapter(new MainPagerAdapter(this, getSupportFragmentManager()));
         tabLayout.setupWithViewPager(mPager);
@@ -69,7 +69,7 @@ public class ActivityMain extends ActivityBase {
         int position = intent.getExtras().getInt(EXTRA_POSITION);
         L.m("position " + position + " post id " + postId);
         if (postId != null) {
-            mTask.deletePostsAsync(mApplication.getToken(), position, postId);
+            mTask.deletePostsAsync(mApp.getToken(), position, postId);
         } else {
             final Snackbar snackbar = Snackbar.make(mPager, R.string.message_invalid_post, Snackbar.LENGTH_INDEFINITE);
             snackbar.setAction(R.string.ok, new View.OnClickListener() {

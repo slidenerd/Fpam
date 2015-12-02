@@ -12,7 +12,16 @@ public class TopKeyword extends RealmObject {
     private String keyword;
     private int count;
 
-    public static String computeGroupKeywordId(String groupId, int order) {
+    public TopKeyword(String compositeGroupOrderId, String keyword, int count) {
+        this.compositeGroupOrderId = compositeGroupOrderId;
+        this.keyword = keyword;
+        this.count = count;
+    }
+
+    public TopKeyword() {
+    }
+
+    public static String computeGroupOrderId(String groupId, int order) {
         return groupId + ":" + order;
     }
 

@@ -1,7 +1,9 @@
 package slidenerd.vivz.fpam.adapter;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,8 +16,11 @@ import android.widget.TextView;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
+import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.util.VersionUtils;
+
+import static slidenerd.vivz.fpam.extras.Constants.*;
 
 /**
  * Created by vivz on 05/10/15.
@@ -26,6 +31,7 @@ public class SettingsGroupsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private RealmResults<Group> mResults;
     private LayoutInflater mInflater;
     private View mHeaderView;
+    private SharedPreferences mPref;
 
     //A variable to enable or disable all items. If the user chooses NEVER to monitor groups, all items are disabled, else enabled.
 
@@ -40,6 +46,7 @@ public class SettingsGroupsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         mResults = results;
         mResources = context.getResources();
         mInflater = LayoutInflater.from(context);
+        mPref = PreferenceManager.getDefaultSharedPreferences(mContext);
     }
 
     @Override
@@ -89,7 +96,8 @@ public class SettingsGroupsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             ItemHolder itemHolder = (ItemHolder) holder;
             final Group group = mResults.get(position - 1);
             itemHolder.setGroupName(group.getGroupName(), mEnabled);
-            itemHolder.setMonitored(group.isMonitored(), mEnabled);
+            boolean isMonitored = mPref.getBoolean(KEY_MONITORED_PREFIX + group.getGroupId(), false);
+            itemHolder.setMonitored(isMonitored, mEnabled);
         }
     }
 
@@ -140,10 +148,8 @@ public class SettingsGroupsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
          */
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            mRealm.beginTransaction();
             Group group = mResults.get(getAdapterPosition() - 1);
-            group.setMonitored(isChecked);
-            mRealm.commitTransaction();
+            mPref.edit().putBoolean(KEY_MONITORED_PREFIX + group.getGroupId(), isChecked).apply();
         }
     }
 }

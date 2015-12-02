@@ -59,38 +59,21 @@ public class TaskLoadAdminAndGroups extends Fragment {
         try {
             Gson gson = Fpam.getGson();
             realm = Realm.getDefaultInstance();
-            Admin admin = FBUtils.requestMeSync(accessToken, gson);
+            Admin admin = FBUtils.loadMe(accessToken, gson);
             if (admin == null) {
                 L.m("Fpam encountered problems downloading admin data, hence admin and groups data have not been downloaded");
                 return;
             }
 
-            //Get the list of groups retrieved in the previous round.
-
-            RealmResults<Group> previousGroups = realm.where(Group.class).findAll();
-
             //Request the fresh list of group objects from the JSON feed. For each group object in this list, its monitored and timestamp are set at default.
 
-            ArrayList<Group> currentGroups = FBUtils.requestGroupsSync(accessToken, gson);
-
-            //If a newly loaded group id matches with a previously loaded group id, then update the value of its timestamp and set its monitored parameter accordingly along with the timestamp
-
-            for (Group previousGroup : previousGroups) {
-                for (Group currentGroup : currentGroups) {
-                    if (currentGroup.getGroupId().equals(previousGroup.getGroupId())) {
-                        currentGroup.setMonitored(previousGroup.isMonitored());
-                        currentGroup.setLastLoaded(previousGroup.getLastLoaded());
-                        currentGroup.setCount(previousGroup.getCount());
-                        break;
-                    }
-                }
-            }
+            ArrayList<Group> groups = FBUtils.loadGroups(accessToken, gson);
 
             //Store the fully constructed group objects to the realm database.
 
             realm.beginTransaction();
             realm.copyToRealmOrUpdate(admin);
-            realm.copyToRealmOrUpdate(currentGroups);
+            realm.copyToRealmOrUpdate(groups);
             realm.commitTransaction();
 
         } catch (JSONException e) {

@@ -53,6 +53,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="slidenerd.vivz.fpam.settings.SettingsActivity_" />
         </activity>
+
+        <receiver android:name=".background.AlarmReceiver">
+            <intent-filter>
+                <action android:name="slidenerd.vivz.fpam.START_SCAN_RECEIVER" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".background.OnBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

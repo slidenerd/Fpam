@@ -1,7 +1,11 @@
 package slidenerd.vivz.fpam.ui;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.IdRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -27,37 +31,35 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.apache.commons.lang3.StringUtils;
 
-import difflib.StringUtills;
 import io.realm.Realm;
-import io.realm.RealmResults;
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.background.TaskFragmentLoadPosts;
 import slidenerd.vivz.fpam.background.TaskFragmentLoadPosts_;
 import slidenerd.vivz.fpam.extras.MyPrefs_;
-import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.model.json.Post;
 import slidenerd.vivz.fpam.model.realm.Dailytics;
-import slidenerd.vivz.fpam.model.realm.TopKeyword;
 import slidenerd.vivz.fpam.model.realm.Keyword;
 import slidenerd.vivz.fpam.model.realm.Spammer;
+import slidenerd.vivz.fpam.model.realm.TopKeyword;
 import slidenerd.vivz.fpam.settings.SettingsActivity_;
 import slidenerd.vivz.fpam.util.DatabaseUtils;
 import slidenerd.vivz.fpam.util.FBUtils;
 
 import static slidenerd.vivz.fpam.extras.Constants.ACTION_LOAD_FEED;
 import static slidenerd.vivz.fpam.extras.Constants.EXTRA_SELECTED_GROUP;
+import static slidenerd.vivz.fpam.extras.Constants.PERIOD;
 
 @EActivity
 
 public abstract class ActivityBase extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, TaskFragmentLoadPosts.TaskCallback {
 
-    private static final String TAG_FRAGMENT_DRAWER = "nav_drawer";
-    private static final String TAG_FRAGMENT_TASK_POSTS = "task_fragment";
+    private static final String TAG_DRAWER = "nav_drawer";
+    private static final String TAG_TASK = "task_load_posts";
     @App
-    protected Fpam mApplication;
+    protected Fpam mApp;
     private TaskFragmentLoadPosts_ mTask;
     private FragmentDrawer_ mDrawer;
     private FloatingActionButton mFab;
@@ -71,8 +73,17 @@ public abstract class ActivityBase extends AppCompatActivity
         @Override
         protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
             AccessToken.setCurrentAccessToken(currentAccessToken);
-            mApplication.setToken(currentAccessToken);
-            L.m("onCurrentAccessTokenChanged ");
+            mApp.setToken(currentAccessToken);
+            L.m("onCurrentAccessTokenChanged " + oldAccessToken + " " + currentAccessToken);
+        }
+    };
+
+    private SharedPreferences.OnSharedPreferenceChangeListener mListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            if (key.equals(getString(R.string.key_scan_frequency))) {
+                L.t(ActivityBase.this, "changed " + sharedPreferences.getInt(getString(R.string.key_scan_frequency), -1));
+            }
         }
     };
 
@@ -81,9 +92,10 @@ public abstract class ActivityBase extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
 
+
         //If the access token has expired or null, take the user back to the login screen, and call return in addition to finish() of the activity to halt processing any remaining code inside onCreate
 
-        if (!FBUtils.isValid(mApplication.getToken())) {
+        if (!FBUtils.isValid(mApp.getToken())) {
             moveToLogin();
             return;
         }
@@ -94,7 +106,7 @@ public abstract class ActivityBase extends AppCompatActivity
 
         //Initialize our retained fragment that performs the task of loading posts in the background
 
-        initTaskFragment();
+        initTask();
 
         //Initialize our Drawer Fragment that contains the navigation view and adds admin information and groups information
 
@@ -105,24 +117,30 @@ public abstract class ActivityBase extends AppCompatActivity
             mTitle = mPref.lastLoadedTitle().get();
             mGroupId = mPref.lastLoadedGroup().get();
             getSupportActionBar().setTitle(StringUtils.isNoneBlank(mTitle, mGroupId) ? mTitle : getString(R.string.app_name));
-            initNavigationDrawer(toolbar);
+            initDrawer(toolbar);
         }
 
         //Inflate the child class root View which is represented by a ViewStub in this layout
 
         ViewStub viewStub = (ViewStub) findViewById(R.id.content_main);
-        viewStub.setInflatedId(getContentViewRoot());
+        viewStub.setInflatedId(getRoot());
         viewStub.setLayoutResource(getContentView());
         View mainContentView = viewStub.inflate();
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
 
+        Intent intent = new Intent("slidenerd.vivz.fpam.START_SCAN_RECEIVER");
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 100, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
         //Give the subclasses an opportunity to create their views by indicating the parent tablayout and their main content view is ready.
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
+        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + PERIOD, PERIOD, pendingIntent);
+        init(tabLayout, mainContentView);
 
-        onCreateUserInterface(tabLayout, mainContentView);
     }
+
 
     private void broadcastSelectedGroup(String groupId) {
         Intent intent = new Intent(ACTION_LOAD_FEED);
@@ -146,26 +164,38 @@ public abstract class ActivityBase extends AppCompatActivity
         });
     }
 
-    private void initTaskFragment() {
-        mTask = (TaskFragmentLoadPosts_) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_TASK_POSTS);
+    private void initTask() {
+        mTask = (TaskFragmentLoadPosts_) getSupportFragmentManager().findFragmentByTag(TAG_TASK);
         if (mTask == null) {
             mTask = new TaskFragmentLoadPosts_();
-            getSupportFragmentManager().beginTransaction().add(mTask, TAG_FRAGMENT_TASK_POSTS).commit();
+            getSupportFragmentManager().beginTransaction().add(mTask, TAG_TASK).commit();
         }
     }
 
-    private void initNavigationDrawer(Toolbar toolbar) {
+    private void initDrawer(Toolbar toolbar) {
 
-        mDrawer = (FragmentDrawer_) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_DRAWER);
+        mDrawer = (FragmentDrawer_) getSupportFragmentManager().findFragmentByTag(TAG_DRAWER);
         if (mDrawer == null) {
             mDrawer = new FragmentDrawer_();
-            getSupportFragmentManager().beginTransaction().add(R.id.drawer_container, mDrawer, TAG_FRAGMENT_DRAWER).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.drawer_container, mDrawer, TAG_DRAWER).commit();
         }
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawerLayout.setDrawerListener(toggle);
         toggle.syncState();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mPref.getSharedPreferences().registerOnSharedPreferenceChangeListener(mListener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mPref.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(mListener);
     }
 
     /**
@@ -204,10 +234,6 @@ public abstract class ActivityBase extends AppCompatActivity
         realm.where(Spammer.class).findAll().clear();
         realm.where(Post.class).findAll().clear();
         realm.where(Keyword.class).findAll().clear();
-        RealmResults<Group> groups = realm.where(Group.class).findAll();
-        for (int i = 0; i < groups.size(); i++) {
-            groups.get(i).setLastLoaded(0);
-        }
         realm.commitTransaction();
         realm.close();
         return true;
@@ -224,7 +250,7 @@ public abstract class ActivityBase extends AppCompatActivity
             getSupportActionBar().setTitle(mTitle);
             mPref.lastLoadedGroup().put(mGroupId);
             mPref.lastLoadedTitle().put(mTitle);
-            mTask.triggerLoadPosts(mGroupId, mApplication.getToken());
+            mTask.triggerLoadPosts(mGroupId, mApp.getToken());
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -266,12 +292,12 @@ public abstract class ActivityBase extends AppCompatActivity
      * @return the id of the root View of the layout of the child
      */
     @IdRes
-    public abstract int getContentViewRoot();
+    public abstract int getRoot();
 
     /**
      * @param tabLayout       the tab layout of the parent which can be used to link with the ViewPager in the child if it uses ViewPager as its root
      * @param mainContentView the View object corresponding to the root View of the child
      */
 
-    public abstract void onCreateUserInterface(TabLayout tabLayout, View mainContentView);
+    public abstract void init(TabLayout tabLayout, View mainContentView);
 }

@@ -30,6 +30,7 @@ import slidenerd.vivz.fpam.extras.MyPrefs_;
 import slidenerd.vivz.fpam.model.json.Group;
 
 import static slidenerd.vivz.fpam.extras.Constants.GROUP_NAME;
+import static slidenerd.vivz.fpam.extras.Constants.NA;
 
 /**
  * TODO save the list of groups selected by the user
@@ -150,7 +151,7 @@ public class SettingsFragmentGroups extends Fragment implements View.OnClickList
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.key_scan_frequency))) {
             int newValue = mPref.scanFrequency().get();
-            mAdapter.setEnabled(newValue != Constants.NA);
+            mAdapter.setEnabled(newValue != NA);
         }
     }
 

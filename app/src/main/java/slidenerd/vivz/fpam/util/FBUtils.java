@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.facebook.AccessToken;
 import com.facebook.FacebookException;
+import com.facebook.FacebookRequestError;
 import com.facebook.GraphRequest;
 import com.facebook.GraphRequestBatch;
 import com.facebook.GraphResponse;
@@ -20,16 +21,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.model.json.Admin;
 import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.model.json.Post;
-import slidenerd.vivz.fpam.model.pojo.DeleteRequestInfo;
-import slidenerd.vivz.fpam.model.pojo.DeleteResponseInfo;
 
 import static slidenerd.vivz.fpam.extras.Constants.FEED_FIELDS;
 import static slidenerd.vivz.fpam.extras.Constants.PUBLISH_ACTIONS;
 import static slidenerd.vivz.fpam.extras.Constants.READ_PERMISSIONS;
+import static slidenerd.vivz.fpam.extras.Constants.SUCCESS;
 import static slidenerd.vivz.fpam.extras.Fields.AFTER;
 import static slidenerd.vivz.fpam.extras.Fields.CURSORS;
 import static slidenerd.vivz.fpam.extras.Fields.DATA;
@@ -46,37 +47,41 @@ public class FBUtils {
      * @param token access token obtained from Facebook
      * @return true if the token is not null , not expired and contains all the read permissions which in our case would be email and groups else return false.
      */
-    public static final boolean isValidAndCanReadEmailGroups(AccessToken token) {
+    public static final boolean canRead(AccessToken token) {
         return isValid(token) && token.getPermissions().containsAll(Arrays.asList(READ_PERMISSIONS));
     }
 
-    public static final boolean isValidAndCanPublish(AccessToken token) {
+    public static final boolean canPublish(AccessToken token) {
         return isValid(token) && token.getPermissions().contains(PUBLISH_ACTIONS);
     }
 
     /**
      * Specify the fields of the logged in user that you are interested to retrieve. Fire a Graph Request synchronously and get its JSON object.
      *
-     * @param accessToken An access token needed to start session with Facebook
+     * @param token An access token needed to start session with Facebook
      * @return an admin object that has all details such as name, email and the profile picture used by the admin.
      */
     @Nullable
-    public static Admin requestMeSync(AccessToken accessToken, Gson gson) throws JSONException {
+    public static Admin loadMe(AccessToken token, Gson gson) throws JSONException {
         Bundle parameters = new Bundle();
         parameters.putString("fields", "id,email,name,picture.type(normal).width(200).height(200)");
-        GraphRequest request = new GraphRequest(accessToken, "me");
+        GraphRequest request = new GraphRequest(token, "me");
         request.setParameters(parameters);
-        GraphResponse graphResponse = request.executeAndWait();
-        return graphResponse.getJSONObject() == null ? null : gson.fromJson(graphResponse.getJSONObject().toString(), Admin.class);
+        GraphResponse response = request.executeAndWait();
+        if (response.getJSONObject() == null) {
+            return null;
+        } else {
+            return gson.fromJson(response.getJSONObject().toString(), Admin.class);
+        }
     }
 
     /**
-     * @param accessToken An access token needed to start session with Facebook
+     * @param token An access token needed to start session with Facebook
      * @return a List containing all the groups owned by the logged in user and empty list if the logged in user doesn't own any groups or the groups were not retrieved for some reason. The JSON response is actually an object that has an array with the name 'data' which has all the groups.
      * @throws JSONException
      */
     @Nullable
-    public static ArrayList<Group> requestGroupsSync(AccessToken accessToken, Gson gson) throws JSONException {
+    public static ArrayList<Group> loadGroups(AccessToken token, Gson gson) throws JSONException {
         ArrayList<Group> listGroups = new ArrayList<>(Constants.RESULTS_PER_PAGE);
         Bundle parameters = new Bundle();
         TypeToken<ArrayList<Group>> typeToken = new TypeToken<ArrayList<Group>>() {
@@ -86,7 +91,7 @@ public class FBUtils {
         //Are there more pages in the result? By default we assume false
         boolean hasMorePages = false;
         do {
-            GraphRequest request = new GraphRequest(accessToken, "me/admined_groups");
+            GraphRequest request = new GraphRequest(token, "me/admined_groups");
             parameters.putString("fields", "name,id,icon,unread");
             //optionally set a limit of number of groups to fetch per load
 //            parameters.putInt("limit", 4);
@@ -149,7 +154,7 @@ public class FBUtils {
         return listGroups;
     }
 
-    public static ArrayList<Post> requestFeedFirstTime(AccessToken token, Gson gson, String groupId, int maximum) throws JSONException {
+    public static ArrayList<Post> loadFeedFirst(AccessToken token, Gson gson, String groupId, int maximum) throws JSONException {
         ArrayList<Post> listPosts = new ArrayList<>(maximum);
         TypeToken<ArrayList<Post>> typeToken = new TypeToken<ArrayList<Post>>() {
         };
@@ -191,13 +196,24 @@ public class FBUtils {
                         response = request.executeAndWait();
                     }
                 }
+            } else {
+                FacebookRequestError error = response.getError();
+                L.m("error " + error.getErrorMessage());
+                L.m("error " + error.getErrorType());
+                L.m("error " + error.getErrorRecoveryMessage());
+                L.m("error " + error.getErrorUserMessage());
+                L.m("error " + error.getErrorUserTitle());
+                L.m("error " + error.getErrorCode());
+                L.m("error " + error.getSubErrorCode());
+
             }
+
         }
         while (hasMoreData);
         return listPosts;
     }
 
-    public static ArrayList<Post> requestFeedSince(AccessToken token, Gson gson, String groupId, int maximum, long sinceUtc) throws JSONException, FacebookException {
+    public static ArrayList<Post> loadFeedSince(AccessToken token, Gson gson, String groupId, int maximum, long sinceUtc) throws JSONException, FacebookException {
         ArrayList<Post> listPosts = new ArrayList<>(maximum);
         TypeToken<ArrayList<Post>> type = new TypeToken<ArrayList<Post>>() {
         };
@@ -248,35 +264,45 @@ public class FBUtils {
                     }
                 }
             }
+            else {
+                FacebookRequestError error = response.getError();
+                L.m("error " + error.getErrorMessage());
+                L.m("error " + error.getErrorType());
+                L.m("error " + error.getErrorRecoveryMessage());
+                L.m("error " + error.getErrorUserMessage());
+                L.m("error " + error.getErrorUserTitle());
+                L.m("error " + error.getErrorCode());
+                L.m("error " + error.getSubErrorCode());
+
+            }
         }
         while (hasMoreData);
         return listPosts;
     }
 
-    public static ArrayList<DeleteResponseInfo> requestDeletePosts(AccessToken token, ArrayList<DeleteRequestInfo> infos) throws JSONException {
-        ArrayList<DeleteResponseInfo> responseInfos = new ArrayList<>();
+    public static boolean requestDelete(AccessToken token, String postId) throws JSONException {
+        GraphRequest request = new GraphRequest(token, postId, null, HttpMethod.DELETE);
+        GraphResponse response = request.executeAndWait();
+        JSONObject json = response.getJSONObject();
+        return json != null && json.has(SUCCESS) && !json.isNull(SUCCESS) && json.getBoolean(SUCCESS);
+    }
+
+    public static boolean[] requestDeletes(AccessToken token, ArrayList<String> postIds, int size) throws JSONException {
+
         GraphRequestBatch requests = new GraphRequestBatch();
-        for (DeleteRequestInfo info : infos) {
-            Post post = info.getPost();
-            GraphRequest graphRequest = new GraphRequest(token, post.getPostId(), null, HttpMethod.DELETE);
+        boolean[] statuses = new boolean[size];
+        for (int i = 0; i < postIds.size(); i++) {
+            String postId = postIds.get(i);
+            GraphRequest graphRequest = new GraphRequest(token, postId, null, HttpMethod.DELETE);
             requests.add(graphRequest);
         }
         List<GraphResponse> responses = requests.executeAndWait();
-        for (int i = 0; i < responses.size(); i++) {
+        for (int i = 0; i < postIds.size(); i++) {
             GraphResponse response = responses.get(i);
-            Post post = infos.get(i).getPost();
-            JSONObject jsonObject = response.getJSONObject();
-            boolean success = (jsonObject != null && jsonObject.has("success") && !jsonObject.isNull("success") && jsonObject.getBoolean("success"));
-            DeleteResponseInfo responseInfo = new DeleteResponseInfo(success, infos.get(i).getPosition(), post);
-            responseInfos.add(responseInfo);
+            JSONObject json = response.getJSONObject();
+            boolean success = (json != null && json.has(SUCCESS) && !json.isNull(SUCCESS) && json.getBoolean(SUCCESS));
+            statuses[i] = success;
         }
-        return responseInfos;
-    }
-
-    public static boolean requestDeletePost(AccessToken token, Post post) throws JSONException {
-        GraphRequest request = new GraphRequest(token, post.getPostId(), null, HttpMethod.DELETE);
-        GraphResponse response = request.executeAndWait();
-        JSONObject object = response.getJSONObject();
-        return object != null && object.has("success") && !object.isNull("success") && object.getBoolean("success");
+        return statuses;
     }
 }

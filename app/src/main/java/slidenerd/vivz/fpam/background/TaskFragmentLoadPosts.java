@@ -2,7 +2,9 @@ package slidenerd.vivz.fpam.background;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 
@@ -21,15 +23,15 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.L;
+import slidenerd.vivz.fpam.core.Core;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.extras.MyPrefs_;
 import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.model.json.Post;
-import slidenerd.vivz.fpam.model.realm.Dailytics;
 import slidenerd.vivz.fpam.util.FBUtils;
 
 import static slidenerd.vivz.fpam.extras.Constants.GROUP_ID;
-import static slidenerd.vivz.fpam.extras.Constants.POSTLYTICS_ID;
+import static slidenerd.vivz.fpam.extras.Constants.KEY_LAST_LOADED_PREFIX;
 
 /**
  * TODO handle the case where the delete fails or the person has deleted the post from Facebook directly instead of this app and try to send a group id instead of the whole group
@@ -82,61 +84,50 @@ public class TaskFragmentLoadPosts extends Fragment {
     void loadPostsAsync(@NonNull String groupId, AccessToken token) {
         if (FBUtils.isValid(token)) {
             Realm realm = null;
-            int originalLoadCount;
-            int filteredLoadCount = 0;
 
+            SharedPreferences pref;
             try {
                 realm = Realm.getDefaultInstance();
 
                 Group group = realm.where(Group.class).equalTo(GROUP_ID, groupId).findFirst();
 
+
                 if (Group.isValidGroup(group)) {
+
+                    pref = PreferenceManager.getDefaultSharedPreferences(mApplication);
                     //Get the maximum number of posts to retrieve or cache size from app settings
                     int maximum = mPref.cacheSize().getOr(Constants.DEFAULT_NUMBER_OF_ITEMS_TO_FETCH);
-
+                    Core core = new Core();
 
                     //Get the time stamp of when this group was last loaded and convert that timestamp to UTC format
-                    long utcTimestamp = group.getLastLoaded() / 1000L;
+                    long utcTimestamp = pref.getLong(KEY_LAST_LOADED_PREFIX + groupId, 0) / 1000L;
                     ArrayList<Post> posts;
 
                     //If the group was loaded before as indicated by a valid timestamp, then fetch all posts made since that timestamp or maximum number of posts as per the cache size from the app settings whichever is greater
 
                     if (utcTimestamp > 0) {
-                        posts = FBUtils.requestFeedSince(token, Fpam.getGson(), groupId, maximum, utcTimestamp);
+                        posts = FBUtils.loadFeedSince(token, Fpam.getGson(), groupId, maximum, utcTimestamp);
                     }
 
                     //If the group was never loaded before, load it for the first time
                     else {
-                        posts = FBUtils.requestFeedFirstTime(token, Fpam.getGson(), groupId, maximum);
+                        posts = FBUtils.loadFeedFirst(token, Fpam.getGson(), groupId, maximum);
                     }
-                    originalLoadCount = posts.size();
-
-                    //If we did retrieve posts, update the timestamp of when the group was loaded
-
-                    if (!posts.isEmpty()) {
-
+                    if(!posts.isEmpty()){
                         //Filter spam posts made by known spammers or containing certain words
+                        core.filterPosts(token, realm, groupId, posts);
 
-                        //Compute the unique id of a dailytics object with is the combination of group id and the current date in dd-MM-yyyy format
-                        String dailyticsId = Dailytics.computeId(groupId);
-
-                        //Get a reference to the current dailytics object for today
-                        Dailytics dailytics = realm.where(Dailytics.class).equalTo(POSTLYTICS_ID, dailyticsId).findFirst();
-
-                        if (dailytics == null) {
-                            dailytics = new Dailytics(dailyticsId, 0, 0, 0, 0, 0, 0);
-                        }
-
+                        //If we did retrieve posts, update the timestamp of when the group was loaded
                         realm.beginTransaction();
                         realm.copyToRealmOrUpdate(posts);
-                        group.setLastLoaded(System.currentTimeMillis());
-                        dailytics.setScanned(dailytics.getScanned() + posts.size());
-                        realm.copyToRealmOrUpdate(dailytics);
                         realm.commitTransaction();
+
+                        pref.edit().putLong(KEY_LAST_LOADED_PREFIX + groupId, System.currentTimeMillis()).commit();
                         //Limit the number of entries stored in the database, based on the cache settings of the app, if the admin has set the cache to 25, if the number of posts loaded were 25 but the number of posts already present in the database were 15, then get rid of the oldest 15 posts and store the new 25 posts in the database.
 
 //                    DataStore.limitStoredPosts(realm, groupId, maximum);
                     }
+
                 } else {
                     L.m("group was invalid while loading posts");
                 }

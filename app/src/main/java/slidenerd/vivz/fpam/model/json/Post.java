@@ -64,6 +64,25 @@ public class Post extends RealmObject {
         return post != null && StringUtils.isNoneBlank(post.getPostId(), post.getGroupId()) && post.getRowId() > 0;
     }
 
+    public static String getContent(Post post) {
+        //Get the 'name'attribute of a post which is found in shared posts, links and pictures
+        String name = post.getName();
+
+        //Get the 'caption' attribute of a post which is found in shared posts, links and pictures
+        String caption = post.getCaption();
+
+        //Get the 'message' attribute of a post which is the actual message by the user
+        String message = post.getMessage();
+
+        //Get the 'description' attribute of a post which is found in shared posts, links and pictures
+        String description = post.getDescription();
+
+        //Combine the 'name', 'caption', 'message' and 'description' attributes to form the total content of the post for the purposes of processing
+        String content = StringUtils.join(message, name, caption, description, ' ');
+
+        return content.toLowerCase();
+    }
+
     public static String toPrint(Post post) {
         return "Post{" +
                 "postId='" + post.postId + '\'' +

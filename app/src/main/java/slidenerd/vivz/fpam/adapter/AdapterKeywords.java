@@ -10,6 +10,7 @@ import android.widget.TextView;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
+import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.model.realm.Keyword;
 
 /**
@@ -34,7 +35,7 @@ public class AdapterKeywords extends RecyclerView.Adapter<AdapterKeywords.Keywor
     }
 
     public void add(final String keywordString) {
-        Keyword keyword = new Keyword(keywordString, System.currentTimeMillis());
+        Keyword keyword = new Keyword(keywordString, System.currentTimeMillis(), Constants.ALL);
         mRealm.beginTransaction();
         mRealm.copyToRealmOrUpdate(keyword);
         mRealm.commitTransaction();

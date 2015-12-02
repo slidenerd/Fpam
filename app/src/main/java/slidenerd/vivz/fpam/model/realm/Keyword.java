@@ -14,31 +14,23 @@ public class Keyword extends RealmObject {
     @PrimaryKey
     private String keyword;
     private long timestamp;
-    private RealmList<Group> groups = new RealmList<>();
+    private String groups;
 
     //Must have default constructor if a custom constructor is included
     public Keyword() {
 
     }
 
-    public Keyword(String keyword, long timestamp) {
-        this(keyword, timestamp, null);
-    }
-
-    public Keyword(String keyword, long timestamp, RealmList<Group> groups) {
+    public Keyword(String keyword, long timestamp, String groups) {
         this.keyword = keyword;
         this.timestamp = timestamp;
-        this.groups = (groups != null ? groups : new RealmList<Group>());
+        this.groups = groups;
     }
 
     public static String toPrint(List<Keyword> keywords) {
         StringBuffer buffer = new StringBuffer();
         for (Keyword keyword : keywords) {
-            buffer.append(keyword.getKeyword()).append("\n").append(keyword.getTimestamp()).append("\n");
-            List<Group> groups = keyword.getGroups();
-            for (Group group : groups) {
-                buffer.append(group.getGroupId()).append("\n").append(group.getGroupName()).append("\n");
-            }
+            buffer.append(keyword.getKeyword()).append("\n").append(keyword.getTimestamp()).append("\n").append(keyword.getGroups()).append("\n");
         }
         return buffer.toString();
     }
@@ -59,11 +51,11 @@ public class Keyword extends RealmObject {
         this.keyword = keyword;
     }
 
-    public RealmList<Group> getGroups() {
+    public String getGroups() {
         return groups;
     }
 
-    public void setGroups(RealmList<Group> groups) {
+    public void setGroups(String groups) {
         this.groups = groups;
     }
 

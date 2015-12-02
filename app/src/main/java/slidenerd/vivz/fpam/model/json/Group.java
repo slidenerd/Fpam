@@ -19,27 +19,16 @@ public class Group extends RealmObject {
 
     private int unread;
 
-    //Time when the feed for this group was last loaded
-    private long lastLoaded;
-
-    //Boolean indicating whether this group is actively monitored in the background from the Settings of the app
-    private boolean monitored;
-
-    //Tracks how many times a particular keyword was found while scanning the feed of a group
-    private int count;
-
     //Default constructor must be declared if a custom constructor is included
     public Group() {
 
     }
 
-    public Group(String groupId, String groupName, String groupIcon, int unread, long lastLoaded, boolean monitored) {
+    public Group(String groupId, String groupName, String groupIcon, int unread, boolean monitored) {
         this.groupId = groupId;
         this.groupName = groupName;
         this.groupIcon = groupIcon;
         this.unread = unread;
-        this.lastLoaded = lastLoaded;
-        this.monitored = monitored;
     }
 
     public static boolean isValidGroup(Group group) {
@@ -52,9 +41,6 @@ public class Group extends RealmObject {
                 ", groupName='" + group.groupName + '\'' +
                 ", groupIcon='" + group.groupIcon + '\'' +
                 ", unread=" + group.unread +
-                ", lastLoaded=" + group.lastLoaded +
-                ", monitored=" + group.monitored +
-                ", count=" + group.count +
                 '}';
     }
 
@@ -112,29 +98,5 @@ public class Group extends RealmObject {
      */
     public void setUnread(int unread) {
         this.unread = unread;
-    }
-
-    public long getLastLoaded() {
-        return lastLoaded;
-    }
-
-    public void setLastLoaded(long lastLoaded) {
-        this.lastLoaded = lastLoaded;
-    }
-
-    public boolean isMonitored() {
-        return monitored;
-    }
-
-    public void setMonitored(boolean monitored) {
-        this.monitored = monitored;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
     }
 }

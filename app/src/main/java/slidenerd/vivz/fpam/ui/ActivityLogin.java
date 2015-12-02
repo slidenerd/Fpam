@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -24,38 +25,40 @@ import org.androidannotations.annotations.ViewById;
 import java.util.Arrays;
 
 import slidenerd.vivz.fpam.Fpam;
+import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.background.TaskLoadAdminAndGroups;
 import slidenerd.vivz.fpam.background.TaskLoadAdminAndGroups_;
 import slidenerd.vivz.fpam.extras.Constants;
-import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.util.FBUtils;
 
 /**
- * TODO make a better dialog to ask permissions and handle onCancel and onError in a better manner
+
  */
 @EActivity(R.layout.activity_login)
 @OptionsMenu(R.menu.menu_activity_login)
 public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAndGroups.TaskCallback {
-    private static final String TAG_FRAGMENT = "task_fragment";
+    private static final String TAG = "task_load_admin_groups";
     @App
-    Fpam mApplication;
+    Fpam mApp;
     @ViewById(R.id.progress)
     ProgressBar mProgress;
-    private TaskLoadAdminAndGroups_ mTaskFragment;
+
+    @ViewById(R.id.text_facebook_error)
+    TextView mTextError;
+    private TaskLoadAdminAndGroups_ mTask;
     private CallbackManager mCallbackManager;
 
-
-    private FacebookCallback<LoginResult> mFacebookCallback = new FacebookCallback<LoginResult>() {
+    private FacebookCallback<LoginResult> mCallback = new FacebookCallback<LoginResult>() {
         @Override
         public void onSuccess(LoginResult loginResult) {
             AccessToken token = loginResult.getAccessToken();
             //if we have an access token which is neither null nor expired, has the permission to read email of the person logging in and groups, then we jump into the app
-
-            mApplication.setToken(token);
-            if (FBUtils.isValidAndCanReadEmailGroups(token)) {
+            mTextError.setVisibility(View.GONE);
+            mApp.setToken(token);
+            if (FBUtils.canRead(token)) {
                 mProgress.setVisibility(View.VISIBLE);
-                mTaskFragment.loadAdminAndGroupsInBackground(token);
+                mTask.loadAdminAndGroupsInBackground(token);
             }
 
             //redirect the person to the login screen after displaying a dialog that shows why and how the permissions are going to be used
@@ -70,7 +73,7 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
                         .onAny(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
-                                initLoginManager();
+                                performLogin();
                             }
                         }).show();
             }
@@ -83,7 +86,8 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
 
         @Override
         public void onError(FacebookException error) {
-            L.m("Error " + error);
+            L.m("Error " + error.toString());
+            mTextError.setVisibility(View.VISIBLE);
         }
     };
 
@@ -91,26 +95,23 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCallbackManager = CallbackManager.Factory.create();
-        mTaskFragment = (TaskLoadAdminAndGroups_) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT);
-        if (mTaskFragment == null) {
-            mTaskFragment = new TaskLoadAdminAndGroups_();
-            getSupportFragmentManager().beginTransaction().add(mTaskFragment, TAG_FRAGMENT).commit();
+        mTask = (TaskLoadAdminAndGroups_) getSupportFragmentManager().findFragmentByTag(TAG);
+        if (mTask == null) {
+            mTask = new TaskLoadAdminAndGroups_();
+            getSupportFragmentManager().beginTransaction().add(mTask, TAG).commit();
         }
     }
 
-    /**
-     * Create the Login Manager responsible for facebook login and login with the initial read permissions.
-     */
     @Click(R.id.btn_login)
-    public void onClickLogin() {
-        initLoginManager();
+    public void login() {
+        performLogin();
     }
 
-    private void initLoginManager() {
-        String[] readPermissions = Constants.READ_PERMISSIONS;
+    private void performLogin() {
+        String[] permissions = Constants.READ_PERMISSIONS;
         LoginManager loginManager = LoginManager.getInstance();
-        loginManager.registerCallback(mCallbackManager, mFacebookCallback);
-        loginManager.logInWithReadPermissions(this, Arrays.asList(readPermissions));
+        loginManager.registerCallback(mCallbackManager, mCallback);
+        loginManager.logInWithReadPermissions(this, Arrays.asList(permissions));
     }
 
     @Override

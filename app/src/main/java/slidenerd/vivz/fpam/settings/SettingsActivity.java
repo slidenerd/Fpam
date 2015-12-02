@@ -37,12 +37,12 @@ public class SettingsActivity extends ActivityBase {
     }
 
     @Override
-    public int getContentViewRoot() {
+    public int getRoot() {
         return R.id.content_main;
     }
 
     @Override
-    public void onCreateUserInterface(TabLayout tabLayout, View mainContentView) {
+    public void init(TabLayout tabLayout, View mainContentView) {
         mPager = (ViewPager) mainContentView;
         mPager.setAdapter(new MainPagerAdapter(this, getSupportFragmentManager()));
         tabLayout.setupWithViewPager(mPager);

@@ -9,6 +9,10 @@ public interface Constants {
     int GREATER = 1;
     int EQUAL = 0;
 
+    int PERIOD = 15000;
+
+    String KEY_LAST_LOADED_PREFIX = "last_loaded_";
+    String KEY_MONITORED_PREFIX = "monitored_";
     String FEED_FIELDS = "from{name,id,picture},message,caption,comments{from,message},description,name,full_picture,type,updated_time,to{id},link,created_time";
 
     String GROUP_ID = "groupId";
@@ -16,11 +20,13 @@ public interface Constants {
     String POST_ID = "postId";
     String KEYWORD = "keyword";
     String POSTLYTICS_ID = "compositeGroupDateId";
-    String SPAMMER_ID = "compositeUserGroupId";
+    String SPAMMER_ID = "compositeGroupUserId";
     String UPDATED_TIME = "updatedTime";
     String COMPOSITE_GROUP_ORDER_ID = "compositeGroupOrderId";
     String COMPOSITE_GROUP_USER_ID = "compositeGroupUserId";
     String COUNT = "count";
+    String SUCCESS = "success";
+    String GROUPS = "groups";
 
     int TOP_ENTRIES_COUNT = 3;
     String ACTION_LOAD_FEED = "slidenerd.vivz.fpam.action.LOAD_FEED";
@@ -44,4 +50,5 @@ public interface Constants {
 
     String GROUP_ID_NONE = "NONE";
     int NA = -1;
+    String ALL = "ALL";
 }

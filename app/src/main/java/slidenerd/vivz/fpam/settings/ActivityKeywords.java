@@ -20,10 +20,14 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.EditorAction;
 import org.androidannotations.annotations.ViewById;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.AdapterKeywordGroups;
@@ -32,7 +36,9 @@ import slidenerd.vivz.fpam.adapter.OnItemClickListener;
 import slidenerd.vivz.fpam.adapter.RecyclerViewHelperImpl;
 import slidenerd.vivz.fpam.adapter.SwipeToDismissTouchListener;
 import slidenerd.vivz.fpam.adapter.SwipeableItemClickListener;
+import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.model.json.Group;
+import slidenerd.vivz.fpam.model.pojo.KeywordGroup;
 import slidenerd.vivz.fpam.model.realm.Keyword;
 
 import static slidenerd.vivz.fpam.extras.Constants.GROUP_NAME;
@@ -46,7 +52,7 @@ public class ActivityKeywords extends AppCompatActivity {
     @ViewById(R.id.input_keyword)
     EditText mInputKeyword;
     @ViewById(R.id.recycler_keywords)
-    RecyclerView mRecyclerKeywords;
+    RecyclerView mRecycler;
     private Realm mRealm;
     private AdapterKeywords mAdapter;
 
@@ -67,14 +73,14 @@ public class ActivityKeywords extends AppCompatActivity {
                 mAdapter.notifyDataSetChanged();
             }
         });
-        mRecyclerKeywords.setLayoutManager(new LinearLayoutManager(this));
+        mRecycler.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new AdapterKeywords(this, mRealm, keywords);
         mAdapter.setHasStableIds(true);
 
-        mRecyclerKeywords.setAdapter(mAdapter);
+        mRecycler.setAdapter(mAdapter);
         final SwipeToDismissTouchListener<RecyclerViewHelperImpl> touchListener =
                 new SwipeToDismissTouchListener<>(
-                        new RecyclerViewHelperImpl(mRecyclerKeywords),
+                        new RecyclerViewHelperImpl(mRecycler),
                         new SwipeToDismissTouchListener.DismissCallbacks<RecyclerViewHelperImpl>() {
                             @Override
                             public boolean canDismiss(int position) {
@@ -87,11 +93,11 @@ public class ActivityKeywords extends AppCompatActivity {
                             }
                         });
 
-        mRecyclerKeywords.setOnTouchListener(touchListener);
+        mRecycler.setOnTouchListener(touchListener);
         // Setting this scroll listener is required to ensure that during ListView scrolling,
         // we don't look for swipes.
-        mRecyclerKeywords.addOnScrollListener((RecyclerView.OnScrollListener) touchListener.makeScrollListener());
-        mRecyclerKeywords.addOnItemTouchListener(new SwipeableItemClickListener(this,
+        mRecycler.addOnScrollListener((RecyclerView.OnScrollListener) touchListener.makeScrollListener());
+        mRecycler.addOnItemTouchListener(new SwipeableItemClickListener(this,
                 new OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
@@ -107,17 +113,39 @@ public class ActivityKeywords extends AppCompatActivity {
     }
 
     public void showKeywordGroups(int position) {
+
+        //get the keyword at the specified position.
         final Keyword keyword = mAdapter.getItem(position);
+
+        //find all the groups in fpam
         final RealmResults<Group> allGroups = mRealm.where(Group.class).findAllSortedAsync(GROUP_NAME);
+
+        //add a ChangeListener to be triggered when all the groups have finished loading asynchronously
         allGroups.addChangeListener(new RealmChangeListener() {
             @Override
             public void onChange() {
-                final AdapterKeywordGroups adapter = new AdapterKeywordGroups(ActivityKeywords.this, allGroups, true);
-                RealmList<Group> selectedGroups = keyword.getGroups();
-                if (selectedGroups.isEmpty()) {
+
+                //Create an empty list of KeywordGroup objects, each object will mirror the group id and group name from the Groups list
+                ArrayList<KeywordGroup> keywordGroups = new ArrayList<KeywordGroup>();
+                for (Group group : allGroups) {
+                    keywordGroups.add(new KeywordGroup(group.getGroupId(), group.getGroupName()));
+                }
+
+                //Initialize our Adapter with the list of KeywordGroup objects
+                final AdapterKeywordGroups adapter = new AdapterKeywordGroups(ActivityKeywords.this, keywordGroups);
+
+                //Get a CSV list of groups for our current Keyword
+                String groups = keyword.getGroups();
+
+                //If a keyword applies to all groups, its does not store all the group ids, instead if stores a simple String "ALL" indicating that this keyword is applicable on all group ids to conserve space
+                if (StringUtils.equals(groups, Constants.ALL)) {
                     adapter.selectAll();
-                } else {
-                    adapter.select(selectedGroups);
+                }
+
+                //if a keyword applies to a few groups, it stores their group ids in the form of a CSV list. In this case, fetch the string, split it on the basis of comma and get a list of all group ids
+                else {
+                    List<String> selected = Arrays.asList(StringUtils.split(groups, ','));
+                    adapter.select(selected);
                 }
                 new MaterialDialog.Builder(ActivityKeywords.this)
                         .title(getString(R.string.title_dialog_applicable_groups, keyword.getKeyword()))
@@ -127,19 +155,31 @@ public class ActivityKeywords extends AppCompatActivity {
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
-                                RealmList<Group> groups = adapter.getSelected();
                                 mRealm.beginTransaction();
-                                keyword.setGroups(groups);
+
+                                //if all the items are selected by the user, then instead of storing a CSV list of all the group ids, simply store a Stirng "ALL" indicating that this keyword is applicable on all groups
+                                if (adapter.isAllSelected()) {
+                                    keyword.setGroups(Constants.ALL);
+                                } else {
+
+                                    //If not all groups are selected by the user, get a list of group ids that are selected.
+                                    ArrayList<String> selected = adapter.getSelected();
+
+                                    //Convert the list to a CSV and store the CSV
+                                    String groups = StringUtils.join(selected.toArray(), ',');
+                                    keyword.setGroups(groups);
+                                }
                                 mRealm.commitTransaction();
                             }
                         })
                         .build()
                         .show();
+
+                //Remove this for not receiving any further notifications.
                 allGroups.removeChangeListeners();
             }
 
         });
-
 
     }
 

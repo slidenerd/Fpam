@@ -12,7 +12,7 @@ public class Spammer extends RealmObject {
     @PrimaryKey
     private String compositeGroupUserId;
     private String userName;
-    private int spamCount;
+    private int count;
     private long lastActive;
     private boolean authorized;
 
@@ -21,11 +21,11 @@ public class Spammer extends RealmObject {
 
     }
 
-    public Spammer(String compositeGroupUserId, String userName, int spamCount, long lastActive, boolean authorized) {
+    public Spammer(String compositeGroupUserId, String userName, int count, long lastActive, boolean authorized) {
         this.compositeGroupUserId = compositeGroupUserId;
 
         this.userName = userName;
-        this.spamCount = spamCount;
+        this.count = count;
         this.lastActive = lastActive;
         this.authorized = authorized;
     }
@@ -34,7 +34,7 @@ public class Spammer extends RealmObject {
         return "Spammer{" +
                 "compositeGroupUserId='" + spammer.compositeGroupUserId + '\'' +
                 ", userName='" + spammer.userName + '\'' +
-                ", spamCount=" + spammer.spamCount +
+                ", count=" + spammer.count +
                 ", lastActive=" + spammer.lastActive +
                 ", authorized=" + spammer.authorized +
                 '}';
@@ -42,6 +42,10 @@ public class Spammer extends RealmObject {
 
     public static String computeId(String groupId, String userId) {
         return groupId + ":" + userId;
+    }
+
+    public static String computeUserId(String compositeGroupUserId) {
+        return compositeGroupUserId.substring(compositeGroupUserId.indexOf(':') + 1);
     }
 
     public String getUserName() {
@@ -60,12 +64,12 @@ public class Spammer extends RealmObject {
         this.compositeGroupUserId = compositeGroupUserId;
     }
 
-    public int getSpamCount() {
-        return spamCount;
+    public int getCount() {
+        return count;
     }
 
-    public void setSpamCount(int spamCount) {
-        this.spamCount = spamCount;
+    public void setCount(int count) {
+        this.count = count;
     }
 
     public long getLastActive() {

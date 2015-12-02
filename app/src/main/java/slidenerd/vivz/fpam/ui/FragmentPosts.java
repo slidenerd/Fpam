@@ -110,7 +110,7 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         mLoginManager.registerCallback(mCallbackManager, this);
 
         //Check if our app has publish_actions permissions, its needed to perform deletes
-        if (!FBUtils.isValidAndCanPublish(mApplication.getToken())) {
+        if (!FBUtils.canPublish(mApplication.getToken())) {
             mLoginManager.logInWithPublishPermissions(FragmentPosts.this, Arrays.asList(Constants.PUBLISH_ACTIONS));
         }
     }
