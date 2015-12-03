@@ -86,13 +86,13 @@ public class AdapterKeywordGroups extends BaseAdapter {
 
     public void select(List<String> selected) {
 
-        //Browse through the list of selected items
+        //Browse through the list of selected data
         for (int i = 0; i < selected.size(); i++) {
 
             //Browse through the list of stored group ids and names.
             for (int j = 0; j < mGroups.size(); j++) {
 
-                //If a selected item's group id is the same as the stored item's group id, it means we need to select that group id
+                //If a selected data's group id is the same as the stored data's group id, it means we need to select that group id
                 if (StringUtils.equals(mGroups.get(j).getGroupId(), selected.get(i))) {
                     mChecked.put(j, true);
                     break;

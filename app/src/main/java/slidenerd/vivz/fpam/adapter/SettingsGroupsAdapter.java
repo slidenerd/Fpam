@@ -16,11 +16,10 @@ import android.widget.TextView;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.util.VersionUtils;
 
-import static slidenerd.vivz.fpam.extras.Constants.*;
+import static slidenerd.vivz.fpam.extras.Constants.KEY_MONITORED_PREFIX;
 
 /**
  * Created by vivz on 05/10/15.
@@ -33,7 +32,7 @@ public class SettingsGroupsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private View mHeaderView;
     private SharedPreferences mPref;
 
-    //A variable to enable or disable all items. If the user chooses NEVER to monitor groups, all items are disabled, else enabled.
+    //A variable to enable or disable all data. If the user chooses NEVER to monitor groups, all data are disabled, else enabled.
 
     private boolean mEnabled;
     private Context mContext;

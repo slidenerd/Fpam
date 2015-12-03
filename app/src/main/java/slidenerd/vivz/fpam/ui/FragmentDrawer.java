@@ -128,7 +128,7 @@ public class FragmentDrawer extends Fragment {
     }
 
     /**
-     * If the access token is null or expired, this Activity will finish executing but this method is still called inside the onCreate as per the debugger and hence, check whether we have a valid groups before adding any items to the nav_drawer to prevent a crash.
+     * If the access token is null or expired, this Activity will finish executing but this method is still called inside the onCreate as per the debugger and hence, check whether we have a valid groups before adding any data to the nav_drawer to prevent a crash.
      */
     public void addGroupsToDrawer(RealmResults<Group> groups) {
         Menu menu = mDrawer.getMenu();
@@ -143,11 +143,11 @@ public class FragmentDrawer extends Fragment {
                 i++;
             }
 
-            //Add an extra item at the bottom to prevent the navigationview from drawing a divider between the last item and settings
+            //Add an extra data at the bottom to prevent the navigationview from drawing a divider between the last data and settings
 
             menu.add(100, i, i, Constants.GROUP_ID_NONE);
         }
-        //Bug Fix for the Navigation View not refreshing after items are added dynamically.
+        //Bug Fix for the Navigation View not refreshing after data are added dynamically.
         MenuItem mi = menu.getItem(menu.size() - 1);
         mi.setTitle(mi.getTitle());
     }

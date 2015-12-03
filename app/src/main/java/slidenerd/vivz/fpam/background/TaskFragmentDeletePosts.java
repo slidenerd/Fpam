@@ -26,6 +26,7 @@ import slidenerd.vivz.fpam.core.Core;
 import slidenerd.vivz.fpam.extras.MyPrefs_;
 import slidenerd.vivz.fpam.model.json.Post;
 import slidenerd.vivz.fpam.model.realm.Keyword;
+import slidenerd.vivz.fpam.util.FBUtils;
 
 import static slidenerd.vivz.fpam.extras.Constants.ACTION_DELETE_RESPONSE;
 import static slidenerd.vivz.fpam.extras.Constants.EXTRA_OUTCOME;
@@ -74,6 +75,7 @@ public class TaskFragmentDeletePosts extends Fragment {
     @Background
     void deletePostsAsync(AccessToken token, int position, String postId) {
         Realm realm = null;
+        boolean isValidPost = false, isValidGroupId = false, isValidToken = false;
         try {
             realm = Realm.getDefaultInstance();
             Core core = new Core();
@@ -90,9 +92,12 @@ public class TaskFragmentDeletePosts extends Fragment {
             //Get the user name of the person who made this post
             String userName = post.getUserName();
 
+            isValidPost = Post.isValidPost(post);
+            isValidGroupId = StringUtils.isNotBlank(groupId);
+            isValidToken = FBUtils.canPublish(token);
 
             //If we have a valid post and group id, then issue a request to delete the post
-            if (Post.isValidPost(post) && StringUtils.isNotBlank(groupId)) {
+            if (isValidPost && isValidGroupId && isValidToken) {
 
                 //Trigger delete the post from Facebook
                 boolean status = core.deletePost(token, postId);
@@ -122,11 +127,8 @@ public class TaskFragmentDeletePosts extends Fragment {
 
                 //Update the analytics information after executing this delete.
                 core.updateDailytics(realm, groupId, status, StringUtils.isBlank(post.getMessage()), byExistingSpammer);
-            } else {
-
-                //We did not get a valid post or group id to delete and hence trigger the callback to indicate the delete failed
-                onDelete(false, position);
             }
+            //TODO handle appropriate cases when the post is not valid or the token does not have publish actions or when the group id is invalid
 
         } catch (JSONException e) {
             L.m(e + "");
@@ -134,6 +136,7 @@ public class TaskFragmentDeletePosts extends Fragment {
             if (realm != null) {
                 realm.close();
             }
+            onDelete(false, position);
         }
     }
 

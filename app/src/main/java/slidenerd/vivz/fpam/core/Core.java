@@ -15,11 +15,11 @@ import java.util.Map;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.model.json.Post;
-import slidenerd.vivz.fpam.model.realm.Dailytics;
 import slidenerd.vivz.fpam.model.pojo.Item;
-import slidenerd.vivz.fpam.model.realm.TopKeyword;
+import slidenerd.vivz.fpam.model.realm.Dailytics;
 import slidenerd.vivz.fpam.model.realm.Keyword;
 import slidenerd.vivz.fpam.model.realm.Spammer;
+import slidenerd.vivz.fpam.model.realm.TopKeyword;
 import slidenerd.vivz.fpam.model.realm.TopSpammer;
 import slidenerd.vivz.fpam.util.FBUtils;
 
@@ -38,6 +38,32 @@ import static slidenerd.vivz.fpam.extras.Constants.TOP_ENTRIES_COUNT;
  * Created by vivz on 10/11/15.
  */
 public class Core {
+    static List<Map.Entry<String, Integer>> sortDescending(Map<String, Integer> map) {
+
+        List<Map.Entry<String, Integer>> sortedEntries = new ArrayList<>(map.entrySet());
+
+        Collections.sort(sortedEntries, new Comparator<Map.Entry<String, Integer>>() {
+            @Override
+            public int compare(Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) {
+                int lhs = e1.getValue();
+                int rhs = e2.getValue();
+
+                //Sort by descending order of count for two entries.
+                if (rhs > lhs) {
+                    return GREATER;
+                } else if (rhs < lhs) {
+                    return LESS;
+                } else {
+
+                    //Sort by descending alphabetical order if two entries have the same count
+                    return e2.getKey().compareTo(e1.getKey());
+                }
+            }
+        });
+
+        return sortedEntries;
+    }
+
     public List<Keyword> getKeywordsFor(Realm realm, String groupId) {
 
         //Return those keywords whose 'groups' attribute contains ALL indicating that this keyword applies to all groups or contains the current group id
@@ -104,7 +130,7 @@ public class Core {
                 //If the post was made by a spammer or contains a keyword, add this post to the list of posts to be deleted.
                 if (bySpammer || byKeyword) {
 
-                    //This item indicates a post to be deleted with certain characteristics
+                    //This data indicates a post to be deleted with certain characteristics
                     Item item = new Item();
                     item.position = i;
                     item.postId = post.getPostId();
@@ -117,7 +143,7 @@ public class Core {
                     item.spammer = spammer;
                     //By default the status of each post's delete is failed
                     item.status = false;
-                    //Add this item to the list of items we want to delete.
+                    //Add this data to the list of data we want to delete.
                     items.add(item);
                 }
             }
@@ -376,31 +402,5 @@ public class Core {
         }
         realm.commitTransaction();
 
-    }
-
-    static List<Map.Entry<String, Integer>> sortDescending(Map<String, Integer> map) {
-
-        List<Map.Entry<String, Integer>> sortedEntries = new ArrayList<>(map.entrySet());
-
-        Collections.sort(sortedEntries, new Comparator<Map.Entry<String, Integer>>() {
-            @Override
-            public int compare(Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) {
-                int lhs = e1.getValue();
-                int rhs = e2.getValue();
-
-                //Sort by descending order of count for two entries.
-                if (rhs > lhs) {
-                    return GREATER;
-                } else if (rhs < lhs) {
-                    return LESS;
-                } else {
-
-                    //Sort by descending alphabetical order if two entries have the same count
-                    return e2.getKey().compareTo(e1.getKey());
-                }
-            }
-        });
-
-        return sortedEntries;
     }
 }

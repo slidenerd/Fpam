@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 
 import com.facebook.AccessToken;
 import com.facebook.FacebookException;
-import com.facebook.FacebookRequestError;
 import com.facebook.GraphRequest;
 import com.facebook.GraphRequestBatch;
 import com.facebook.GraphResponse;
@@ -18,14 +17,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.model.json.Admin;
 import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.model.json.Post;
+import slidenerd.vivz.fpam.model.pojo.CollectionPayload;
+import slidenerd.vivz.fpam.model.pojo.ObjectPayload;
 
 import static slidenerd.vivz.fpam.extras.Constants.FEED_FIELDS;
 import static slidenerd.vivz.fpam.extras.Constants.PUBLISH_ACTIONS;
@@ -48,7 +47,7 @@ public class FBUtils {
      * @return true if the token is not null , not expired and contains all the read permissions which in our case would be email and groups else return false.
      */
     public static final boolean canRead(AccessToken token) {
-        return isValid(token) && token.getPermissions().containsAll(Arrays.asList(READ_PERMISSIONS));
+        return isValid(token) && token.getPermissions().containsAll(READ_PERMISSIONS);
     }
 
     public static final boolean canPublish(AccessToken token) {
@@ -62,27 +61,27 @@ public class FBUtils {
      * @return an admin object that has all details such as name, email and the profile picture used by the admin.
      */
     @Nullable
-    public static Admin loadMe(AccessToken token, Gson gson) throws JSONException {
+    public static ObjectPayload<Admin> loadMe(AccessToken token, Gson gson) throws JSONException {
         Bundle parameters = new Bundle();
         parameters.putString("fields", "id,email,name,picture.type(normal).width(200).height(200)");
         GraphRequest request = new GraphRequest(token, "me");
         request.setParameters(parameters);
         GraphResponse response = request.executeAndWait();
-        if (response.getJSONObject() == null) {
-            return null;
-        } else {
-            return gson.fromJson(response.getJSONObject().toString(), Admin.class);
-        }
+        ObjectPayload<Admin> payload = new ObjectPayload<>();
+        payload.data = gson.fromJson(response.getJSONObject().toString(), Admin.class);
+        payload.error = response.getError();
+        return payload;
     }
 
     /**
      * @param token An access token needed to start session with Facebook
-     * @return a List containing all the groups owned by the logged in user and empty list if the logged in user doesn't own any groups or the groups were not retrieved for some reason. The JSON response is actually an object that has an array with the name 'data' which has all the groups.
+     * @return a List containing all the groups owned by the logged in user and empty list if the logged in user doesn't own any groups or the groups were not retrieved for some reason. The JSON data is actually an object that has an array with the name 'data' which has all the groups.
      * @throws JSONException
      */
     @Nullable
-    public static ArrayList<Group> loadGroups(AccessToken token, Gson gson) throws JSONException {
+    public static CollectionPayload<Group> loadGroups(AccessToken token, Gson gson) throws JSONException {
         ArrayList<Group> listGroups = new ArrayList<>(Constants.RESULTS_PER_PAGE);
+        CollectionPayload<Group> payload = new CollectionPayload<>();
         Bundle parameters = new Bundle();
         TypeToken<ArrayList<Group>> typeToken = new TypeToken<ArrayList<Group>>() {
         };
@@ -101,6 +100,7 @@ public class FBUtils {
             request.setParameters(parameters);
             GraphResponse response = request.executeAndWait();
             JSONObject root = response.getJSONObject();
+            payload.error = response.getError();
             if (root != null) {
 
                 //Check if our root contains a json array called 'data' that has all the group objects inside it
@@ -147,15 +147,17 @@ public class FBUtils {
                     hasMorePages = (paging != null && paging.has(NEXT) && !paging.isNull(NEXT));
                 }
             } else {
-                //if we did not get a valid response, we have no more pages to process
+                //if we did not get a valid data, we have no more pages to process
                 hasMorePages = false;
             }
         } while (hasMorePages);
-        return listGroups;
+        payload.data = listGroups;
+        return payload;
     }
 
-    public static ArrayList<Post> loadFeedFirst(AccessToken token, Gson gson, String groupId, int maximum) throws JSONException {
-        ArrayList<Post> listPosts = new ArrayList<>(maximum);
+    public static CollectionPayload<Post> loadFeed(AccessToken token, Gson gson, String groupId, int maximum) throws JSONException {
+        CollectionPayload<Post> payload = new CollectionPayload<>();
+        ArrayList<Post> posts = new ArrayList<>(maximum);
         TypeToken<ArrayList<Post>> typeToken = new TypeToken<ArrayList<Post>>() {
         };
         Bundle parameters = new Bundle();
@@ -169,6 +171,7 @@ public class FBUtils {
         JSONArray dataArray;
         do {
             root = response.getJSONObject();
+            payload.error = response.getError();
             if (root != null) {
                 //Check if our root contains a json array called 'data' that has all the group objects inside it
                 if (root.has(DATA) && !root.isNull(DATA)) {
@@ -179,42 +182,35 @@ public class FBUtils {
 
                     //For each iteration, we fetch the list of groups and append all of them to what we have so far
 
-                    ArrayList<Post> posts = gson.fromJson(dataArray.toString(), typeToken.getType());
-                    for (Post post : posts) {
+                    ArrayList<Post> list = gson.fromJson(dataArray.toString(), typeToken.getType());
+                    for (Post post : list) {
 
                         if (fetched < maximum) {
-                            listPosts.add(post);
+                            posts.add(post);
                             fetched++;
                         }
                     }
                     request = response.getRequestForPagedResults(GraphResponse.PagingDirection.NEXT);
+                    payload.error = response.getError();
                     //We have more data if posts retrieved in the current iteration are not empty and we have a valid pagination request for the next round and we have not reached the limit or maximum number of posts to retrieve yet
 
-                    hasMoreData = !posts.isEmpty() && request != null && fetched != maximum;
+                    hasMoreData = !list.isEmpty() && request != null && fetched != maximum;
                     if (hasMoreData) {
                         request.setParameters(parameters);
                         response = request.executeAndWait();
                     }
                 }
-            } else {
-                FacebookRequestError error = response.getError();
-                L.m("error " + error.getErrorMessage());
-                L.m("error " + error.getErrorType());
-                L.m("error " + error.getErrorRecoveryMessage());
-                L.m("error " + error.getErrorUserMessage());
-                L.m("error " + error.getErrorUserTitle());
-                L.m("error " + error.getErrorCode());
-                L.m("error " + error.getSubErrorCode());
-
             }
 
         }
         while (hasMoreData);
-        return listPosts;
+        payload.data = posts;
+        return payload;
     }
 
-    public static ArrayList<Post> loadFeedSince(AccessToken token, Gson gson, String groupId, int maximum, long sinceUtc) throws JSONException, FacebookException {
-        ArrayList<Post> listPosts = new ArrayList<>(maximum);
+    public static CollectionPayload<Post> loadFeedSince(AccessToken token, Gson gson, String groupId, int maximum, long sinceUtc) throws JSONException, FacebookException {
+        CollectionPayload<Post> payload = new CollectionPayload<>();
+        ArrayList<Post> posts = new ArrayList<>(maximum);
         TypeToken<ArrayList<Post>> type = new TypeToken<ArrayList<Post>>() {
         };
         Bundle parameters = new Bundle();
@@ -233,6 +229,7 @@ public class FBUtils {
         JSONArray dataArray;
         do {
             root = response.getJSONObject();
+            payload.error = response.getError();
             if (root != null) {
 
                 //Check if our root contains a json array called 'data' that has all the group objects inside it
@@ -245,39 +242,29 @@ public class FBUtils {
 
                     //For each iteration, we fetch the list of groups and append all of them to what we have so far
 
-                    ArrayList<Post> posts = gson.fromJson(dataArray.toString(), type.getType());
-                    for (Post post : posts) {
+                    ArrayList<Post> list = gson.fromJson(dataArray.toString(), type.getType());
+                    for (Post post : list) {
                         if (fetched < maximum) {
-                            listPosts.add(post);
+                            posts.add(post);
                             fetched++;
                         }
                     }
                     request = response.getRequestForPagedResults(GraphResponse.PagingDirection.NEXT);
-
+                    payload.error = response.getError();
 
                     //We have more data if posts retrieved in the current iteration are not empty and we have a valid pagination request for the next round and we have not reached the limit or maximum number of posts to retrieve yet
 
-                    hasMoreData = !posts.isEmpty() && request != null && fetched != maximum;
+                    hasMoreData = !list.isEmpty() && request != null && fetched != maximum;
                     if (hasMoreData) {
                         request.setParameters(parametersSubsequent);
                         response = request.executeAndWait();
                     }
                 }
             }
-            else {
-                FacebookRequestError error = response.getError();
-                L.m("error " + error.getErrorMessage());
-                L.m("error " + error.getErrorType());
-                L.m("error " + error.getErrorRecoveryMessage());
-                L.m("error " + error.getErrorUserMessage());
-                L.m("error " + error.getErrorUserTitle());
-                L.m("error " + error.getErrorCode());
-                L.m("error " + error.getSubErrorCode());
-
-            }
         }
         while (hasMoreData);
-        return listPosts;
+        payload.data = posts;
+        return payload;
     }
 
     public static boolean requestDelete(AccessToken token, String postId) throws JSONException {

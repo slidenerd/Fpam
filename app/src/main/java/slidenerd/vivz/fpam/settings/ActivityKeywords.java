@@ -157,7 +157,7 @@ public class ActivityKeywords extends AppCompatActivity {
                             public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
                                 mRealm.beginTransaction();
 
-                                //if all the items are selected by the user, then instead of storing a CSV list of all the group ids, simply store a Stirng "ALL" indicating that this keyword is applicable on all groups
+                                //if all the data are selected by the user, then instead of storing a CSV list of all the group ids, simply store a Stirng "ALL" indicating that this keyword is applicable on all groups
                                 if (adapter.isAllSelected()) {
                                     keyword.setGroups(Constants.ALL);
                                 } else {

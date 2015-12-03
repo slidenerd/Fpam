@@ -13,6 +13,7 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.FacebookRequestError;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 
@@ -23,14 +24,19 @@ import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.background.TaskLoadAdminAndGroups;
 import slidenerd.vivz.fpam.background.TaskLoadAdminAndGroups_;
-import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.util.FBUtils;
+
+import static slidenerd.vivz.fpam.extras.Constants.PERMISSION_EMAIL;
+import static slidenerd.vivz.fpam.extras.Constants.PERMISSION_GROUPS;
+import static slidenerd.vivz.fpam.extras.Constants.READ_PERMISSIONS;
 
 /**
 
@@ -51,7 +57,7 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
 
     private FacebookCallback<LoginResult> mCallback = new FacebookCallback<LoginResult>() {
         @Override
-        public void onSuccess(LoginResult loginResult) {
+        public void onSuccess(final LoginResult loginResult) {
             AccessToken token = loginResult.getAccessToken();
             //if we have an access token which is neither null nor expired, has the permission to read email of the person logging in and groups, then we jump into the app
             mTextError.setVisibility(View.GONE);
@@ -60,10 +66,9 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
                 mProgress.setVisibility(View.VISIBLE);
                 mTask.loadAdminAndGroupsInBackground(token);
             }
-
-            //redirect the person to the login screen after displaying a dialog that shows why and how the permissions are going to be used
-
-            else {
+            final Set<String> denied = loginResult.getRecentlyDeniedPermissions();
+            if (!denied.isEmpty()) {
+                //redirect the person to the login screen after displaying a dialog that shows why and how the permissions are going to be used
                 new MaterialDialog.Builder(ActivityLogin.this)
                         .title(R.string.text_permission_declined)
                         .customView(R.layout.request_permission, true)
@@ -73,7 +78,14 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
                         .onAny(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
-                                performLogin();
+
+                                if (denied.contains(PERMISSION_EMAIL) && denied.contains(PERMISSION_GROUPS)) {
+                                    performLogin(Arrays.asList(PERMISSION_EMAIL, PERMISSION_GROUPS));
+                                } else if (denied.contains(PERMISSION_EMAIL)) {
+                                    performLogin(Arrays.asList(PERMISSION_EMAIL));
+                                } else if (denied.contains(PERMISSION_GROUPS)) {
+                                    performLogin(Arrays.asList(PERMISSION_GROUPS));
+                                }
                             }
                         }).show();
             }
@@ -91,6 +103,7 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
         }
     };
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,15 +117,15 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
 
     @Click(R.id.btn_login)
     public void login() {
-        performLogin();
+        performLogin(READ_PERMISSIONS);
     }
 
-    private void performLogin() {
-        String[] permissions = Constants.READ_PERMISSIONS;
+    private void performLogin(List<String> permissions) {
         LoginManager loginManager = LoginManager.getInstance();
         loginManager.registerCallback(mCallbackManager, mCallback);
-        loginManager.logInWithReadPermissions(this, Arrays.asList(permissions));
+        loginManager.logInWithReadPermissions(this, permissions);
     }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -122,9 +135,19 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
     }
 
     @Override
-    public void afterAdminAndGroupsLoaded() {
+    public void afterAdminLoaded(FacebookRequestError error) {
+        if (error != null) {
+            L.m("error " + error);
+        }
+    }
+
+    @Override
+    public void afterGroupsLoaded(FacebookRequestError error) {
         mProgress.setVisibility(View.GONE);
-        ActivityMain_.intent(this).start();
+        if (error != null) {
+            L.m("error " + error);
+        }
+        ActivityMain_.intent(this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP).start();
         finish();
     }
 }

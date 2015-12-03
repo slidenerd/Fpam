@@ -83,7 +83,7 @@ public class SettingsFragmentGeneral extends Fragment {
 
         int cacheSize = mPref.cacheSize().get();
 
-        //Let the first item be selected by default
+        //Let the first data be selected by default
 
         int selectedIndex = 0;
         for (int i = 0; i < mCacheSizes.length; i++) {
@@ -95,7 +95,7 @@ public class SettingsFragmentGeneral extends Fragment {
             }
         }
 
-        //Display a dialog containing the user choices for the number of items to be stored in the database
+        //Display a dialog containing the user choices for the number of data to be stored in the database
 
         new MaterialDialog.Builder(mContext)
                 .title(R.string.pref_cache)

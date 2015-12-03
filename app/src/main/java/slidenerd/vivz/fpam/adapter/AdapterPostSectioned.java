@@ -31,31 +31,23 @@ import slidenerd.vivz.fpam.widget.ExpandableTextView;
  */
 public class AdapterPostSectioned extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    //The type of a row that may contain a picture in the post
+    private static final int IMAGE = 1;
+    //The type of a row that does not contain a picture in its post
+    private static final int NO_IMAGE = 2;
     private Context mContext;
     private Realm mRealm;
     private RealmResults<Post> mResults;
     private LayoutInflater mLayoutInflater;
-
     //Width of the image found in the post when there is one
     private int mPostImageWidth;
-
     //Height of the image found in the post when there is one
     private int mPostImageHeight;
-
     //The transformation to be applied to the user's profile picture
     private CropCircleTransform mCircleTransform;
-
     //The transformation to be applied to the post's image if one is present.
     private CropTransformation mCropTransform;
-
-    //The type of a row that may contain a picture in the post
-    private static final int IMAGE = 1;
-
-    //The type of a row that does not contain a picture in its post
-    private static final int NO_IMAGE = 2;
-
-
-    //Keep track of whether an item at a given position is expanded or collapsed, the key is the position whereas the value is boolean indicating whether the item is expanded or collapsed.
+    //Keep track of whether an data at a given position is expanded or collapsed, the key is the position whereas the value is boolean indicating whether the data is expanded or collapsed.
     private SparseBooleanArray mState = new SparseBooleanArray();
 
     public AdapterPostSectioned(Context context, Realm realm, RealmResults<Post> results) {

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import com.facebook.AccessToken;
+import com.facebook.FacebookRequestError;
 import com.google.gson.Gson;
 
 import org.androidannotations.annotations.Background;
@@ -13,14 +14,13 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
 import org.json.JSONException;
 
-import java.util.ArrayList;
-
 import io.realm.Realm;
-import io.realm.RealmResults;
 import slidenerd.vivz.fpam.Fpam;
 import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.model.json.Admin;
 import slidenerd.vivz.fpam.model.json.Group;
+import slidenerd.vivz.fpam.model.pojo.CollectionPayload;
+import slidenerd.vivz.fpam.model.pojo.ObjectPayload;
 import slidenerd.vivz.fpam.util.FBUtils;
 
 @EFragment
@@ -56,25 +56,26 @@ public class TaskLoadAdminAndGroups extends Fragment {
     @Background
     void loadAdminAndGroupsInBackground(AccessToken accessToken) {
         Realm realm = null;
+        FacebookRequestError adminError = null, groupError = null;
         try {
             Gson gson = Fpam.getGson();
             realm = Realm.getDefaultInstance();
-            Admin admin = FBUtils.loadMe(accessToken, gson);
-            if (admin == null) {
-                L.m("Fpam encountered problems downloading admin data, hence admin and groups data have not been downloaded");
-                return;
-            }
+            ObjectPayload<Admin> admin = FBUtils.loadMe(accessToken, gson);
 
             //Request the fresh list of group objects from the JSON feed. For each group object in this list, its monitored and timestamp are set at default.
 
-            ArrayList<Group> groups = FBUtils.loadGroups(accessToken, gson);
+            CollectionPayload<Group> groups = FBUtils.loadGroups(accessToken, gson);
 
             //Store the fully constructed group objects to the realm database.
 
-            realm.beginTransaction();
-            realm.copyToRealmOrUpdate(admin);
-            realm.copyToRealmOrUpdate(groups);
-            realm.commitTransaction();
+            if (admin.data != null) {
+                realm.beginTransaction();
+                realm.copyToRealmOrUpdate(admin.data);
+                realm.copyToRealmOrUpdate(groups.data);
+                realm.commitTransaction();
+            }
+            adminError = admin.error;
+            groupError = groups.error;
 
         } catch (JSONException e) {
             L.m("" + e);
@@ -82,9 +83,9 @@ public class TaskLoadAdminAndGroups extends Fragment {
             if (realm != null) {
                 realm.close();
             }
-            onAdminAndGroupsLoaded();
+            onAdminLoaded(adminError);
+            onGroupsLoaded(groupError);
         }
-
     }
 
     @Override
@@ -93,14 +94,24 @@ public class TaskLoadAdminAndGroups extends Fragment {
         mCallback = null;
     }
 
+
     @UiThread
-    void onAdminAndGroupsLoaded() {
+    void onAdminLoaded(FacebookRequestError error) {
         if (mCallback != null) {
-            mCallback.afterAdminAndGroupsLoaded();
+            mCallback.afterAdminLoaded(error);
+        }
+    }
+
+    @UiThread
+    void onGroupsLoaded(FacebookRequestError error) {
+        if (mCallback != null) {
+            mCallback.afterGroupsLoaded(error);
         }
     }
 
     public interface TaskCallback {
-        void afterAdminAndGroupsLoaded();
+        void afterAdminLoaded(FacebookRequestError error);
+
+        void afterGroupsLoaded(FacebookRequestError error);
     }
 }

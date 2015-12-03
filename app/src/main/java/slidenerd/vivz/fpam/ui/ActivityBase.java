@@ -23,6 +23,7 @@ import android.view.ViewStub;
 
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
+import com.facebook.FacebookRequestError;
 import com.facebook.login.LoginManager;
 
 import org.androidannotations.annotations.App;
@@ -58,6 +59,8 @@ public abstract class ActivityBase extends AppCompatActivity
 
     private static final String TAG_DRAWER = "nav_drawer";
     private static final String TAG_TASK = "task_load_posts";
+    @Pref
+    public MyPrefs_ mPref;
     @App
     protected Fpam mApp;
     private TaskFragmentLoadPosts_ mTask;
@@ -66,9 +69,6 @@ public abstract class ActivityBase extends AppCompatActivity
     private String mGroupId;
     private String mTitle;
     private DrawerLayout mDrawerLayout;
-    @Pref
-    public MyPrefs_ mPref;
-
     private AccessTokenTracker mTracker = new AccessTokenTracker() {
         @Override
         protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
@@ -95,7 +95,7 @@ public abstract class ActivityBase extends AppCompatActivity
 
         //If the access token has expired or null, take the user back to the login screen, and call return in addition to finish() of the activity to halt processing any remaining code inside onCreate
 
-        if (!FBUtils.isValid(mApp.getToken())) {
+        if (!FBUtils.canRead(mApp.getToken())) {
             moveToLogin();
             return;
         }
@@ -242,7 +242,7 @@ public abstract class ActivityBase extends AppCompatActivity
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
+        // Handle navigation view data clicks here.
         int id = item.getItemId();
         mGroupId = mDrawer.getSelected(id);
         if (mGroupId != null) {
@@ -263,7 +263,7 @@ public abstract class ActivityBase extends AppCompatActivity
     }
 
     @Override
-    public void afterPostsLoaded() {
+    public void afterPostsLoaded(FacebookRequestError error) {
         FragmentProgress.dismiss(this);
         broadcastSelectedGroup(mGroupId);
     }

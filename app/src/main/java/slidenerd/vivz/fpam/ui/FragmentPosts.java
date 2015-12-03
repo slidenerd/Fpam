@@ -26,6 +26,7 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.Receiver;
 import org.androidannotations.annotations.sharedpreferences.Pref;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 
@@ -56,7 +57,7 @@ import static slidenerd.vivz.fpam.extras.Constants.POST_ID;
 import static slidenerd.vivz.fpam.extras.Constants.UPDATED_TIME;
 
 /**
- * TODO handle error conditions, handle the loginmanager properly, how the items are shown while deleting and after deleting, move the scroll position to wherever the user was previously after restoring adapter on delete
+ * TODO handle error conditions, handle the loginmanager properly, how the data are shown while deleting and after deleting, move the scroll position to wherever the user was previously after restoring adapter on delete
  * A simple {@link Fragment} subclass.
  */
 @EFragment
@@ -67,6 +68,8 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     @InstanceState
     String mGroupId = Constants.GROUP_ID_NONE;
 
+    @InstanceState
+    boolean mAddedListener;
     @Pref
     MyPrefs_ mPref;
     private RecyclerView mRecycler;
@@ -109,10 +112,6 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         mLoginManager = LoginManager.getInstance();
         mLoginManager.registerCallback(mCallbackManager, this);
 
-        //Check if our app has publish_actions permissions, its needed to perform deletes
-        if (!FBUtils.canPublish(mApplication.getToken())) {
-            mLoginManager.logInWithPublishPermissions(FragmentPosts.this, Arrays.asList(Constants.PUBLISH_ACTIONS));
-        }
     }
 
 
@@ -127,17 +126,27 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
         super.onViewCreated(view, savedInstanceState);
         mRecycler = (RecyclerView) view.findViewById(R.id.recycler_posts);
         mRecycler.setLayoutManager(new LinearLayoutManager(mContext));
-        mAdapter = new AdapterPostSectioned(mContext, mRealm, mPosts);
-        mAdapter.setHasStableIds(true);
         mSelectedGroupId = mPref.lastLoadedGroup().get();
         initWithPosts();
+        mAdapter = new AdapterPostSectioned(mContext, mRealm, mPosts);
+        mAdapter.setHasStableIds(true);
+
         mRecycler.setAdapter(mAdapter);
         final SwipeToDismissTouchListener<RecyclerViewHelperImpl> mTouchListener = new SwipeToDismissTouchListener<>(
                 new RecyclerViewHelperImpl(mRecycler),
                 new SwipeToDismissTouchListener.DismissCallbacks<RecyclerViewHelperImpl>() {
+                    /**
+                     * @param position at which a swipe has been detected
+                     * @return true if we have the publish_actions permission from graph api, else false
+                     */
                     @Override
                     public boolean canDismiss(int position) {
-                        return true;
+                        //Check if our app has publish_actions permissions, its needed to perform deletes
+                        //TODO add a dialog here to tell people why fpam needs permissions to delete post
+                        if (!FBUtils.canPublish(mApplication.getToken())) {
+                            mLoginManager.logInWithPublishPermissions(FragmentPosts.this, Arrays.asList(Constants.PUBLISH_ACTIONS));
+                        }
+                        return FBUtils.canPublish(mApplication.getToken());
                     }
 
                     @Override
@@ -205,16 +214,11 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (mPosts != null) {
-            mPosts.removeChangeListener(mListener);
-        }
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
+        if (mAddedListener) {
+            mPosts.removeChangeListener(mListener);
+        }
         mRealm.close();
     }
 
@@ -227,9 +231,10 @@ public class FragmentPosts extends Fragment implements FacebookCallback<LoginRes
     }
 
     private void initWithPosts() {
-        if (mSelectedGroupId != null) {
+        if (StringUtils.isNotBlank(mSelectedGroupId)) {
             mPosts = mRealm.where(Post.class).beginsWith(POST_ID, mSelectedGroupId).findAllSortedAsync(UPDATED_TIME, false);
             if (mPosts != null) {
+                mAddedListener = true;
                 mPosts.addChangeListener(mListener);
             }
         }

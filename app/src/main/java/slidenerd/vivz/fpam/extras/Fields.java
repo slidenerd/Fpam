@@ -2,7 +2,7 @@ package slidenerd.vivz.fpam.extras;
 
 /**
  * Created by vivz on 11/11/15.
- * Contains the constants representing the names of all json nodes from the json response object for admin, groups and posts
+ * Contains the constants representing the names of all json nodes from the json data object for admin, groups and posts
  */
 public interface Fields {
     String EMAIL = "email";

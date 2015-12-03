@@ -12,14 +12,12 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 
-import slidenerd.vivz.fpam.L;
-
 /**
- * TODO doesnt work properly if wasabeef animators are used as item decorations in the recyclerview before adding this, haven't tested the after adding scenario yet.
- * A {@link android.view.View.OnTouchListener} that makes the list items in a collection view
+ * TODO doesnt work properly if wasabeef animators are used as data decorations in the recyclerview before adding this, haven't tested the after adding scenario yet.
+ * A {@link android.view.View.OnTouchListener} that makes the list data in a collection view
  * dismissable.
- * It is given special treatment because by default it handles touches for its list items...
- * i.e. it's in charge of drawing the pressed state (the list selector), handling list item
+ * It is given special treatment because by default it handles touches for its list data...
+ * i.e. it's in charge of drawing the pressed state (the list selector), handling list data
  * clicks, etc.
  * <p/>
  * <p>After creating the listener, the caller should also call
@@ -78,9 +76,9 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends RecyclerView
     /**
      * Constructs a new swipe-to-dismiss touch listener for the given list view.
      *
-     * @param recyclerView The list view whose items should be dismissable.
+     * @param recyclerView The list view whose data should be dismissable.
      * @param callbacks    The callback to trigger when the user has indicated that she would like to
-     *                     dismiss one or more list items.
+     *                     dismiss one or more list data.
      */
     public SwipeToDismissTouchListener(SomeCollectionView recyclerView,
                                        DismissCallbacks<SomeCollectionView> callbacks) {
@@ -270,7 +268,7 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends RecyclerView
                     mSwipingSlop = (deltaX > 0 ? mSlop : -mSlop);
                     mRecyclerView.requestDisallowInterceptTouchEvent(true);
 
-                    // Cancel ListViewListView's touch (un-highlighting the item)
+                    // Cancel ListViewListView's touch (un-highlighting the data)
                     MotionEvent cancelEvent = MotionEvent.obtain(motionEvent);
                     cancelEvent.setAction(MotionEvent.ACTION_CANCEL |
                             (motionEvent.getActionIndex()
@@ -292,8 +290,8 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends RecyclerView
     }
 
     private void performDismiss(RowContainer dismissView, int dismissPosition) {
-        // Animate the dismissed list item to zero-height and fire the dismiss callback when
-        // all dismissed list item animations have completed. This triggers layout on each animation
+        // Animate the dismissed list data to zero-height and fire the dismiss callback when
+        // all dismissed list data animations have completed. This triggers layout on each animation
         // frame; in the future we may want to do something smarter and more performant.
         if (mPendingDismiss != null) {
             boolean dismissingDifferentRow = mPendingDismiss.position != dismissPosition;
@@ -315,7 +313,7 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends RecyclerView
 
     /**
      * If a view was dismissed and the undo container is showing it will proceed with the final
-     * dismiss of the item.
+     * dismiss of the data.
      *
      * @return whether there were any pending rows to be dismissed.
      */
@@ -396,7 +394,7 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends RecyclerView
 
     /**
      * The callback interface used by {@link SwipeToDismissTouchListener} to inform its client
-     * about a successful dismissal of one or more list item positions.
+     * about a successful dismissal of one or more list data positions.
      */
     public interface DismissCallbacks<SomeCollectionView extends RecyclerViewHelper> {
         /**
@@ -405,11 +403,11 @@ public class SwipeToDismissTouchListener<SomeCollectionView extends RecyclerView
         boolean canDismiss(int position);
 
         /**
-         * Called when the user has indicated they she would like to dismiss one or more list item
+         * Called when the user has indicated they she would like to dismiss one or more list data
          * positions.
          *
          * @param recyclerView The originating {@link android.support.v7.widget.RecyclerView}.
-         * @param position     The position of the dismissed item.
+         * @param position     The position of the dismissed data.
          */
         void onDismiss(SomeCollectionView recyclerView, int position);
     }

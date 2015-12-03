@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 
 import com.facebook.AccessToken;
 import com.facebook.FacebookException;
+import com.facebook.FacebookRequestError;
 
 import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Background;
@@ -22,12 +23,12 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import slidenerd.vivz.fpam.Fpam;
-import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.core.Core;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.extras.MyPrefs_;
 import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.model.json.Post;
+import slidenerd.vivz.fpam.model.pojo.CollectionPayload;
 import slidenerd.vivz.fpam.util.FBUtils;
 
 import static slidenerd.vivz.fpam.extras.Constants.GROUP_ID;
@@ -82,15 +83,15 @@ public class TaskFragmentLoadPosts extends Fragment {
      */
     @Background
     void loadPostsAsync(@NonNull String groupId, AccessToken token) {
-        if (FBUtils.isValid(token)) {
-            Realm realm = null;
+        Realm realm = null;
+        SharedPreferences pref;
+        FacebookRequestError error = null;
+        try {
+            if (FBUtils.isValid(token)) {
 
-            SharedPreferences pref;
-            try {
                 realm = Realm.getDefaultInstance();
 
                 Group group = realm.where(Group.class).equalTo(GROUP_ID, groupId).findFirst();
-
 
                 if (Group.isValidGroup(group)) {
 
@@ -103,17 +104,20 @@ public class TaskFragmentLoadPosts extends Fragment {
                     long utcTimestamp = pref.getLong(KEY_LAST_LOADED_PREFIX + groupId, 0) / 1000L;
                     ArrayList<Post> posts;
 
+                    CollectionPayload<Post> payload;
                     //If the group was loaded before as indicated by a valid timestamp, then fetch all posts made since that timestamp or maximum number of posts as per the cache size from the app settings whichever is greater
 
                     if (utcTimestamp > 0) {
-                        posts = FBUtils.loadFeedSince(token, Fpam.getGson(), groupId, maximum, utcTimestamp);
+                        payload = FBUtils.loadFeedSince(token, Fpam.getGson(), groupId, maximum, utcTimestamp);
                     }
 
                     //If the group was never loaded before, load it for the first time
                     else {
-                        posts = FBUtils.loadFeedFirst(token, Fpam.getGson(), groupId, maximum);
+                        payload = FBUtils.loadFeed(token, Fpam.getGson(), groupId, maximum);
                     }
-                    if(!posts.isEmpty()){
+                    posts = payload.data;
+                    error = payload.error;
+                    if (!posts.isEmpty()) {
                         //Filter spam posts made by known spammers or containing certain words
                         core.filterPosts(token, realm, groupId, posts);
 
@@ -128,29 +132,25 @@ public class TaskFragmentLoadPosts extends Fragment {
 //                    DataStore.limitStoredPosts(realm, groupId, maximum);
                     }
 
-                } else {
-                    L.m("group was invalid while loading posts");
                 }
-            } catch (JSONException e) {
-                L.m("" + e);
-            } catch (FacebookException e) {
-                L.m("" + e);
-            } finally {
-                if (realm != null) {
-                    realm.close();
-                }
-                onPostsLoaded();
+                //TODO handle invalid group id here
             }
-        } else {
-            L.m("invalid access token since it was null or expired while loading posts");
-            onPostsLoaded();
+        } catch (JSONException e) {
+
+        } catch (FacebookException e) {
+
+        } finally {
+            if (realm != null) {
+                realm.close();
+            }
+            onPostsLoaded(error);
         }
     }
 
     @UiThread
-    void onPostsLoaded() {
+    void onPostsLoaded(FacebookRequestError error) {
         if (mCallback != null) {
-            mCallback.afterPostsLoaded();
+            mCallback.afterPostsLoaded(error);
         }
     }
 
@@ -163,6 +163,6 @@ public class TaskFragmentLoadPosts extends Fragment {
     public interface TaskCallback {
         void beforePostsLoaded();
 
-        void afterPostsLoaded();
+        void afterPostsLoaded(FacebookRequestError error);
     }
 }
