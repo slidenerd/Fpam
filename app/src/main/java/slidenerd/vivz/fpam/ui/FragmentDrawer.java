@@ -52,19 +52,16 @@ public class FragmentDrawer extends Fragment {
     private Context mContext;
     private ActivityBase mActivity;
     private Realm mRealm;
-
     //Did we add the admin to the header already?
     private boolean isAdminAdded;
 
     //Did we add the groups to the header already?
     private boolean areGroupsAdded;
 
-    /**
-     * This is triggered each time admin or one of the groups is modified. To ensure that we don't add multiple headers or the same group more than once to the Navigation Drawer, check if both admin and groups have been loaded and they have not been added before. There is no need to save the isAdminAdded and areGroupsAdded before rotating the Fragment since the Fragment gets reset after rotation and their values become false once again letting us add them only once per orientation change.
-     */
-    private RealmChangeListener mChangeListener = new RealmChangeListener() {
+
+    private RealmChangeListener mListener = new RealmChangeListener() {
         @Override
-        public void onChange() {
+        public void onChange() { // called once the query complete and on every update
             if (mAdmin.isLoaded() && mGroups.isLoaded() && !isAdminAdded && !areGroupsAdded) {
                 addHeaderToDrawer(mAdmin);
                 addGroupsToDrawer(mGroups);
@@ -100,8 +97,8 @@ public class FragmentDrawer extends Fragment {
         mGroups = mRealm.where(Group.class).findAllSortedAsync(GROUP_NAME);
 
         //Add change listener to be notified when the objects are loaded asynchronously
-        mAdmin.addChangeListener(mChangeListener);
-        mGroups.addChangeListener(mChangeListener);
+        mAdmin.addChangeListener(mListener);
+        mGroups.addChangeListener(mListener);
     }
 
     @AfterViews
@@ -145,7 +142,7 @@ public class FragmentDrawer extends Fragment {
 
             //Add an extra data at the bottom to prevent the navigationview from drawing a divider between the last data and settings
 
-            menu.add(100, i, i, Constants.GROUP_ID_NONE);
+            menu.add(100, i, i, Constants.GROUP_NONE);
         }
         //Bug Fix for the Navigation View not refreshing after data are added dynamically.
         MenuItem mi = menu.getItem(menu.size() - 1);
@@ -176,10 +173,8 @@ public class FragmentDrawer extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
-        //Remove the change listeners prior to this Fragment getting destroyed
-        mAdmin.removeChangeListener(mChangeListener);
-        mGroups.removeChangeListener(mChangeListener);
+        mAdmin.removeChangeListener(mListener);
+        mGroups.removeChangeListener(mListener);
         mRealm.close();
     }
 }

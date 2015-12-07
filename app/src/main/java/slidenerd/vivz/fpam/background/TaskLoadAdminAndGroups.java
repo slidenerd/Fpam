@@ -60,19 +60,22 @@ public class TaskLoadAdminAndGroups extends Fragment {
         try {
             Gson gson = Fpam.getGson();
             realm = Realm.getDefaultInstance();
-            ObjectPayload<Admin> admin = FBUtils.loadMe(accessToken, gson);
+            final ObjectPayload<Admin> admin = FBUtils.loadMe(accessToken, gson);
 
             //Request the fresh list of group objects from the JSON feed. For each group object in this list, its monitored and timestamp are set at default.
 
-            CollectionPayload<Group> groups = FBUtils.loadGroups(accessToken, gson);
+            final CollectionPayload<Group> groups = FBUtils.loadGroups(accessToken, gson);
 
             //Store the fully constructed group objects to the realm database.
 
             if (admin.data != null) {
-                realm.beginTransaction();
-                realm.copyToRealmOrUpdate(admin.data);
-                realm.copyToRealmOrUpdate(groups.data);
-                realm.commitTransaction();
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        realm.copyToRealmOrUpdate(admin.data);
+                        realm.copyToRealmOrUpdate(groups.data);
+                    }
+                });
             }
             adminError = admin.error;
             groupError = groups.error;

@@ -24,8 +24,7 @@ import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.R;
-import slidenerd.vivz.fpam.adapter.SettingsGroupsAdapter;
-import slidenerd.vivz.fpam.extras.Constants;
+import slidenerd.vivz.fpam.adapter.AdapterGroups;
 import slidenerd.vivz.fpam.extras.MyPrefs_;
 import slidenerd.vivz.fpam.model.json.Group;
 
@@ -59,7 +58,7 @@ public class SettingsFragmentGroups extends Fragment implements View.OnClickList
     private TextView mTextSummaryScanFrequency;
     private Realm mRealm;
     private Context mContext;
-    private SettingsGroupsAdapter mAdapter;
+    private AdapterGroups mAdapter;
 
     @Override
     public void onAttach(Context context) {
@@ -88,7 +87,7 @@ public class SettingsFragmentGroups extends Fragment implements View.OnClickList
         results.addChangeListener(new RealmChangeListener() {
             @Override
             public void onChange() {
-                mAdapter = new SettingsGroupsAdapter(getActivity(), mRealm, results);
+                mAdapter = new AdapterGroups(getActivity(), mRealm, results);
                 mHeaderGroups = LayoutInflater.from(mContext).inflate(R.layout.header_groups, mRecyclerGroups, false);
                 mAdapter.setHeaderView(mHeaderGroups);
                 mRecyclerGroups.setAdapter(mAdapter);

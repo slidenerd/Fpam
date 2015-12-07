@@ -55,17 +55,15 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
     private TaskLoadAdminAndGroups_ mTask;
     private CallbackManager mCallbackManager;
 
+
     private FacebookCallback<LoginResult> mCallback = new FacebookCallback<LoginResult>() {
         @Override
         public void onSuccess(final LoginResult loginResult) {
+            //TODO when you clear all permissions from facebook console, first give no permission, then give only email, then give only groups, it still assumes that all permissions are not available since getRecentlyDeclinedPermissions returns groups in the last round and hence find a way to make a better dialog
             AccessToken token = loginResult.getAccessToken();
             //if we have an access token which is neither null nor expired, has the permission to read email of the person logging in and groups, then we jump into the app
             mTextError.setVisibility(View.GONE);
             mApp.setToken(token);
-            if (FBUtils.canRead(token)) {
-                mProgress.setVisibility(View.VISIBLE);
-                mTask.loadAdminAndGroupsInBackground(token);
-            }
             final Set<String> denied = loginResult.getRecentlyDeniedPermissions();
             if (!denied.isEmpty()) {
                 //redirect the person to the login screen after displaying a dialog that shows why and how the permissions are going to be used
@@ -88,6 +86,10 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
                                 }
                             }
                         }).show();
+            }
+            if (FBUtils.canRead(token)) {
+                mProgress.setVisibility(View.VISIBLE);
+                mTask.loadAdminAndGroupsInBackground(token);
             }
         }
 
@@ -147,7 +149,7 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
         if (error != null) {
             L.m("error " + error);
         }
-        ActivityMain_.intent(this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP).start();
+        ActivityMain_.intent(this).start();
         finish();
     }
 }

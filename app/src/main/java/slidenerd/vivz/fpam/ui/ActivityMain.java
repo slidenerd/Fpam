@@ -16,10 +16,10 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.Receiver;
 
+import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.background.TaskFragmentDeletePosts_;
 import slidenerd.vivz.fpam.extras.Constants;
-import slidenerd.vivz.fpam.L;
 
 import static slidenerd.vivz.fpam.extras.Constants.EXTRA_ID;
 import static slidenerd.vivz.fpam.extras.Constants.EXTRA_POSITION;
@@ -30,7 +30,6 @@ public class ActivityMain extends ActivityBase {
     private static final String TAG = "delete_posts";
     private ViewPager mPager;
     private TaskFragmentDeletePosts_ mTask;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

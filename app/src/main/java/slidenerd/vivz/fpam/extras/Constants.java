@@ -41,7 +41,7 @@ public interface Constants {
     String EXTRA_OUTCOME = "slidenerd.vivz.fpam.extra.OUTCOME";
     String PERMISSION_EMAIL = "email";
     String PERMISSION_GROUPS = "user_managed_groups";
-    List<String> READ_PERMISSIONS = Arrays.asList(new String[]{PERMISSION_EMAIL, PERMISSION_GROUPS});
+    List<String> READ_PERMISSIONS = Arrays.asList(PERMISSION_EMAIL, PERMISSION_GROUPS);
     String PUBLISH_ACTIONS = "publish_actions";
     int RESULTS_PER_PAGE = 25;
     int DEFAULT_NUMBER_OF_ITEMS_TO_FETCH = 25;
@@ -51,7 +51,7 @@ public interface Constants {
      */
     int MENU_START_ID = 101;
 
-    String GROUP_ID_NONE = "NONE";
+    String GROUP_NONE = "NONE";
     int NA = -1;
     String ALL = "ALL";
 }

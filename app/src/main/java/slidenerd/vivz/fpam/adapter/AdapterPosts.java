@@ -29,7 +29,7 @@ import slidenerd.vivz.fpam.widget.ExpandableTextView;
  * Refer https://github.com/thorbenprimke/realm-recyclerview/blob/master/library/src/main/java/io/realm/RealmBasedRecyclerViewAdapter.java for implementation details with respect to animation of changes in the data of the adapter.
  * Created by vivz on 29/08/15.
  */
-public class AdapterPostSectioned extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class AdapterPosts extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     //The type of a row that may contain a picture in the post
     private static final int IMAGE = 1;
@@ -50,7 +50,7 @@ public class AdapterPostSectioned extends RecyclerView.Adapter<RecyclerView.View
     //Keep track of whether an data at a given position is expanded or collapsed, the key is the position whereas the value is boolean indicating whether the data is expanded or collapsed.
     private SparseBooleanArray mState = new SparseBooleanArray();
 
-    public AdapterPostSectioned(Context context, Realm realm, RealmResults<Post> results) {
+    public AdapterPosts(Context context, Realm realm, RealmResults<Post> results) {
         mContext = context;
         mRealm = realm;
         mLayoutInflater = LayoutInflater.from(context);

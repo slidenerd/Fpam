@@ -51,7 +51,7 @@ public class FBUtils {
     }
 
     public static final boolean canPublish(AccessToken token) {
-        return isValid(token) && token.getPermissions().contains(PUBLISH_ACTIONS);
+        return canRead(token) && token.getPermissions().contains(PUBLISH_ACTIONS);
     }
 
     /**

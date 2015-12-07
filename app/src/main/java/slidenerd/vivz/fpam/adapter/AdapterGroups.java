@@ -24,7 +24,7 @@ import static slidenerd.vivz.fpam.extras.Constants.KEY_MONITORED_PREFIX;
 /**
  * Created by vivz on 05/10/15.
  */
-public class SettingsGroupsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class AdapterGroups extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Realm mRealm;
     private RealmResults<Group> mResults;
@@ -39,7 +39,7 @@ public class SettingsGroupsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private Resources mResources;
 
 
-    public SettingsGroupsAdapter(Context context, Realm realm, @NonNull RealmResults<Group> results) {
+    public AdapterGroups(Context context, Realm realm, @NonNull RealmResults<Group> results) {
         mContext = context;
         mRealm = realm;
         mResults = results;
@@ -55,7 +55,7 @@ public class SettingsGroupsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     public void setHeaderView(View headerView) {
         if (headerView == null) {
-            throw new IllegalArgumentException("Header View cannot be null for SettingsGroupsAdapter");
+            throw new IllegalArgumentException("Header View cannot be null for AdapterGroups");
         }
         mHeaderView = headerView;
     }
@@ -78,7 +78,7 @@ public class SettingsGroupsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int type) {
         if (type == ItemType.HEADER.ordinal()) {
             if (mHeaderView == null) {
-                throw new IllegalArgumentException("Header View cannot be null for SettingsGroupsAdapter");
+                throw new IllegalArgumentException("Header View cannot be null for AdapterGroups");
             }
             HeaderHolder holder = new HeaderHolder(mHeaderView);
             return holder;
@@ -101,7 +101,7 @@ public class SettingsGroupsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
     public enum ItemType {
-        HEADER, ITEM;
+        HEADER, ITEM
     }
 
     public class HeaderHolder extends RecyclerView.ViewHolder {

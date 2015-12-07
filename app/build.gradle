@@ -39,7 +39,7 @@ dependencies {
     compile 'com.facebook.android:facebook-android-sdk:4.8.1'
     compile 'com.android.support:design:23.1.1'
     compile 'com.google.code.gson:gson:2.4'
-    compile 'io.realm:realm-android:0.85.0'
+    compile 'io.realm:realm-android:0.85.1'
     compile 'org.apache.commons:commons-lang3:3.4'
     apt "org.androidannotations:androidannotations:3.3.2"
     compile 'com.github.bumptech.glide:glide:3.6.1'
