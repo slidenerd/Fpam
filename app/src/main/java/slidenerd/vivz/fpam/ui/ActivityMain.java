@@ -9,13 +9,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.Receiver;
 
-import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.background.TaskFragmentDeletePosts_;
 import slidenerd.vivz.fpam.extras.Constants;
@@ -70,7 +70,7 @@ public class ActivityMain extends ActivityBase {
     public void onDeleteRequest(Context context, Intent intent) {
         String postId = intent.getExtras().getString(EXTRA_ID);
         int position = intent.getExtras().getInt(EXTRA_POSITION);
-        L.m("position " + position + " post id " + postId);
+        Log.i(TAG, "onDeleteRequest: " + postId + " pos " + position);
         if (postId != null) {
             mTask.deletePostsAsync(mApp.getToken(), position, postId);
         } else {

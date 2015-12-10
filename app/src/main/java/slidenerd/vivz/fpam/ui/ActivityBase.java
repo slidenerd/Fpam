@@ -17,9 +17,11 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewStub;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
@@ -34,7 +36,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import io.realm.Realm;
 import slidenerd.vivz.fpam.Fpam;
-import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.background.TaskFragmentLoadPosts;
 import slidenerd.vivz.fpam.background.TaskFragmentLoadPosts_;
@@ -51,6 +52,7 @@ import slidenerd.vivz.fpam.util.FBUtils;
 import static slidenerd.vivz.fpam.extras.Constants.ACTION_LOAD_FEED;
 import static slidenerd.vivz.fpam.extras.Constants.EXTRA_SELECTED_GROUP;
 import static slidenerd.vivz.fpam.extras.Constants.PERIOD;
+import static slidenerd.vivz.fpam.extras.Constants.TAG;
 
 @EActivity
 
@@ -74,7 +76,7 @@ public abstract class ActivityBase extends AppCompatActivity
         protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
             AccessToken.setCurrentAccessToken(currentAccessToken);
             mApp.setToken(currentAccessToken);
-            L.m("onCurrentAccessTokenChanged " + oldAccessToken + " " + currentAccessToken);
+            Log.i(TAG, "onCurrentAccessTokenChanged: " + oldAccessToken + " " + currentAccessToken);
         }
     };
 
@@ -82,7 +84,7 @@ public abstract class ActivityBase extends AppCompatActivity
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             if (key.equals(getString(R.string.key_scan_frequency))) {
-                L.t(ActivityBase.this, "changed " + sharedPreferences.getInt(getString(R.string.key_scan_frequency), -1));
+                Toast.makeText(ActivityBase.this, "Changed " + sharedPreferences.getInt(getString(R.string.key_scan_frequency), -1), Toast.LENGTH_SHORT).show();
             }
         }
     };

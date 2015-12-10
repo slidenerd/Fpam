@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.facebook.AccessToken;
 
@@ -21,7 +22,6 @@ import java.util.List;
 
 import io.realm.Realm;
 import slidenerd.vivz.fpam.Fpam;
-import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.core.Core;
 import slidenerd.vivz.fpam.extras.MyPrefs_;
 import slidenerd.vivz.fpam.model.json.Post;
@@ -32,6 +32,7 @@ import static slidenerd.vivz.fpam.extras.Constants.ACTION_DELETE_RESPONSE;
 import static slidenerd.vivz.fpam.extras.Constants.EXTRA_OUTCOME;
 import static slidenerd.vivz.fpam.extras.Constants.EXTRA_POSITION;
 import static slidenerd.vivz.fpam.extras.Constants.POST_ID;
+import static slidenerd.vivz.fpam.extras.Constants.TAG;
 
 /**
  * TODO handle the case where the delete fails or the person has deleted the post from Facebook directly instead of this app
@@ -131,7 +132,7 @@ public class TaskFragmentDeletePosts extends Fragment {
             //TODO handle appropriate cases when the post is not valid or the token does not have publish actions or when the group id is invalid
 
         } catch (JSONException e) {
-            L.m(e + "");
+            Log.e(TAG, "deletePostsAsync: ", e);
         } finally {
             if (realm != null) {
                 realm.close();

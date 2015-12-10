@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 
 import com.facebook.AccessToken;
@@ -33,7 +34,6 @@ import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import slidenerd.vivz.fpam.Fpam;
-import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.adapter.AdapterPosts;
 import slidenerd.vivz.fpam.adapter.OnItemClickListener;
@@ -53,6 +53,7 @@ import static slidenerd.vivz.fpam.extras.Constants.EXTRA_OUTCOME;
 import static slidenerd.vivz.fpam.extras.Constants.EXTRA_POSITION;
 import static slidenerd.vivz.fpam.extras.Constants.EXTRA_SELECTED_GROUP;
 import static slidenerd.vivz.fpam.extras.Constants.POST_ID;
+import static slidenerd.vivz.fpam.extras.Constants.TAG;
 import static slidenerd.vivz.fpam.extras.Constants.UPDATED_TIME;
 
 /**
@@ -202,7 +203,7 @@ public class FragmentPosts extends Fragment {
     @Receiver(actions = ACTION_LOAD_FEED, registerAt = Receiver.RegisterAt.OnCreateOnDestroy, local = true)
     public void onBroadcastSelectedGroup(Context context, Intent intent) {
         mGroupId = intent.getExtras().getString(EXTRA_SELECTED_GROUP);
-        L.m("fragment on load " + mGroupId);
+        Log.i(TAG, "onBroadcastSelectedGroup: " + mGroupId);
         initWithPosts();
 
     }

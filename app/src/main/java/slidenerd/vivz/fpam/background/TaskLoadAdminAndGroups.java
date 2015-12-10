@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 
 import com.facebook.AccessToken;
 import com.facebook.FacebookRequestError;
@@ -16,12 +17,13 @@ import org.json.JSONException;
 
 import io.realm.Realm;
 import slidenerd.vivz.fpam.Fpam;
-import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.model.json.Admin;
 import slidenerd.vivz.fpam.model.json.Group;
 import slidenerd.vivz.fpam.model.pojo.CollectionPayload;
 import slidenerd.vivz.fpam.model.pojo.ObjectPayload;
 import slidenerd.vivz.fpam.util.FBUtils;
+
+import static slidenerd.vivz.fpam.extras.Constants.TAG;
 
 @EFragment
 public class TaskLoadAdminAndGroups extends Fragment {
@@ -81,7 +83,7 @@ public class TaskLoadAdminAndGroups extends Fragment {
             groupError = groups.error;
 
         } catch (JSONException e) {
-            L.m("" + e);
+            Log.e(TAG, "loadAdminAndGroupsInBackground: ", e);
         } finally {
             if (realm != null) {
                 realm.close();

@@ -2,10 +2,11 @@ package slidenerd.vivz.fpam.background;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.util.Log;
 
 import com.facebook.AccessToken;
 
-import slidenerd.vivz.fpam.L;
+import static slidenerd.vivz.fpam.extras.Constants.TAG;
 
 public class FpamService extends IntentService {
 
@@ -20,10 +21,7 @@ public class FpamService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         // This describes what will happen when service is triggered
-        L.m("onHandleIntent was called");
+        Log.i(TAG, "onHandleIntent: " + AccessToken.getCurrentAccessToken());
         AlarmReceiver.completeWakefulIntent(intent);
-        L.m("onHandleIntent " + AccessToken.getCurrentAccessToken());
-
-
     }
 }

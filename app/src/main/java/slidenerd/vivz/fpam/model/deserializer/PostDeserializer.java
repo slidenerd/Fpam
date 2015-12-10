@@ -1,5 +1,7 @@
 package slidenerd.vivz.fpam.model.deserializer;
 
+import android.util.Log;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -11,10 +13,10 @@ import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.extras.Constants;
 import slidenerd.vivz.fpam.model.json.Post;
 
+import static slidenerd.vivz.fpam.extras.Constants.TAG;
 import static slidenerd.vivz.fpam.extras.Fields.CAPTION;
 import static slidenerd.vivz.fpam.extras.Fields.CREATED_TIME;
 import static slidenerd.vivz.fpam.extras.Fields.DATA;
@@ -43,7 +45,7 @@ public class PostDeserializer implements JsonDeserializer<Post> {
         try {
             timeMillis = format.parse(timeString).getTime();
         } catch (ParseException e) {
-            L.m(timeString + " " + e);
+            Log.e(TAG, "formatFacebookTime: " + timeString, e);
         }
         return timeMillis;
     }
@@ -91,7 +93,6 @@ public class PostDeserializer implements JsonDeserializer<Post> {
                 }
             }
         }
-
 
 
         //Retrieve 'from' that contains user info of who made a post, it is optional in case the person doesnt exist on Facebook anymore

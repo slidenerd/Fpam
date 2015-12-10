@@ -3,6 +3,7 @@ package slidenerd.vivz.fpam.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -28,7 +29,6 @@ import java.util.List;
 import java.util.Set;
 
 import slidenerd.vivz.fpam.Fpam;
-import slidenerd.vivz.fpam.L;
 import slidenerd.vivz.fpam.R;
 import slidenerd.vivz.fpam.background.TaskLoadAdminAndGroups;
 import slidenerd.vivz.fpam.background.TaskLoadAdminAndGroups_;
@@ -95,12 +95,12 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
 
         @Override
         public void onCancel() {
-            L.m("You cancelled");
+            Log.i(TAG, "onCancel: ");
         }
 
         @Override
         public void onError(FacebookException error) {
-            L.m("Error " + error.toString());
+            Log.e(TAG, "onError: ", error);
             mTextError.setVisibility(View.VISIBLE);
         }
     };
@@ -139,7 +139,7 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
     @Override
     public void afterAdminLoaded(FacebookRequestError error) {
         if (error != null) {
-            L.m("error " + error);
+            Log.i(TAG, "afterAdminLoaded: " + error);
         }
     }
 
@@ -147,7 +147,7 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
     public void afterGroupsLoaded(FacebookRequestError error) {
         mProgress.setVisibility(View.GONE);
         if (error != null) {
-            L.m("error " + error);
+            Log.i(TAG, "afterGroupsLoaded: " + error);
         }
         ActivityMain_.intent(this).start();
         finish();
