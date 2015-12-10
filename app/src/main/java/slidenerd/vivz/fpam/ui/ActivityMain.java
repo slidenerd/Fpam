@@ -97,28 +97,51 @@ public class ActivityMain extends ActivityBase {
             this.titles = titles;
         }
 
+        /**
+         * @param locked Boolean indicating that the ViewPager is locked or disabled so that the Adapter displays only one page as per the parameter below.
+         * @param page   The index of the item inside the Adapter that should be displayed always after swiping the ViewPager with finger has been disabled.
+         */
         public void setLocked(boolean locked, int page) {
             this.locked = locked;
             lockedIndex = page;
             notifyDataSetChanged();
         }
 
-        @Override
-        public Fragment getItem(int position) {
-            if (locked) return fragments[lockedIndex];
-            return fragments[position];
-        }
 
+        /**
+         * Return the number of views available.
+         * If we have locked the Adapter, then return 1 to indicate we only want a single page to be displayed.
+         */
         @Override
         public int getCount() {
             if (locked) return 1;
             return fragments.length;
         }
 
+        /**
+         * This method may be called by the ViewPager to obtain a title string to describe the specified page.
+         * This method may return null indicating no title for this page. The default implementation returns null.
+         * If we have locked the Adapter, then return the title of the item from the locked position of the Adapter.
+         *
+         * @param position Position for which we need the title.
+         * @return String containing the title to be displayed at the specified position
+         */
         @Override
         public CharSequence getPageTitle(int position) {
             if (locked) return titles[lockedIndex];
             return titles[position];
+        }
+
+        /**
+         * Return the Fragment associated with a specified position.
+         * If we have locked the Adapter, then return the item from the locked position of the Adapter
+         *
+         * @param position
+         */
+        @Override
+        public Fragment getItem(int position) {
+            if (locked) return fragments[lockedIndex];
+            return fragments[position];
         }
     }
 }
