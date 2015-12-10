@@ -24,5 +24,6 @@ public class FpamService extends IntentService {
         AlarmReceiver.completeWakefulIntent(intent);
         L.m("onHandleIntent " + AccessToken.getCurrentAccessToken());
 
+
     }
 }

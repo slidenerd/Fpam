@@ -13,7 +13,7 @@
         android:layout_gravity="center" />
 
     <TextView
-        android:id="@+id/text_group_name"
+        android:id="@+id/group_name"
         android:layout_width="0dp"
         android:layout_height="?attr/listPreferredItemHeight"
         android:layout_gravity="center"

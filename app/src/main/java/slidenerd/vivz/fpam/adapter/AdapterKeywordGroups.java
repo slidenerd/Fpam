@@ -124,7 +124,7 @@ public class AdapterKeywordGroups extends BaseAdapter {
         public ViewHolder(View view) {
             super(view);
             mCheckGroup = (CheckBox) view.findViewById(R.id.check_group);
-            mTextGroupName = (TextView) view.findViewById(R.id.text_group_name);
+            mTextGroupName = (TextView) view.findViewById(R.id.group_name);
         }
     }
 }

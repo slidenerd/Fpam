@@ -87,7 +87,7 @@ public class SettingsFragmentGroups extends Fragment implements View.OnClickList
         results.addChangeListener(new RealmChangeListener() {
             @Override
             public void onChange() {
-                mAdapter = new AdapterGroups(getActivity(), mRealm, results);
+                mAdapter = new AdapterGroups(getActivity(), results);
                 mHeaderGroups = LayoutInflater.from(mContext).inflate(R.layout.header_groups, mRecyclerGroups, false);
                 mAdapter.setHeaderView(mHeaderGroups);
                 mRecyclerGroups.setAdapter(mAdapter);

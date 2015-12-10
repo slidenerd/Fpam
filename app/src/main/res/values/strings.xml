@@ -10,9 +10,6 @@
 
     <string name="key_spammers">key_spammers</string>
 
-    <string name="tab_posts">Posts</string>
-    <string name="tab_stats">Stats</string>
-
     <string name="text_empty_posts">No Posts To Display</string>
     <string name="text_no_spammers">No topSpammers added yet</string>
 
@@ -52,4 +49,9 @@
     <string name="cancel">Cancel</string>
     <string name="message_invalid_post">Sorry, we did not get the button on this post to delete</string>
     <string name="facebook_error">Oops, The Engine Blew Up!</string>
+
+    <string-array name="tabs">
+        <item>Posts</item>
+        <item>Stats</item>
+    </string-array>
 </resources>

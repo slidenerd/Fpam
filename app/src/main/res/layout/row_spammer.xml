@@ -6,7 +6,7 @@
 
 
     <TextView
-        android:id="@+id/text_group_name"
+        android:id="@+id/group_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

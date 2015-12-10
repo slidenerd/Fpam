@@ -2,7 +2,6 @@ package slidenerd.vivz.fpam.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -30,6 +29,7 @@ public class ActivityMain extends ActivityBase {
     private static final String TAG = "delete_posts";
     private ViewPager mPager;
     private TaskFragmentDeletePosts_ mTask;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +58,11 @@ public class ActivityMain extends ActivityBase {
     @Override
     public void init(TabLayout tabLayout, View mainContentView) {
         mPager = (ViewPager) mainContentView;
-        mPager.setAdapter(new MainPagerAdapter(this, getSupportFragmentManager()));
+        Fragment[] fragments = {FragmentPosts_.builder().build(), FragmentStats_.builder().build()};
+        String[] titles = getResources().getStringArray(R.array.tabs);
+        MainPagerAdapter adapter = new MainPagerAdapter(getSupportFragmentManager(), fragments, titles);
+        adapter.setLocked(true, 0);
+        mPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(mPager);
     }
 
@@ -82,37 +86,39 @@ public class ActivityMain extends ActivityBase {
     }
 
     public static class MainPagerAdapter extends FragmentStatePagerAdapter {
-        public static final int TAB_COUNT = 2;
-        private Resources mResources;
+        private Fragment[] fragments;
+        private String[] titles;
+        private boolean locked = false;
+        private int lockedIndex;
 
-        public MainPagerAdapter(Context context, FragmentManager fm) {
+        public MainPagerAdapter(FragmentManager fm, Fragment[] fragments, String[] titles) {
             super(fm);
-            mResources = context.getResources();
+            this.fragments = fragments;
+            this.titles = titles;
+        }
+
+        public void setLocked(boolean locked, int page) {
+            this.locked = locked;
+            lockedIndex = page;
+            notifyDataSetChanged();
         }
 
         @Override
         public Fragment getItem(int position) {
-            Fragment fragment;
-            if (position == 0) {
-                fragment = FragmentPosts_.builder().build();
-            } else {
-                fragment = FragmentStats_.builder().build();
-            }
-            return fragment;
+            if (locked) return fragments[lockedIndex];
+            return fragments[position];
         }
 
         @Override
         public int getCount() {
-            return TAB_COUNT;
+            if (locked) return 1;
+            return fragments.length;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            if (position == 0) {
-                return mResources.getString(R.string.tab_posts);
-            } else {
-                return mResources.getString(R.string.tab_stats);
-            }
+            if (locked) return titles[lockedIndex];
+            return titles[position];
         }
     }
 }
