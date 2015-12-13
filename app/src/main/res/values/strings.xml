@@ -48,7 +48,8 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="message_invalid_post">Sorry, we did not get the button on this post to delete</string>
-    <string name="facebook_error">Oops, The Engine Blew Up!</string>
+    <string name="login_error">Oops, The Engine Blew Up!</string>
+    <string name="login_with_facebook">Login With Facebook</string>
 
     <string-array name="tabs">
         <item>Posts</item>

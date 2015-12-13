@@ -8,8 +8,6 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.DialogAction;
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -24,6 +22,7 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -47,10 +46,13 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
     private static final String TAG = "task_load_admin_groups";
     @App
     Fpam mApp;
+
+    @ViewById(R.id.root)
+    View root;
     @ViewById(R.id.progress)
     ProgressBar mProgress;
 
-    @ViewById(R.id.text_facebook_error)
+    @ViewById(R.id.error)
     TextView mTextError;
     private TaskLoadAdminAndGroups_ mTask;
     private CallbackManager mCallbackManager;
@@ -62,35 +64,28 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
             //TODO when you clear all permissions from facebook console, first give no permission, then give only email, then give only groups, it still assumes that all permissions are not available since getRecentlyDeclinedPermissions returns groups in the last round and hence find a way to make a better dialog
             AccessToken token = loginResult.getAccessToken();
             //if we have an access token which is neither null nor expired, has the permission to read email of the person logging in and groups, then we jump into the app
-            mTextError.setVisibility(View.GONE);
             mApp.setToken(token);
-            final Set<String> denied = loginResult.getRecentlyDeniedPermissions();
-            if (!denied.isEmpty()) {
-                //redirect the person to the login screen after displaying a dialog that shows why and how the permissions are going to be used
-                new MaterialDialog.Builder(ActivityLogin.this)
-                        .title(R.string.text_permission_declined)
-                        .customView(R.layout.request_permission, true)
-                        .autoDismiss(false)
-                        .cancelable(false)
-                        .positiveText(R.string.ok)
-                        .onAny(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
-
-                                if (denied.contains(PERMISSION_EMAIL) && denied.contains(PERMISSION_GROUPS)) {
-                                    performLogin(Arrays.asList(PERMISSION_EMAIL, PERMISSION_GROUPS));
-                                } else if (denied.contains(PERMISSION_EMAIL)) {
-                                    performLogin(Arrays.asList(PERMISSION_EMAIL));
-                                } else if (denied.contains(PERMISSION_GROUPS)) {
-                                    performLogin(Arrays.asList(PERMISSION_GROUPS));
-                                }
-                            }
-                        }).show();
-            }
+            FragmentPermission fragment = null;
             if (FBUtils.canRead(token)) {
                 mProgress.setVisibility(View.VISIBLE);
                 mTask.loadAdminAndGroupsInBackground(token);
+                mTextError.setVisibility(View.GONE);
+            } else {
+                Set<String> denied = loginResult.getRecentlyDeniedPermissions();
+                if (denied.contains(PERMISSION_EMAIL) && denied.contains(PERMISSION_GROUPS)) {
+                    fragment = FragmentPermission_.builder().mMessage(new ArrayList<>(Arrays.asList(PERMISSION_EMAIL, PERMISSION_GROUPS))).build();
+                    fragment.show(getSupportFragmentManager(), "permission");
+
+                } else if (denied.contains(PERMISSION_EMAIL)) {
+                    fragment = FragmentPermission_.builder().mMessage(new ArrayList<>(Arrays.asList(PERMISSION_EMAIL))).build();
+                    fragment.show(getSupportFragmentManager(), "permission");
+
+                } else if (denied.contains(PERMISSION_GROUPS)) {
+                    fragment = FragmentPermission_.builder().mMessage(new ArrayList<>(Arrays.asList(PERMISSION_GROUPS))).build();
+                    fragment.show(getSupportFragmentManager(), "permission");
+                }
             }
+
         }
 
         @Override
@@ -122,7 +117,7 @@ public class ActivityLogin extends AppCompatActivity implements TaskLoadAdminAnd
         performLogin(READ_PERMISSIONS);
     }
 
-    private void performLogin(List<String> permissions) {
+    public void performLogin(List<String> permissions) {
         LoginManager loginManager = LoginManager.getInstance();
         loginManager.registerCallback(mCallbackManager, mCallback);
         loginManager.logInWithReadPermissions(this, permissions);

@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="flat_blue">#2196F3</color>
     <color name="flat_gray">#E1E5E6</color>
-    <color name="flat_pink">#FF4081</color>
     <color name="flat_yellow">#FFE066</color>
     <color name="flat_white">@android:color/white</color>
-    <color name="colorPrimary">@color/flat_blue</color>
+    <color name="colorPrimary">#2196F3</color>
     <color name="colorPrimaryDark">#1976D2</color>
     <color name="colorPrimaryLight">#BBDEFB</color>
-    <color name="colorAccent">@color/flat_pink</color>
+    <color name="colorAccent">#FF4081</color>
     <color name="colorTextPrimary">#212121</color>
     <color name="colorTextSecondary">#727272</color>
     <color name="colorTextSecondaryDisabled">#88727272</color>

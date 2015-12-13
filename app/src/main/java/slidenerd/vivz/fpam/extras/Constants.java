@@ -22,9 +22,9 @@ public interface Constants {
     int GREATER = 1;
 
     /**
-     * The constant PERIOD.
+     * The monitoring frequency
      */
-    int PERIOD = 15000;
+    int PERIOD = 1800000;
 
     /**
      * The constant KEY_LAST_LOADED_PREFIX.
@@ -165,4 +165,5 @@ public interface Constants {
      * The constant ALL.
      */
     String ALL = "ALL";
+    String TEXT_REQUEST_PERMISSION = "request_permission";
 }

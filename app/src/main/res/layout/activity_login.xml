@@ -1,24 +1,27 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
+    android:padding="@dimen/margin_login"
     tools:context="slidenerd.vivz.fpam.ui.ActivityLogin">
 
+    <!--Hide the progress bar by default-->
     <ProgressBar
         android:id="@+id/progress"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="@dimen/progress_size"
+        android:layout_height="@dimen/progress_size"
         android:layout_centerInParent="true"
         android:visibility="gone" />
 
+    <!--Hide the error message by default-->
     <TextView
-        android:id="@+id/text_facebook_error"
+        android:id="@+id/error"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:gravity="center"
-        android:text="@string/facebook_error"
+        android:text="@string/login_error"
         android:visibility="gone" />
 
     <Button
@@ -26,12 +29,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_margin="32dp"
         android:background="@color/colorPrimary"
-        android:drawableLeft="@drawable/com_facebook_button_icon"
         android:fontFamily="sans-serif-light"
-        android:text="Login With Facebook"
+        android:text="@string/login_with_facebook"
         android:textAllCaps="false"
         android:textColor="@android:color/white" />
+
 
 </RelativeLayout>

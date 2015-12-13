@@ -23,6 +23,7 @@
 
     <include layout="@layout/activity_main" />
 
+    <!--Hide the floating action button in this version of the app-->
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"

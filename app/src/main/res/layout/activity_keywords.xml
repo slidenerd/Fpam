@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
 
+        <!--TODO find a better way to accept input here-->
         <android.support.v7.widget.Toolbar
             android:id="@+id/app_bar"
             android:layout_width="match_parent"
@@ -19,17 +20,21 @@
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
-            <EditText
-                android:id="@+id/input_keyword"
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:hint="@string/hint_keyword"
-                android:imeOptions="actionDone"
-                android:singleLine="true" />
-        </android.support.v7.widget.Toolbar>
+                android:hint="@string/hint_keyword">
 
+                <EditText
+                    android:id="@+id/input_keyword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/sixteen"
+                    android:layout_marginRight="@dimen/sixteen"
+                    android:imeOptions="actionDone"
+                    android:inputType="textVisiblePassword" />
+            </android.support.design.widget.TextInputLayout>
+        </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_activity_keywords" />
